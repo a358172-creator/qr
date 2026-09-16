@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#061a27" />
+    <meta name="description" content="Exploración conceptual interactiva de una sinapsis glutamatérgica y la excitotoxicidad." />
+    <title>Vulnerabilidad del cerebro | Sinapsis interactiva</title>
+  </head>
+  <body>
+    <main class="experience">
+      <header class="site-header">
+        <a class="brand" href="#inicio" aria-label="Inicio">NEURO<span>·</span>VISTA</a>
+        <div class="title-group"><p class="eyebrow">Experiencia científica interactiva</p><h1>Vulnerabilidad del cerebro <em>edad-dependiente</em></h1></div>
+        <button class="reference-link" type="button" data-open-references>Referencias <span aria-hidden="true">↗</span></button>
+      </header>
+      <section class="hero" id="inicio" aria-labelledby="scene-title">
+        <div class="scene-heading"><p class="eyebrow">Sinapsis glutamatérgica</p><h2 id="scene-title">Del impulso sináptico a la sobrecarga celular</h2><p>Explora cómo el exceso sostenido de señal excitadora puede comprometer la homeostasis neuronal.</p></div>
+        <div class="scene-shell"><canvas id="synapse-canvas" aria-label="Modelo 3D interactivo de una sinapsis glutamatérgica"></canvas><div class="scene-vignette" aria-hidden="true"></div><div class="scene-hint"><span class="hint-dot"></span> Arrastra para explorar <span class="hint-separator">·</span> rueda para acercar</div><div class="orientation" aria-hidden="true"><span>TERMINAL<br>PRE</span><i></i><span>ESPINA<br>POST</span></div><div class="labels-layer" id="labels-layer" aria-live="polite"></div></div>
+        <aside class="context-panel glass" aria-live="polite"><div class="panel-topline"><span id="mode-indicator" class="mode-indicator">Estado fisiológico</span><span class="pulse" aria-hidden="true"></span></div><p class="panel-index" id="panel-index">01 — COMPONENTE</p><h3 id="detail-title">La comunicación comienza aquí</h3><p id="detail-text">Selecciona una estructura en la escena o en los controles para observar su papel en la señalización glutamatérgica.</p><div class="detail-rule"></div><p id="detail-note" class="detail-note">Arrastra el modelo para cambiar de perspectiva.</p></aside>
+      </section>
+      <section class="control-deck" aria-label="Controles de la experiencia">
+        <div class="state-control glass"><p class="control-label">Modo de visualización</p><div class="segmented" role="group" aria-label="Estado celular"><button class="active" data-mode="physiological" type="button">Fisiológico</button><button data-mode="overload" type="button">Sobrecarga excitotóxica</button></div></div>
+        <div class="structure-control glass"><p class="control-label">Estructuras clave</p><div class="structure-buttons" role="group" aria-label="Seleccionar estructura"><button data-select="ampa" type="button"><b>AMPA</b><span>Na⁺</span></button><button data-select="nmda" type="button"><b>NMDA</b><span>Ca²⁺</span></button><button data-select="mitochondria" type="button"><b>Mitocondria</b></button><button data-select="calcium" type="button"><b>Ca²⁺</b></button><button data-select="ros" type="button"><b>ROS</b></button><button data-select="caspases" type="button"><b>Caspasas</b></button></div></div>
+        <div class="utility-control glass"><button id="sequence-btn" class="sequence-btn" type="button"><span aria-hidden="true">▷</span> Guiar secuencia</button><div class="utility-buttons"><button id="pause-btn" type="button" aria-pressed="false" aria-label="Pausar animación">Ⅱ</button><button id="labels-btn" type="button" aria-pressed="true">Etiquetas</button><button id="reset-btn" type="button" aria-label="Restablecer cámara">↺</button></div></div>
+      </section>
+      <section class="sequence-section" id="sequence" aria-labelledby="sequence-title"><div><p class="eyebrow">Secuencia conceptual</p><h2 id="sequence-title">Una cascada, no una medida</h2></div><ol id="sequence-steps" class="sequence-steps"><li data-step="0"><span>01</span> Liberación de glutamato</li><li data-step="1"><span>02</span> Activación de receptores</li><li data-step="2"><span>03</span> Entrada de Ca²⁺</li><li data-step="3"><span>04</span> Estrés oxidativo</li><li data-step="4"><span>05</span> Señalización de daño</li></ol></section>
+      <section id="references" class="references" hidden aria-labelledby="references-title"><div><p class="eyebrow">Lecturas seleccionadas</p><h2 id="references-title">Referencias</h2></div><ol><li>Choi, D. W. (1988). Glutamate neurotoxicity and diseases of the nervous system. <i>Neuron</i>, 1(8), 623–634.</li><li>Dong, X. X., Wang, Y. & Qin, Z. H. (2009). Molecular mechanisms of excitotoxicity and their relevance to pathogenesis of neurodegenerative diseases. <i>Acta Pharmacol Sin</i>, 30, 379–387.</li><li>Hardingham, G. E. & Bading, H. (2010). Synaptic versus extrasynaptic NMDA receptor signalling. <i>Nature Reviews Neuroscience</i>, 11, 682–696.</li></ol></section>
+    </main>
+    <footer><span>Modelo conceptual con fines educativos; no es una simulación cuantitativa ni una reconstrucción a escala.</span><span>Neurociencia · excitotoxicidad · plasticidad sináptica</span></footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
