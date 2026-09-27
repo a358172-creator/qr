@@ -1,33 +1,65 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#061a27" />
-    <meta name="description" content="Exploración conceptual interactiva de una sinapsis glutamatérgica y la excitotoxicidad." />
-    <title>Vulnerabilidad del cerebro | Sinapsis interactiva</title>
-  </head>
-  <body>
-    <main class="experience">
-      <header class="site-header">
-        <a class="brand" href="#inicio" aria-label="Inicio">NEURO<span>·</span>VISTA</a>
-        <div class="title-group"><p class="eyebrow">Experiencia científica interactiva</p><h1>Vulnerabilidad del cerebro <em>edad-dependiente</em></h1></div>
-        <button class="reference-link" type="button" data-open-references>Referencias <span aria-hidden="true">↗</span></button>
-      </header>
-      <section class="hero" id="inicio" aria-labelledby="scene-title">
-        <div class="scene-heading"><p class="eyebrow">Sinapsis glutamatérgica</p><h2 id="scene-title">Del impulso sináptico a la sobrecarga celular</h2><p>Explora cómo el exceso sostenido de señal excitadora puede comprometer la homeostasis neuronal.</p></div>
-        <div class="scene-shell"><canvas id="synapse-canvas" aria-label="Modelo 3D interactivo de una sinapsis glutamatérgica"></canvas><div class="scene-vignette" aria-hidden="true"></div><div class="scene-hint"><span class="hint-dot"></span> Arrastra para explorar <span class="hint-separator">·</span> rueda para acercar</div><div class="orientation" aria-hidden="true"><span>TERMINAL<br>PRE</span><i></i><span>ESPINA<br>POST</span></div><div class="labels-layer" id="labels-layer" aria-live="polite"></div></div>
-        <aside class="context-panel glass" aria-live="polite"><div class="panel-topline"><span id="mode-indicator" class="mode-indicator">Estado fisiológico</span><span class="pulse" aria-hidden="true"></span></div><p class="panel-index" id="panel-index">01 — COMPONENTE</p><h3 id="detail-title">La comunicación comienza aquí</h3><p id="detail-text">Selecciona una estructura en la escena o en los controles para observar su papel en la señalización glutamatérgica.</p><div class="detail-rule"></div><p id="detail-note" class="detail-note">Arrastra el modelo para cambiar de perspectiva.</p></aside>
-      </section>
-      <section class="control-deck" aria-label="Controles de la experiencia">
-        <div class="state-control glass"><p class="control-label">Modo de visualización</p><div class="segmented" role="group" aria-label="Estado celular"><button class="active" data-mode="physiological" type="button">Fisiológico</button><button data-mode="overload" type="button">Sobrecarga excitotóxica</button></div></div>
-        <div class="structure-control glass"><p class="control-label">Estructuras clave</p><div class="structure-buttons" role="group" aria-label="Seleccionar estructura"><button data-select="ampa" type="button"><b>AMPA</b><span>Na⁺</span></button><button data-select="nmda" type="button"><b>NMDA</b><span>Ca²⁺</span></button><button data-select="mitochondria" type="button"><b>Mitocondria</b></button><button data-select="calcium" type="button"><b>Ca²⁺</b></button><button data-select="ros" type="button"><b>ROS</b></button><button data-select="caspases" type="button"><b>Caspasas</b></button></div></div>
-        <div class="utility-control glass"><button id="sequence-btn" class="sequence-btn" type="button"><span aria-hidden="true">▷</span> Guiar secuencia</button><div class="utility-buttons"><button id="pause-btn" type="button" aria-pressed="false" aria-label="Pausar animación">Ⅱ</button><button id="labels-btn" type="button" aria-pressed="true">Etiquetas</button><button id="reset-btn" type="button" aria-label="Restablecer cámara">↺</button></div></div>
-      </section>
-      <section class="sequence-section" id="sequence" aria-labelledby="sequence-title"><div><p class="eyebrow">Secuencia conceptual</p><h2 id="sequence-title">Una cascada, no una medida</h2></div><ol id="sequence-steps" class="sequence-steps"><li data-step="0"><span>01</span> Liberación de glutamato</li><li data-step="1"><span>02</span> Activación de receptores</li><li data-step="2"><span>03</span> Entrada de Ca²⁺</li><li data-step="3"><span>04</span> Estrés oxidativo</li><li data-step="4"><span>05</span> Señalización de daño</li></ol></section>
-      <section id="references" class="references" hidden aria-labelledby="references-title"><div><p class="eyebrow">Lecturas seleccionadas</p><h2 id="references-title">Referencias</h2></div><ol><li>Choi, D. W. (1988). Glutamate neurotoxicity and diseases of the nervous system. <i>Neuron</i>, 1(8), 623–634.</li><li>Dong, X. X., Wang, Y. & Qin, Z. H. (2009). Molecular mechanisms of excitotoxicity and their relevance to pathogenesis of neurodegenerative diseases. <i>Acta Pharmacol Sin</i>, 30, 379–387.</li><li>Hardingham, G. E. & Bading, H. (2010). Synaptic versus extrasynaptic NMDA receptor signalling. <i>Nature Reviews Neuroscience</i>, 11, 682–696.</li></ol></section>
-    </main>
-    <footer><span>Modelo conceptual con fines educativos; no es una simulación cuantitativa ni una reconstrucción a escala.</span><span>Neurociencia · excitotoxicidad · plasticidad sináptica</span></footer>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071923" />
+  <meta name="description" content="Un atlas tridimensional de mecanismos de neurotoxicidad. Explora la neurona, su dendrita y el interior de una sinapsis glutamatérgica." />
+  <title>NEURO·VISTA — Atlas de neurotoxicidad</title>
+</head>
+<body>
+  <a class="skip-link" href="#atlas-navigation">Ir a los controles del atlas</a>
+  <main id="atlas" class="atlas" data-view="hub">
+    <canvas id="synapse-canvas" tabindex="0" aria-label="Atlas neuronal 3D. Arrastra para rotar y usa la rueda para acercarte. También puedes usar las flechas, los signos más y menos, y la tecla Inicio." aria-describedby="scene-hint"></canvas>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <header class="masthead">
+      <a class="brand" href="#" id="brand-home" aria-label="Neuro Vista, volver a la neurona">NEURO<span>·</span>VISTA<small>ATLAS DE NEUROTOXICIDAD</small></a>
+      <nav class="scale-navigation" id="atlas-navigation" aria-label="Escala de exploración">
+        <button data-view="neuron" type="button">Neurona</button><span aria-hidden="true">/</span>
+        <button data-view="hub" type="button" aria-current="location">Dendrita</button><span aria-hidden="true">/</span>
+        <button data-view="synapse" type="button">Sinapsis</button>
+      </nav>
+      <div class="header-actions"><button id="references-btn" type="button">Referencias <span aria-hidden="true">↗</span></button><button id="help-btn" type="button" aria-label="Ayuda de exploración">?</button></div>
+    </header>
+    <section class="scene-heading" aria-labelledby="scene-title">
+      <p class="eyebrow"><span class="live-dot"></span><span id="scene-eyebrow">01 / TERRITORIO NEURONAL</span></p>
+      <h1 id="scene-title">El paisaje<br><em>sináptico.</em></h1>
+      <p id="scene-description">Cada conexión, una puerta<br>al universo celular.</p>
+      <div class="heading-line" aria-hidden="true"></div>
+    </section>
+    <div id="hotspots-layer" class="hotspots-layer" aria-label="Regiones dendríticas"></div>
+    <div id="labels-layer" class="labels-layer" aria-label="Estructuras de la sinapsis"></div>
+    <div class="scale-indicator" aria-hidden="true"><span id="scale-name">ESCALA CELULAR</span><i></i><b id="scale-index">01</b></div>
+    <div class="specimen-note" id="specimen-note"><span class="eyebrow">UNA CONEXIÓN, DE CERCA</span><p>La dendrita es tu mapa.<br>Entra en la espina iluminada.</p></div>
+    <aside class="callout" id="context-panel" hidden aria-labelledby="detail-title"><button id="panel-close" class="close" aria-label="Cerrar estructura" type="button">×</button><p id="panel-index" class="eyebrow"></p><h2 id="detail-title"></h2><p id="detail-text"></p><p id="detail-note" class="detail-note"></p></aside>
+    <p class="region-toast" id="region-toast" role="status" hidden></p>
+    <section class="narrative" id="narrative" aria-label="Recorrido por la excitotoxicidad" hidden>
+      <div class="narrative-caption"><span id="step-number">01 / 06</span><div><h2 id="step-title">Liberación de glutamato</h2><p id="step-caption" aria-live="polite"></p></div></div>
+      <div class="timeline-track" id="timeline-track" role="group" aria-label="Etapas del mecanismo"></div>
+      <div class="transport"><button id="previous-btn" type="button" aria-label="Etapa anterior">←</button><button id="play-btn" type="button" aria-label="Reproducir recorrido"><span id="play-icon" aria-hidden="true">▷</span></button><button id="next-btn" type="button" aria-label="Etapa siguiente">→</button><span class="transport-divider"></span><button id="explore-btn" aria-pressed="false" type="button">Explorar</button><button id="restart-btn" type="button" aria-label="Reiniciar recorrido">↺</button><span class="transport-divider"></span><button id="back-btn" type="button">Volver a la dendrita <span aria-hidden="true">↗</span></button></div>
+    </section>
+    <footer class="scene-footer">
+      <div class="scene-hint" id="scene-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10V5a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-4a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-2 0-4-1-5-3l-4-6a2 2 0 0 1 3-2l2 2"/></svg><span id="hint-text">Arrastra para explorar <b>·</b> Rueda para acercarte</span></div>
+      <div class="view-tools"><button id="labels-btn" type="button" aria-pressed="true">Anotaciones <span class="toggle" aria-hidden="true"></span></button><button id="reset-btn" type="button" aria-label="Restablecer encuadre">↺</button></div>
+      <span class="figure-note">MODELO CONCEPTUAL <i>/</i> 3D INTERACTIVO</span>
+    </footer>
+    <div class="scene-loading" id="scene-loading" role="status"><span class="loading-orbit" aria-hidden="true"></span><p>Preparando el territorio neuronal</p><small>Geometría · membranas · luz</small></div>
+    <section class="scene-error" id="scene-error" hidden><p class="eyebrow">ATLAS NEURO·VISTA</p><h2>La escena necesita WebGL 2.</h2><p id="scene-error-text">Puedes consultar las notas y referencias del modelo.</p><button type="button" id="error-references-btn">Leer notas y referencias ↗</button></section>
+  </main>
+  <dialog id="references" aria-labelledby="references-title">
+    <button class="close" id="close-references" type="button" aria-label="Cerrar referencias">×</button><p class="eyebrow">EL CONOCIMIENTO DETRÁS DEL MODELO</p><h2 id="references-title">Notas & referencias</h2>
+    <p>Una representación conceptual de la comunicación sináptica y su desregulación. Las proporciones, concentraciones y dinámicas se simplifican; los mecanismos pueden coexistir y retroalimentarse. El daño no es un desenlace inevitable.</p>
+    <p>El corte de membrana permite ver vesículas, receptores y crestas mitocondriales. La ubicación de la mitocondria en la espina facilita la lectura y no representa todas las sinapsis. Se omiten recaptación, astrocitos, Mg²⁺ y coagonistas. Los colores identifican estructuras; no son colores naturales.</p>
+    <p>Este primer volumen desarrolla únicamente la sinapsis glutamatérgica. Las demás regiones son marcadores para futuras exploraciones. La experiencia no compara edades ni estima susceptibilidad individual.</p>
+      <ol class="reference-list">
+        <li><span>01</span><div><a href="https://doi.org/10.1016/0896-6273(88)90162-6" target="_blank" rel="noopener noreferrer">Glutamate neurotoxicity and diseases of the nervous system <span>↗</span></a><p>Choi, D. W. · 1988 · <i>Neuron</i>, 1(8), 623–634.</p></div></li>
+        <li><span>02</span><div><a href="https://doi.org/10.1038/aps.2009.24" target="_blank" rel="noopener noreferrer">Molecular mechanisms of excitotoxicity and their relevance to pathogenesis of neurodegenerative diseases <span>↗</span></a><p>Dong, X. X., Wang, Y. & Qin, Z. H. · 2009 · <i>Acta Pharmacologica Sinica</i>, 30, 379–387.</p></div></li>
+        <li><span>03</span><div><a href="https://doi.org/10.1038/nrn2911" target="_blank" rel="noopener noreferrer">Synaptic versus extrasynaptic NMDA receptor signalling: implications for neurodegenerative disorders <span>↗</span></a><p>Hardingham, G. E. & Bading, H. · 2010 · <i>Nature Reviews Neuroscience</i>, 11, 682–696.</p></div></li>
+        <li><span>04</span><div><a href="https://doi.org/10.1016/j.cell.2004.11.003" target="_blank" rel="noopener noreferrer">The importance of dendritic mitochondria in the morphogenesis and plasticity of spines and synapses <span>↗</span></a><p>Li, Z., Okamoto, K. I., Hayashi, Y. & Sheng, M. · 2004 · <i>Cell</i>, 119(6), 873–887.</p></div></li>
+      </ol>
+  </dialog>
+  <dialog id="help" class="help-dialog" aria-labelledby="help-title"><button class="close" id="close-help" type="button" aria-label="Cerrar ayuda">×</button><p class="eyebrow">EXPLORA A TU RITMO</p><h2 id="help-title">De la neurona<br>a la sinapsis.</h2><dl><dt>Gira el modelo</dt><dd>Arrastra con el ratón o con un dedo.</dd><dt>Cambia de escala</dt><dd>Usa la rueda, pellizca con dos dedos o elige una escala en la parte superior.</dd><dt>Entra en la conexión</dt><dd>Selecciona el punto iluminado sobre la espina dendrítica.</dd><dt>Observa y explora</dt><dd>En la sinapsis, reproduce el recorrido o selecciona Explorar. La animación se detiene; al continuar, retoma el mismo instante.</dd><dt>Usa el teclado</dt><dd>Tab para los controles; flechas para girar; + / − para acercar; Inicio para recuperar el encuadre. Escape cierra la información.</dd></dl></dialog>
+  <noscript><div class="noscript"><h1>Atlas de neurotoxicidad</h1><p>Activa JavaScript para explorar la neurona 3D. <a href="https://doi.org/10.1038/aps.2009.24">Consultar una revisión de los mecanismos de excitotoxicidad</a>.</p></div></noscript>
+  <script type="module" src="/src/main.js"></script>
+</body>
 </html>

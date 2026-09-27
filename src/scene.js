@@ -1,69 +1,287 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { createNeuron } from './atlas/neuron.js';
+import { mechanisms } from './atlas/config.js';
+import { createAfferentAxon } from './atlas/axon.js';
+import { createAnatomy } from './scene/anatomy.js';
+import { createParticles } from './scene/particles.js';
+import { createCameraController } from './core/camera.js';
+import { createInteractionManager } from './core/interaction.js';
+import { createAnnotations } from './core/annotations.js';
+import { createTimeline } from './core/timeline.js';
+import { glutamateMechanism } from './mechanisms/glutamate.js';
 
-const C = { cyan: 0x48e4f2, blue: 0x397bff, purple: 0x9e72ff, pink: 0xf068a8, orange: 0xff9e61, tissue: 0x7563bf };
-const material = (color, options = {}) => new THREE.MeshPhysicalMaterial({ color, roughness: .32, metalness: .05, clearcoat: .25, ...options });
-const data = {
-  ampa: ['02 — RECEPTOR', 'Receptor AMPA', 'Los receptores AMPA median gran parte de la transmisión excitadora rápida. Su apertura favorece principalmente el flujo de Na⁺.', 'Canal activado de forma conceptual.'],
-  nmda: ['03 — RECEPTOR', 'Receptor NMDA', 'Los receptores NMDA requieren glutamato y condiciones de voltaje adecuadas. En sobrecarga, su señal puede contribuir a una entrada elevada de Ca²⁺.', 'El Mg²⁺ y los cofactores se simplifican en este modelo.'],
-  mitochondria: ['04 — ORGÁNULO', 'Mitocondria', 'Integra el estado energético y las señales de calcio. La sobrecarga puede asociarse con disfunción metabólica y estrés oxidativo.', 'Las crestas representan la arquitectura interna de forma simplificada.'],
-  calcium: ['05 — IÓN SEÑAL', 'Entrada de Ca²⁺', 'El calcio participa en señalización fisiológica. Una acumulación sostenida puede alterar la homeostasis celular.', 'La densidad de partículas es ilustrativa, no cuantitativa.'],
-  ros: ['06 — SEÑAL', 'Especies reactivas de oxígeno', 'Las ROS son productos y señales químicas que, cuando exceden las defensas celulares, pueden contribuir al daño oxidativo.', 'Su brillo representa una señal conceptual.'],
-  caspases: ['07 — VÍA DE DAÑO', 'Caspasas', 'Se muestran como una señal conceptual de rutas proteolíticas asociadas a daño celular; no representan una estructura anatómica.', 'No se infiere destino celular a partir de este modelo.'],
-};
-
-export function createSynapse(canvas, onSelect) {
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x061827, .075);
-  const camera = new THREE.PerspectiveCamera(38, 1, .1, 100);
-  camera.position.set(0, 1.3, 12.5);
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const vector = (x, y, z = 0) => new THREE.Vector3(x, y, z);
+export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, onSelect, onTimeline, onProgress, onRegion, onContextLost } = {}) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.65));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.06;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, .025, 180);
   const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true; controls.dampingFactor = .06; controls.enablePan = false;
-  controls.minDistance = 8.5; controls.maxDistance = 16; controls.target.set(0, 0, 0);
-  controls.autoRotate = true; controls.autoRotateSpeed = .28;
-  scene.add(new THREE.HemisphereLight(0x6edfff, 0x100b25, 2.1));
-  const key = new THREE.PointLight(0x9edcff, 18, 24, 2); key.position.set(-4, 5, 7); scene.add(key);
-  const rim = new THREE.PointLight(0xf35fab, 15, 20, 2); rim.position.set(5, -2, 4); scene.add(rim);
-  const fill = new THREE.PointLight(0x4388ff, 11, 16, 2); fill.position.set(0, -5, -3); scene.add(fill);
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  controls.enableDamping = !motion.matches; controls.dampingFactor = .065;
+  controls.enablePan = false; controls.rotateSpeed = .4; controls.zoomSpeed = .6;
+  // Every scale keeps generous orbit freedom without turning the specimen upside down.
+  controls.minPolarAngle = .65; controls.maxPolarAngle = 2.15;
+  controls.minAzimuthAngle = -.85; controls.maxAzimuthAngle = 1.0;
+  controls.target.copy(vector(-5, -.4, -1)); camera.position.copy(vector(-3, 8, 35));
+  const cameraController = createCameraController(camera, controls, () => motion.matches);
+  const ambient = new THREE.HemisphereLight(0xd2e0ed, 0x3b294b, .6); scene.add(ambient);
+  const key = new THREE.DirectionalLight(0xffe5dc, 2.35); key.position.set(-8, 12, 11); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xc0d9ea, .55); fill.position.set(8, 3, 9); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xcbbae7, 1.65); rim.position.set(-5, 7, -8); scene.add(rim);
+  const bounce = new THREE.DirectionalLight(0xd19ba9, .35); bounce.position.set(0, -7, 4); scene.add(bounce);
+  let environmentTarget;
+  function buildEnvironment() {
+    environmentTarget?.dispose();
+    const pmrem = new THREE.PMREMGenerator(renderer), environment = new RoomEnvironment();
+    environmentTarget = pmrem.fromScene(environment, .06);
+    scene.environment = environmentTarget.texture; scene.environmentIntensity = .16;
+    environment.dispose(); pmrem.dispose();
+  }
+  buildEnvironment();
+  const neuron = createNeuron(); scene.add(neuron.root);
+  const anatomy = createAnatomy({ includeDendrite: false });
+  anatomy.root.position.copy(neuron.synapseOrigin); anatomy.root.scale.setScalar(neuron.synapseScale);
+  scene.add(anatomy.root);
+  scene.add(createAfferentAxon(anatomy.texture));
+  const world = point => point.clone().multiplyScalar(neuron.synapseScale).add(neuron.synapseOrigin);
+  const particles = createParticles(anatomy.root, anatomy.nmdaChannels, anatomy.receptors);
+  const hotspotConfigs = neuron.hotspots.map(item => {
+    const id = item.id === 'synapse' ? 'glutamate' : item.id === 'mitochondria' ? 'mitochondrial' : item.id;
+    return { ...item, ...mechanisms.find(mechanism => mechanism.id === id) };
+  });
+  const hitGeometry = new THREE.SphereGeometry(.28, 12, 8);
+  const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
+  const hotspotMeshes = hotspotConfigs.map(item => {
+    const mesh = new THREE.Mesh(hitGeometry, hitMaterial); mesh.position.copy(item.position);
+    mesh.userData.key = item.id; scene.add(mesh); return mesh;
+  });
+  const anchors = anatomy.labelAnchors.map(item => ({ ...item, position: world(item.position) }));
+  const annotations = createAnnotations({ hotspotLayer, labelLayer, camera, canvas, hotspots: hotspotConfigs, anchors, onHotspot: openHotspot, onSelect: select });
+  let view = 'neuron', selected = null, hovered = null, exploring = false, width = 0, height = 0;
+  let frame = 0, lastTime = 0, disposed = false, contextLost = false, biologicalTime = 0, introTimer = null;
+  let transitioning = false, dirty = true;
+  const current = { glut: .12, activation: .04, ca: 0, stress: 0, damage: 0 };
+  const baseState = { ...current };
+  const transform = new THREE.Object3D(), cargoTransform = new THREE.Object3D();
+  const abort = new AbortController(), listen = (element, name, callback) => element.addEventListener(name, callback, { signal: abort.signal });
+  const timeline = createTimeline({
+    steps: glutamateMechanism.steps,
+    onChange(state) {
+      onTimeline?.({ ...state, exploring });
+      if (view === 'synapse' && !exploring && !transitioning) {
+        if (state.playing) focusStep(state.step);
+        controls.enabled = !state.playing && !cameraController.active;
+      }
+      invalidate();
+    },
+  });
+  function invalidate() {
+    dirty = true;
+    if (!frame && !disposed && !contextLost && !document.hidden) frame = requestAnimationFrame(tick);
+  }
+  function clearIntro() { if (introTimer) clearTimeout(introTimer); introTimer = null; }
+  function poseFor(nextView) {
+    if (nextView === 'synapse') {
+      const target = world(vector(0, -.25, 0));
+      // On portrait displays preserve receptor readability while leaving room for the narrative.
+      const factor = Math.max(1, .69 / camera.aspect);
+      const offset = vector(2.15, 1.5, 14).multiplyScalar(neuron.synapseScale * factor);
+      return { target, position: target.clone().add(offset) };
+    }
+    const pose = neuron.cameraPoses[nextView === 'neuron' ? 'overview' : 'hub'];
+    const target = pose.target.clone(), offset = pose.position.clone().sub(pose.target);
+    if (width < 640) {
+      if (nextView === 'neuron') { target.copy(vector(-7, -.4, -1)); offset.multiplyScalar(1.33); }
+      else { target.copy(vector(.7, .7, 0)); offset.multiplyScalar(1.04); }
+    }
+    return { target, position: target.clone().add(offset) };
+  }
+  function limits(pose, isDetail) {
+    const distance = pose.position.distanceTo(pose.target);
+    controls.minDistance = isDetail ? distance * .47 : distance * .36;
+    controls.maxDistance = isDetail ? distance * 1.6 : distance * 1.75;
+  }
+  function navigate(nextView, { duration = 3.4, intro = false } = {}) {
+    clearIntro();
+    if (!['hub', 'neuron', 'synapse'].includes(nextView)) return;
+    // Time spent inspecting a still frame is not part of the next camera trip.
+    lastTime = 0;
+    timeline.pause(); exploring = false; selected = null; hovered = null;
+    onSelect?.(null);
+    view = nextView; transitioning = true;
+    const pose = poseFor(view);
+    onView?.({ view, transitioning: true, exploring });
+    cameraController.move(pose.position, pose.target, { duration, onComplete() {
+      transitioning = false;
+      limits(pose, view === 'synapse');
+      controls.enabled = true;
+      if (view === 'synapse') {
+        annotations.setVisited('glutamate');
+        onTimeline?.({ ...timeline.getState(), exploring });
+      }
+      onView?.({ view, transitioning: false, exploring });
+      invalidate();
+    } });
+    if (!intro) canvas.focus({ preventScroll: true });
+    invalidate();
+  }
+  function openHotspot(id) {
+    const entry = mechanisms.find(item => item.id === id);
+    if (!entry) return;
+    if (entry.available) navigate('synapse');
+    else onRegion?.(entry);
+  }
+  function select(key) {
+    if (view !== 'synapse' || transitioning) return;
+    selected = key; onSelect?.(key); invalidate();
+  }
+  function focusStep(step) {
+    const pose = poseFor('synapse');
+    const focus = world(vector(...step.focus));
+    const target = pose.target.clone().lerp(focus, .23);
+    const position = target.clone().add(pose.position.sub(pose.target).multiplyScalar(.97));
+    cameraController.move(position, target, { duration: 1.6, onComplete() { controls.enabled = !timeline.getState().playing; invalidate(); } });
+  }
+  const interactive = createInteractionManager(canvas, camera, {
+    objects: () => view === 'synapse' ? [...anatomy.selectable, ...particles.selectable] : hotspotMeshes,
+    enabled: () => !transitioning && !cameraController.active,
+    onSelect: key => view === 'synapse' ? select(key) : key && openHotspot(key),
+    onHover: key => { if (hovered !== key) { hovered = key; invalidate(); } },
+  });
+  function resize() {
+    const rect = canvas.getBoundingClientRect(); width = rect.width; height = rect.height;
+    if (!width || !height) return;
+    camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false);
+    const pose = poseFor(view);
+    const wasPlaying = timeline.getState().playing;
+    cameraController.cancel(); transitioning = false;
+    limits(pose, view === 'synapse');
+    camera.position.copy(pose.position); controls.target.copy(pose.target);
+    controls.enabled = !wasPlaying;
+    onView?.({ view, transitioning: false, exploring });
+    annotations.resize(width, height); controls.update(); invalidate();
+  }
+  const observer = new ResizeObserver(resize); observer.observe(canvas);
+  const controlsChange = () => invalidate();
+  const controlsStart = () => { clearIntro(); if (!transitioning) cameraController.cancel(); invalidate(); };
+  controls.addEventListener('change', controlsChange); controls.addEventListener('start', controlsStart);
+  listen(canvas, 'keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '=', '-', 'Home'].includes(event.key) || !controls.enabled) return;
+    event.preventDefault(); clearIntro(); cameraController.cancel();
+    if (event.key === 'Home') { navigate(view, { duration: 1.2 }); return; }
+    const offset = camera.position.clone().sub(controls.target), spherical = new THREE.Spherical().setFromVector3(offset);
+    if (event.key === 'ArrowLeft') spherical.theta -= .09;
+    if (event.key === 'ArrowRight') spherical.theta += .09;
+    if (event.key === 'ArrowUp') spherical.phi -= .06;
+    if (event.key === 'ArrowDown') spherical.phi += .06;
+    if (event.key === '+' || event.key === '=') spherical.radius *= .92;
+    if (event.key === '-') spherical.radius *= 1.08;
+    spherical.theta = THREE.MathUtils.clamp(spherical.theta, controls.minAzimuthAngle, controls.maxAzimuthAngle);
+    spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
+    spherical.radius = THREE.MathUtils.clamp(spherical.radius, controls.minDistance, controls.maxDistance);
+    camera.position.copy(controls.target).add(offset.setFromSpherical(spherical)); controls.update(); invalidate();
+  });
+  listen(document, 'visibilitychange', () => { lastTime = 0; if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else invalidate(); });
+  listen(motion, 'change', () => { controls.enableDamping = !motion.matches; if (motion.matches) { clearIntro(); timeline.pause(); navigate(view, { duration: 0 }); } invalidate(); });
+  listen(canvas, 'webglcontextlost', event => { event.preventDefault(); contextLost = true; cancelAnimationFrame(frame); frame = 0; clearIntro(); timeline.pause(); onContextLost?.(true); });
+  listen(canvas, 'webglcontextrestored', () => { buildEnvironment(); contextLost = false; lastTime = 0; onContextLost?.(false); invalidate(); });
 
-  const root = new THREE.Group(); scene.add(root);
-  const selectable = []; const labels = []; const animated = { glutamate: [], calcium: [], ros: [], vesicles: [], caspases: [], receptors: [] };
-  const organicGeo = new THREE.SphereGeometry(1, 42, 30);
-  const pre = new THREE.Mesh(organicGeo, material(C.tissue, { transmission: .12, thickness: 1.1, transparent: true, opacity: .88 }));
-  pre.scale.set(3.25, 1.65, 1.45); pre.position.set(-.15, 2.55, 0); pre.rotation.z = -.09; root.add(pre);
-  const preGlow = new THREE.Mesh(organicGeo, material(0x7455d8, { transparent: true, opacity: .13, side: THREE.BackSide })); preGlow.scale.set(3.4, 1.78, 1.58); preGlow.position.copy(pre.position); root.add(preGlow);
-  const post = new THREE.Mesh(organicGeo, material(0x5640a0, { transmission: .1, thickness: .9, transparent: true, opacity: .9 }));
-  post.scale.set(2.4, 1.55, 1.2); post.position.set(.45, -2.35, .05); root.add(post);
-  const neck = new THREE.Mesh(new THREE.CapsuleGeometry(.8, 3.7, 12, 28), material(0x4e3c94, { transparent: true, opacity: .9 })); neck.position.set(.38, -4.25, .05); neck.rotation.z = -.13; root.add(neck);
-  // subtly irregular membrane contours
-  [pre, post].forEach((body, i) => { const wire = new THREE.Mesh(body.geometry, new THREE.MeshBasicMaterial({ color: i ? 0x80bdf8 : 0xdca4ff, wireframe: true, transparent: true, opacity: .11 })); wire.position.copy(body.position); wire.rotation.copy(body.rotation); wire.scale.copy(body.scale).multiplyScalar(1.015); root.add(wire); });
-  labels.push(['Terminal presináptica', pre, new THREE.Vector3(-1.9, 3.6, 0)]);
-  labels.push(['Espina dendrítica', post, new THREE.Vector3(2, -2.8, 0)]);
-
-  const vesMat = material(0xa8d5ff, { emissive: 0x243d7d, emissiveIntensity: .5, transparent: true, opacity: .92 });
-  for (let i = 0; i < 26; i++) { const v = new THREE.Mesh(new THREE.SphereGeometry(.13 + (i % 4) * .018, 18, 14), vesMat); const a = i * 2.4; v.position.set(Math.sin(a) * 2.25, 2.35 + Math.cos(a * 1.7) * .75, Math.cos(a) * .7); root.add(v); animated.vesicles.push(v); }
-  labels.push(['Vesículas', animated.vesicles[3], new THREE.Vector3(-2.6, 2.8, 0)]);
-
-  function receptor(kind, x, y, color) { const g = new THREE.Group(); const m = material(color, { emissive: color, emissiveIntensity: .28 }); for (const dx of [-.17, .17]) { const l = new THREE.Mesh(new THREE.CapsuleGeometry(.11, .72, 8, 12), m); l.position.set(dx, 0, 0); g.add(l); } const cap = new THREE.Mesh(new THREE.SphereGeometry(.27, 16, 12), m); cap.scale.y = .62; cap.position.y = .42; g.add(cap); g.position.set(x, y, .1); g.rotation.z = kind === 'nmda' ? .12 : -.13; g.userData.key = kind; root.add(g); selectable.push(g); animated.receptors.push(g); labels.push([kind === 'ampa' ? 'AMPA' : 'NMDA', g, new THREE.Vector3(x, y - .55, 0)]); return g; }
-  receptor('ampa', -1.2, -.7, C.cyan); receptor('ampa', -.1, -.78, C.cyan); receptor('nmda', 1.05, -.72, C.purple); receptor('nmda', 1.95, -.82, C.purple);
-  const mito = new THREE.Group(); const mitoOuter = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 22), material(0xee7d8d, { emissive: 0x6d123d, emissiveIntensity: .25, transparent: true, opacity: .96 })); mitoOuter.scale.set(1.55, .6, .55); mito.add(mitoOuter); for (let i = 0; i < 5; i++) { const crest = new THREE.Mesh(new THREE.TorusGeometry(.25, .06, 8, 18, Math.PI * 1.3), material(0xffb1a0, { emissive: 0x551024, emissiveIntensity: .25 })); crest.position.set(-.85 + i * .42, 0, .52); crest.rotation.z = Math.PI / 2; mito.add(crest); } mito.position.set(.5, -2.35, .78); mito.rotation.z = -.22; mito.userData.key = 'mitochondria'; root.add(mito); selectable.push(mito); labels.push(['Mitocondria', mito, new THREE.Vector3(.7, -3.25, 0)]);
-  const glutMat = material(C.orange, { emissive: 0xff4a1d, emissiveIntensity: .9 }); for (let i = 0; i < 44; i++) { const p = new THREE.Mesh(new THREE.SphereGeometry(.055 + (i % 3) * .018, 12, 10), glutMat); p.userData = { phase: i * .61, lane: (i % 9) - 4 }; root.add(p); animated.glutamate.push(p); }
-  labels.push(['Glutamato', animated.glutamate[15], new THREE.Vector3(-2.4, .6, 0)]);
-  const caMat = material(0x53dfff, { emissive: 0x0eb7ff, emissiveIntensity: 1 }); const calciumGroup = new THREE.Group(); calciumGroup.userData.key = 'calcium'; root.add(calciumGroup); selectable.push(calciumGroup); for (let i = 0; i < 28; i++) { const p = new THREE.Mesh(new THREE.SphereGeometry(.055, 12, 10), caMat); p.userData.phase = i * .76; calciumGroup.add(p); animated.calcium.push(p); } labels.push(['Ca²⁺', calciumGroup, new THREE.Vector3(2.7, -1.4, 0)]);
-  const rosGroup = new THREE.Group(); rosGroup.userData.key = 'ros'; root.add(rosGroup); selectable.push(rosGroup); for (let i = 0; i < 14; i++) { const p = new THREE.Mesh(new THREE.OctahedronGeometry(.09, 1), material(C.pink, { emissive: 0xff216b, emissiveIntensity: 1.4 })); p.userData.phase = i * .85; rosGroup.add(p); animated.ros.push(p); } labels.push(['ROS', rosGroup, new THREE.Vector3(2.45, -2.05, 0)]);
-  const casGroup = new THREE.Group(); casGroup.userData.key = 'caspases'; root.add(casGroup); selectable.push(casGroup); for (let i = 0; i < 6; i++) { const p = new THREE.Mesh(new THREE.IcosahedronGeometry(.16, 1), material(0xf94e93, { emissive: 0x8f0c44, emissiveIntensity: .5 })); p.position.set(-.6 + i * .24, -3.25 + (i % 2) * .22, .65); casGroup.add(p); animated.caspases.push(p); } labels.push(['Caspasas', casGroup, new THREE.Vector3(-1.55, -3.6, 0)]);
-  let overload = false; let playing = true; let selected = null; const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2();
-  function setMode(next) { overload = next === 'overload'; scene.fog.density = overload ? .09 : .075; rim.color.setHex(overload ? 0xff3c82 : 0xf35fab); }
-  function select(key) { selected = key; onSelect?.(key, data[key]); }
-  canvas.addEventListener('pointerup', (e) => { if (Math.abs(e.movementX) + Math.abs(e.movementY) > 5) return; const r = canvas.getBoundingClientRect(); pointer.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1); raycaster.setFromCamera(pointer, camera); const hit = raycaster.intersectObjects(selectable, true)[0]; if (hit) { let object = hit.object; while (object && !object.userData.key) object = object.parent; if (object?.userData.key) select(object.userData.key); } });
-  function resize() { const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return; camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); renderer.setSize(r.width, r.height, false); }
-  const clock = new THREE.Clock();
-  function tick() { const t = clock.getElapsedTime(); const gain = overload ? 1.9 : .72; if (playing) { animated.glutamate.forEach((p, i) => { const q = (t * (.2 + gain * .19) + p.userData.phase) % 1; p.position.set(p.userData.lane * .32 + Math.sin(t + i) * .08, 1.35 - q * 1.9, .38 + Math.cos(i * 1.7 + t) * .6); p.visible = i < (overload ? 44 : 19); }); animated.calcium.forEach((p, i) => { const q = (t * (.22 + gain * .18) + p.userData.phase) % 1; p.position.set(.8 + Math.sin(i * 2.1) * .7, -.95 - q * 1.85, .3 + Math.cos(i * 1.6) * .55); p.visible = i < (overload ? 28 : 8); }); animated.ros.forEach((p, i) => { p.position.set(1.15 + Math.sin(t * 1.5+i)*(.65+i%3*.1), -2.25 + Math.cos(t*1.2+i*.7)*.55, .9); p.rotation.set(t, t*.5, 0); p.visible = overload || i < 3; }); animated.vesicles.forEach((v,i)=>v.position.y += Math.sin(t*1.2+i)*.0009); animated.receptors.forEach((r,i)=>r.scale.setScalar(1 + (overload ? .08 : .025) * Math.sin(t*2+i))); casGroup.visible = overload; mitoOuter.material.emissiveIntensity = overload ? .82 : .25; mitoOuter.material.color.setHex(overload ? 0xc74771 : 0xee7d8d); controls.update(); } renderer.render(scene, camera); requestAnimationFrame(tick); }
-  resize(); new ResizeObserver(resize).observe(canvas); tick();
-  return { setMode, select, setPlaying: (v) => { playing = v; controls.autoRotate = v; }, reset: () => { camera.position.set(0,1.3,12.5); controls.target.set(0,0,0); controls.update(); }, getLabels: () => labels.map(([name, object, offset]) => ({ name, position: object.getWorldPosition(new THREE.Vector3()).add(offset), key: object.userData.key })), project: (v) => v.clone().project(camera), isOverload: () => overload };
+  function updateAnatomy(dt, running, timelineState) {
+    const target = view === 'synapse' ? timelineState.step.state : baseState;
+    let changing = false;
+    for (const name of Object.keys(current)) {
+      // Explicit pause also freezes biochemical changes, not merely particle paths.
+      if (running) current[name] = THREE.MathUtils.damp(current[name], target[name], 3, dt);
+      if (running && Math.abs(current[name] - target[name]) > .001) changing = true;
+    }
+    particles.update(biologicalTime, current, selected);
+    particles.calcium.visible = view === 'synapse' && timelineState.index >= 2;
+    particles.sodium.visible = view === 'synapse' && timelineState.index >= 1;
+    anatomy.vesicleSeeds.forEach((seed, i) => {
+      transform.position.copy(seed.position); transform.position.y += Math.sin(biologicalTime * .55 + seed.phase) * .012;
+      if (i < 5) transform.position.y -= .06 * (.5 + .5 * Math.sin(biologicalTime * 1.2 + seed.phase)) * current.glut;
+      transform.scale.setScalar(seed.radius); transform.updateMatrix(); anatomy.vesicles.setMatrixAt(i, transform.matrix);
+      for (let j = 0; j < 4; j++) {
+        cargoTransform.position.set(transform.position.x + Math.sin(j * 2.4) * .05, transform.position.y + Math.cos(j * 1.5) * .04, transform.position.z + Math.cos(j * 2.4) * .05);
+        cargoTransform.updateMatrix(); anatomy.cargo.setMatrixAt(i * 4 + j, cargoTransform.matrix);
+      }
+    });
+    anatomy.vesicles.instanceMatrix.needsUpdate = true; anatomy.cargo.instanceMatrix.needsUpdate = true;
+    for (const receptor of anatomy.receptors) {
+      const active = receptor.kind === 'ampa' ? timelineState.index >= 1 : timelineState.index >= 2;
+      receptor.material.emissiveIntensity = .06 + (active ? current.activation * .15 : 0) + (selected === receptor.kind ? .13 : 0);
+    }
+    anatomy.mito.outerMat.emissiveIntensity = .05 + current.stress * .18;
+    anatomy.mito.foldMat.emissiveIntensity = .07 + current.stress * .12;
+    anatomy.caspases.visible = false;
+    return changing;
+  }
+  function tick(now) {
+    frame = 0; if (disposed || contextLost || document.hidden) return;
+    const dt = lastTime ? (now - lastTime) / 1000 : 0; lastTime = now;
+    const running = view === 'synapse' && timeline.getState().playing && !exploring && !transitioning;
+    if (running) { biologicalTime += dt; timeline.update(dt); }
+    const moving = cameraController.update(dt);
+    // Disabled OrbitControls still clamp the camera on update; skip them while
+    // crossing scales so destination zoom limits cannot truncate the journey.
+    if (cameraController.active) camera.lookAt(controls.target);
+    else controls.update();
+    const state = timeline.getState();
+    if (dirty || moving || running) {
+      updateAnatomy(dt, running, state);
+      scene.updateMatrixWorld(); camera.updateMatrixWorld();
+      annotations.update({ view, transitioning, selected, hovered, stress: current.stress, calcium: current.ca });
+      renderer.render(scene, camera); onProgress?.(state.progress); dirty = false;
+    }
+    if ((running || cameraController.active) && !frame) frame = requestAnimationFrame(tick);
+  }
+  resize(); controls.update();
+  await renderer.compileAsync(scene, camera);
+  if (motion.matches) { view = 'hub'; const pose = poseFor(view); limits(pose, false); camera.position.copy(pose.position); controls.target.copy(pose.target); controls.update(); }
+  else introTimer = setTimeout(() => navigate('hub', { duration: 4.2, intro: true }), 1900);
+  onView?.({ view, transitioning: false, exploring }); onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+  return {
+    navigate, select,
+    setLabels(value) { annotations.setEnabled(value); invalidate(); },
+    resetView() { navigate(view, { duration: 1.5 }); },
+    playPause() {
+      if (transitioning || view !== 'synapse') return;
+      if (timeline.getState().playing) { timeline.pause(); cameraController.cancel(); }
+      else { exploring = false; lastTime = 0; timeline.play(); }
+      onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+    },
+    explore() {
+      if (transitioning || view !== 'synapse') return;
+      if (!exploring) { exploring = true; timeline.pause(); cameraController.cancel(); controls.enabled = true; }
+      else { exploring = false; lastTime = 0; timeline.play(); }
+      onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+    },
+    seek(index) {
+      cameraController.cancel(); timeline.seek(THREE.MathUtils.clamp(index, 0, glutamateMechanism.steps.length - 1));
+      Object.assign(current, timeline.getState().step.state); invalidate();
+    },
+    restart() { biologicalTime = 0; exploring = false; timeline.reset(); Object.assign(current, baseState); navigate('synapse', { duration: 1.2 }); },
+    suspend() {
+      clearIntro(); timeline.pause(); cameraController.cancel(); transitioning = false;
+      // Preserve the current inspected pose, including a partially completed trip.
+      limits({ position: camera.position, target: controls.target }, view === 'synapse');
+      onView?.({ view, transitioning, exploring }); invalidate();
+    },
+    getState() { return { view, transitioning, exploring, selected, time: biologicalTime, timeline: { ...timeline.getState(), step: timeline.getState().step.key }, particles: { ...current }, camera: camera.position.toArray(), target: controls.target.toArray(), controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }; },
+    dispose() {
+      disposed = true; clearIntro(); cancelAnimationFrame(frame); observer.disconnect(); abort.abort();
+      controls.removeEventListener('change', controlsChange); controls.removeEventListener('start', controlsStart); controls.dispose();
+      annotations.dispose(); interactive.dispose();
+      const geometries = new Set(), materials = new Set(), textures = new Set();
+      scene.traverse(object => { if (object.geometry) geometries.add(object.geometry); if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => materials.add(material)); if (object.isInstancedMesh) object.dispose(); });
+      materials.forEach(material => { Object.values(material).forEach(value => { if (value?.isTexture) textures.add(value); }); material.dispose(); });
+      geometries.forEach(geometry => geometry.dispose()); textures.forEach(texture => texture.dispose()); environmentTarget.dispose(); renderer.dispose();
+    },
+  };
 }

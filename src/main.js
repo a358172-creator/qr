@@ -1,28 +1,33 @@
 import './styles.css';
-import { createSynapse } from './scene.js';
 import { bindInteractions } from './interactions.js';
 
-const details = {
-  physiological: ['Estado fisiológico', 'Señalización regulada', 'La liberación moderada de glutamato y la activación regulada de receptores contribuyen a la comunicación sináptica.', 'Representación conceptual de un equilibrio dinámico.'],
-  overload: ['Sobrecarga excitotóxica', 'Exceso de señal excitadora', 'Una activación sostenida puede relacionarse con sobrecarga de Ca²⁺, alteración mitocondrial, aumento de ROS y vías de daño celular.', 'La secuencia ilustra mecanismos relacionados, no una relación causal cuantificada.'],
+const ui = bindInteractions();
+let atlas;
+const showUnavailable = (lost = false) => {
+  document.querySelector('#scene-loading').hidden = true;
+  if (lost) document.querySelector('#scene-error-text').textContent = 'La conexión gráfica se ha interrumpido. La escena se recuperará cuando vuelva la conexión.';
+  document.querySelector('#scene-error').hidden = false;
+  ui.unavailable();
 };
-const labelsLayer = document.querySelector('#labels-layer');
-const setPanel = (entry) => {
-  document.querySelector('#panel-index').textContent = entry[0];
-  document.querySelector('#detail-title').textContent = entry[1];
-  document.querySelector('#detail-text').textContent = entry[2];
-  document.querySelector('#detail-note').textContent = entry[3];
-};
-const scene = createSynapse(document.querySelector('#synapse-canvas'), (_key, entry) => setPanel(entry));
-
-function renderLabels() {
-  if (!labelsLayer.classList.contains('hidden')) {
-    labelsLayer.replaceChildren(...scene.getLabels().map(({ name, position }) => {
-      const p = scene.project(position); const el = document.createElement('span'); el.className = 'scene-label'; el.textContent = name;
-      el.style.left = `${(p.x * .5 + .5) * 100}%`; el.style.top = `${(-p.y * .5 + .5) * 100}%`; el.style.opacity = p.z > 1 ? '0' : '1'; return el;
-    }));
-  }
-  requestAnimationFrame(renderLabels);
+try {
+  const { createAtlas } = await import('./scene.js');
+  atlas = await createAtlas(document.querySelector('#synapse-canvas'), {
+    hotspotLayer: document.querySelector('#hotspots-layer'),
+    labelLayer: document.querySelector('#labels-layer'),
+    onView: ui.updateView,
+    onSelect: ui.select,
+    onTimeline: ui.updateTimeline,
+    onProgress: ui.setProgress,
+    onRegion: ui.showRegion,
+    onContextLost: lost => { if (lost) showUnavailable(true); else { document.querySelector('#scene-error').hidden = true; ui.available(); } },
+  });
+  ui.attachScene(atlas);
+  document.querySelector('#scene-loading').hidden = true;
+  document.querySelector('#detail-text').setAttribute('aria-live', 'polite');
+  if (import.meta.env.DEV) window.__atlas = { getState: () => atlas.getState() };
+} catch (error) {
+  console.error('No se pudo iniciar el atlas WebGL:', error);
+  showUnavailable();
 }
-renderLabels();
-bindInteractions(scene, { setPanel, details, labelsLayer });
+if (import.meta.hot) import.meta.hot.dispose(() => { ui.dispose(); atlas?.dispose(); });
+window.addEventListener('pagehide', event => { if (!event.persisted) { ui.dispose(); atlas?.dispose(); } }, { once: true });
