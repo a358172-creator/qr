@@ -9,8 +9,8 @@ import { createParticles } from './scene/particles.js';
 import { createCameraController } from './core/camera.js';
 import { createInteractionManager } from './core/interaction.js';
 import { createAnnotations } from './core/annotations.js';
-import { createTimeline } from './core/timeline.js';
-import { glutamateMechanism } from './mechanisms/glutamate.js';
+import { createMechanismSession } from './core/mechanism-session.js';
+import { loadMechanism } from './mechanisms/registry.js';
 
 const vector = (x, y, z = 0) => new THREE.Vector3(x, y, z);
 export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, onSelect, onTimeline, onProgress, onRegion, onContextLost } = {}) {
@@ -48,8 +48,18 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   const anatomy = createAnatomy({ includeDendrite: false });
   anatomy.root.position.copy(neuron.synapseOrigin); anatomy.root.scale.setScalar(neuron.synapseScale);
   scene.add(anatomy.root);
-  scene.add(createAfferentAxon(anatomy.texture));
-  const world = point => point.clone().multiplyScalar(neuron.synapseScale).add(neuron.synapseOrigin);
+  const cellularContext = new THREE.Group();
+  cellularContext.add(neuron.root, anatomy.root, createAfferentAxon(anatomy.texture));
+  scene.add(cellularContext);
+  const contextMaterials = new Map();
+  cellularContext.traverse(object => {
+    if (!object.material) return;
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+      if (!contextMaterials.has(material)) contextMaterials.set(material, {
+        opacity: material.opacity, transparent: material.transparent, depthWrite: material.depthWrite,
+      });
+    }
+  });
   const particles = createParticles(anatomy.root, anatomy.nmdaChannels, anatomy.receptors);
   const hotspotConfigs = neuron.hotspots.map(item => {
     const id = item.id === 'synapse' ? 'glutamate' : item.id === 'mitochondria' ? 'mitochondrial' : item.id;
@@ -61,44 +71,112 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     const mesh = new THREE.Mesh(hitGeometry, hitMaterial); mesh.position.copy(item.position);
     mesh.userData.key = item.id; scene.add(mesh); return mesh;
   });
-  const anchors = anatomy.labelAnchors.map(item => ({ ...item, position: world(item.position) }));
-  const annotations = createAnnotations({ hotspotLayer, labelLayer, camera, canvas, hotspots: hotspotConfigs, anchors, onHotspot: openHotspot, onSelect: select });
+  const annotations = createAnnotations({ hotspotLayer, labelLayer, camera, canvas, hotspots: hotspotConfigs, onHotspot: openHotspot, onSelect: select });
   let view = 'neuron', selected = null, hovered = null, exploring = false, width = 0, height = 0;
-  let frame = 0, lastTime = 0, disposed = false, contextLost = false, biologicalTime = 0, introTimer = null;
-  let transitioning = false, dirty = true;
-  const current = { glut: .12, activation: .04, ca: 0, stress: 0, damage: 0 };
-  const baseState = { ...current };
-  const transform = new THREE.Object3D(), cargoTransform = new THREE.Object3D();
+  let frame = 0, lastTime = 0, disposed = false, contextLost = false, introTimer = null;
+  let transitioning = false, dirty = true, navigationId = 0, active;
+  const sessions = new Map(), pending = new Map();
   const abort = new AbortController(), listen = (element, name, callback) => element.addEventListener(name, callback, { signal: abort.signal });
-  const timeline = createTimeline({
-    steps: glutamateMechanism.steps,
-    onChange(state) {
-      onTimeline?.({ ...state, exploring });
-      if (view === 'synapse' && !exploring && !transitioning) {
-        if (state.playing) focusStep(state.step);
-        controls.enabled = !state.playing && !cameraController.active;
+  function emitView(loading = false) {
+    onView?.({ view, transitioning, exploring, loading, mechanism: active?.definition });
+    annotations.resize(width, height);
+  }
+  function availableKeys() {
+    const index = active.timeline.getState().index;
+    return active.model.visibleKeys?.(index) || active.anchors.map(anchor => anchor.key).filter(key =>
+      key !== 'caspases' && (key !== 'calcium' || index >= 2) && (key !== 'ros' || index >= 3));
+  }
+  function emitTimeline() {
+    if (active) onTimeline?.({ ...active.timeline.getState(), exploring, transitioning, mechanism: active.definition, availableKeys: availableKeys() });
+    annotations.resize(width, height);
+  }
+  async function getSession(id) {
+    if (sessions.has(id)) return sessions.get(id);
+    if (pending.has(id)) return pending.get(id);
+    const promise = (async () => {
+      const definition = await loadMechanism(id);
+      if (disposed) throw new Error('Atlas disposed during module loading');
+      const model = await definition.createScene({ texture: anatomy.texture, anatomy, particles });
+      if (disposed) { disposeObjects(model.root); throw new Error('Atlas disposed during scene creation'); }
+      if (id !== 'glutamate') {
+        const site = hotspotConfigs.find(item => item.id === id);
+        // A magnified open section sits at its dendritic site, in front of the
+        // intact tissue. The camera visits that site before entering the section.
+        model.root.position.copy(site.position).add(vector(0, .25, 1.1));
+        model.root.scale.setScalar(.35); model.root.visible = false;
+        scene.add(model.root);
       }
-      invalidate();
-    },
-  });
+      const session = createMechanismSession(definition, model, state => {
+        if (session !== active) return;
+        if (selected && !availableKeys().includes(selected)) { selected = null; onSelect?.(null); }
+        emitTimeline();
+        if (view === 'synapse' && !exploring && !transitioning) {
+          if (state.playing) focusStep(state.step);
+          controls.enabled = !state.playing && !cameraController.active;
+        }
+        invalidate();
+      });
+      session.anchors = model.labelAnchors.map(item => ({ ...item, position: item.position.clone() }));
+      sessions.set(id, session); pending.delete(id); return session;
+    })();
+    pending.set(id, promise);
+    try { return await promise; } catch (error) { pending.delete(id); throw error; }
+  }
+  active = await getSession('glutamate');
+  function syncAnchors() {
+    active.model.root.updateMatrixWorld(true);
+    active.anchors.forEach((anchor, i) => anchor.position.copy(active.model.labelAnchors[i].position).applyMatrix4(active.model.root.matrixWorld));
+  }
+  function reconcileVisibility() {
+    for (const [id, session] of sessions) {
+      session.model.root.visible = id === 'glutamate' || (view === 'synapse' && session === active);
+    }
+  }
+  function updateCellularContext() {
+    // Keep the spatial landmark during the approach, then reveal the cutaway
+    // without an opaque macro-scale branch behind the intracellular specimen.
+    const section = active.definition.isolatedContext && active.model.root.visible;
+    const shortViewport = THREE.MathUtils.clamp((900 - height) / 180, 0, 1);
+    const distance = camera.position.distanceTo(active.model.root.position) / Math.max(1 + shortViewport * .18, .69 / camera.aspect);
+    const opacity = section ? THREE.MathUtils.smoothstep(distance, 5.8, 10.5) : 1;
+    cellularContext.visible = opacity > .002;
+    for (const [material, baseline] of contextMaterials) {
+      const transparent = opacity < .999 ? true : baseline.transparent;
+      if (material.transparent !== transparent) { material.transparent = transparent; material.needsUpdate = true; }
+      material.opacity = baseline.opacity * opacity;
+      material.depthWrite = opacity < .999 ? false : baseline.depthWrite;
+    }
+  }
+  syncAnchors(); annotations.setAnchors(active.anchors);
   function invalidate() {
     dirty = true;
     if (!frame && !disposed && !contextLost && !document.hidden) frame = requestAnimationFrame(tick);
   }
   function clearIntro() { if (introTimer) clearTimeout(introTimer); introTimer = null; }
-  function poseFor(nextView) {
+  function poseFor(nextView, cameraName) {
     if (nextView === 'synapse') {
-      const target = world(vector(0, -.25, 0));
+      const definition = active.definition;
+      const local = definition.cameraPoses[cameraName || definition.overviewCamera];
+      const localTarget = vector(...local.target);
+      const shortViewport = definition.isolatedContext ? THREE.MathUtils.clamp((900 - height) / 180, 0, 1) : 0;
+      localTarget.y -= shortViewport * .70;
+      const target = localTarget.applyMatrix4(active.model.root.matrixWorld);
       // On portrait displays preserve receptor readability while leaving room for the narrative.
-      const factor = Math.max(1, .69 / camera.aspect);
-      const offset = vector(2.15, 1.5, 14).multiplyScalar(neuron.synapseScale * factor);
+      const factor = Math.max(1 + shortViewport * .18, .69 / camera.aspect);
+      const offset = vector(...local.position).sub(vector(...local.target)).multiplyScalar(active.model.root.scale.x * factor);
       return { target, position: target.clone().add(offset) };
     }
     const pose = neuron.cameraPoses[nextView === 'neuron' ? 'overview' : 'hub'];
     const target = pose.target.clone(), offset = pose.position.clone().sub(pose.target);
     if (width < 640) {
       if (nextView === 'neuron') { target.copy(vector(-7, -.4, -1)); offset.multiplyScalar(1.33); }
-      else { target.copy(vector(.7, .7, 0)); offset.multiplyScalar(1.04); }
+      else {
+        const available = hotspotConfigs.filter(item => item.available);
+        target.set(0, 0, 0);
+        available.forEach(item => target.add(item.position));
+        target.multiplyScalar(1 / available.length);
+        offset.multiplyScalar(1.22);
+      }
     }
     return { target, position: target.clone().add(offset) };
   }
@@ -107,49 +185,96 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     controls.minDistance = isDetail ? distance * .47 : distance * .36;
     controls.maxDistance = isDetail ? distance * 1.6 : distance * 1.75;
   }
-  function navigate(nextView, { duration = 3.4, intro = false } = {}) {
+  function travel(poses, duration, token, complete) {
+    let index = 0;
+    function next() {
+      if (token !== navigationId || disposed) return;
+      const pose = poses[index++];
+      cameraController.move(pose.position, pose.target, { duration: duration / poses.length, onComplete() {
+        if (token !== navigationId) return;
+        if (index < poses.length) next();
+        else complete(pose);
+      } });
+    }
+    next();
+  }
+  async function navigate(nextView, { duration = 3.4, intro = false, mechanismId } = {}) {
     clearIntro();
     if (!['hub', 'neuron', 'synapse'].includes(nextView)) return;
+    const token = ++navigationId, previousView = view;
+    cameraController.cancel();
     // Time spent inspecting a still frame is not part of the next camera trip.
     lastTime = 0;
-    timeline.pause(); exploring = false; selected = null; hovered = null;
+    active.timeline.pause(); exploring = false; selected = null; hovered = null;
     onSelect?.(null);
-    view = nextView; transitioning = true;
+    transitioning = true; controls.enabled = false;
+    const outgoing = previousView === 'synapse' && active.definition.entryCamera ? active : null;
+    const exitPose = outgoing ? poseFor('synapse', outgoing.definition.entryCamera) : null;
+    if (nextView === 'synapse') {
+      const id = mechanismId || (previousView === 'synapse' ? active.definition.id : 'glutamate');
+      if (!sessions.has(id)) emitView(true);
+      try {
+        const nextSession = await getSession(id);
+        if (token !== navigationId || disposed) return;
+        if (active !== nextSession && active.definition.id !== 'glutamate') active.model.root.visible = false;
+        active = nextSession; active.model.root.visible = true;
+        syncAnchors(); annotations.setAnchors(active.anchors);
+      } catch (error) {
+        if (token !== navigationId || disposed) return;
+        console.error('No se pudo cargar el mecanismo:', error);
+        transitioning = false; controls.enabled = true; emitView();
+        onRegion?.({ title: 'No se pudo preparar el mecanismo. Inténtalo de nuevo.', error: true }); return;
+      }
+    }
+    view = nextView;
     const pose = poseFor(view);
-    onView?.({ view, transitioning: true, exploring });
-    cameraController.move(pose.position, pose.target, { duration, onComplete() {
+    const poses = [];
+    if (nextView !== 'synapse' && exitPose) poses.push(exitPose);
+    if (nextView === 'synapse' && previousView !== 'synapse' && active.definition.entryCamera) {
+      const membrane = poseFor('synapse', active.definition.entryCamera);
+      const region = { target: membrane.target.clone(), position: membrane.target.clone().add(vector(1, 2.5, 10)) };
+      poses.push(region, membrane);
+    }
+    poses.push(pose);
+    lastTime = 0; emitView(); emitTimeline();
+    travel(poses, poses.length > 1 ? duration * 1.55 : duration, token, finalPose => {
       transitioning = false;
-      limits(pose, view === 'synapse');
+      limits(finalPose, view === 'synapse');
       controls.enabled = true;
       if (view === 'synapse') {
-        annotations.setVisited('glutamate');
-        onTimeline?.({ ...timeline.getState(), exploring });
-      }
-      onView?.({ view, transitioning: false, exploring });
+        annotations.setVisited(active.definition.id);
+        emitTimeline();
+      } else reconcileVisibility();
+      emitView();
       invalidate();
-    } });
+    });
     if (!intro) canvas.focus({ preventScroll: true });
     invalidate();
   }
   function openHotspot(id) {
     const entry = mechanisms.find(item => item.id === id);
     if (!entry) return;
-    if (entry.available) navigate('synapse');
+    if (entry.available) navigate('synapse', { mechanismId: entry.id });
     else onRegion?.(entry);
   }
   function select(key) {
-    if (view !== 'synapse' || transitioning) return;
+    if (view !== 'synapse' || transitioning || contextLost) return;
+    if (key && !availableKeys().includes(key)) return;
     selected = key; onSelect?.(key); invalidate();
   }
   function focusStep(step) {
-    const pose = poseFor('synapse');
-    const focus = world(vector(...step.focus));
-    const target = pose.target.clone().lerp(focus, .23);
-    const position = target.clone().add(pose.position.sub(pose.target).multiplyScalar(.97));
-    cameraController.move(position, target, { duration: 1.6, onComplete() { controls.enabled = !timeline.getState().playing; invalidate(); } });
+    const pose = poseFor('synapse', step.camera);
+    if (step.focus) {
+      const focus = vector(...step.focus).applyMatrix4(active.model.root.matrixWorld);
+      const offset = pose.position.clone().sub(pose.target).multiplyScalar(.97);
+      pose.target.lerp(focus, .23); pose.position.copy(pose.target).add(offset);
+    }
+    cameraController.move(pose.position, pose.target, { duration: 1.6, onComplete() {
+      limits(pose, true); controls.enabled = !active.timeline.getState().playing; invalidate();
+    } });
   }
   const interactive = createInteractionManager(canvas, camera, {
-    objects: () => view === 'synapse' ? [...anatomy.selectable, ...particles.selectable] : hotspotMeshes,
+    objects: () => view === 'synapse' ? active.model.selectable : hotspotMeshes,
     enabled: () => !transitioning && !cameraController.active,
     onSelect: key => view === 'synapse' ? select(key) : key && openHotspot(key),
     onHover: key => { if (hovered !== key) { hovered = key; invalidate(); } },
@@ -159,12 +284,13 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     if (!width || !height) return;
     camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false);
     const pose = poseFor(view);
-    const wasPlaying = timeline.getState().playing;
-    cameraController.cancel(); transitioning = false;
+    const wasPlaying = active.timeline.getState().playing;
+    navigationId++; cameraController.cancel(); transitioning = false;
+    reconcileVisibility();
     limits(pose, view === 'synapse');
     camera.position.copy(pose.position); controls.target.copy(pose.target);
     controls.enabled = !wasPlaying;
-    onView?.({ view, transitioning: false, exploring });
+    emitView();
     annotations.resize(width, height); controls.update(); invalidate();
   }
   const observer = new ResizeObserver(resize); observer.observe(canvas);
@@ -188,55 +314,27 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     camera.position.copy(controls.target).add(offset.setFromSpherical(spherical)); controls.update(); invalidate();
   });
   listen(document, 'visibilitychange', () => { lastTime = 0; if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else invalidate(); });
-  listen(motion, 'change', () => { controls.enableDamping = !motion.matches; if (motion.matches) { clearIntro(); timeline.pause(); navigate(view, { duration: 0 }); } invalidate(); });
-  listen(canvas, 'webglcontextlost', event => { event.preventDefault(); contextLost = true; cancelAnimationFrame(frame); frame = 0; clearIntro(); timeline.pause(); onContextLost?.(true); });
+  listen(motion, 'change', () => { controls.enableDamping = !motion.matches; if (motion.matches) { clearIntro(); active.timeline.pause(); navigate(view, { duration: 0 }); } invalidate(); });
+  listen(canvas, 'webglcontextlost', event => { event.preventDefault(); contextLost = true; cancelAnimationFrame(frame); frame = 0; clearIntro(); active.timeline.pause(); onContextLost?.(true); });
   listen(canvas, 'webglcontextrestored', () => { buildEnvironment(); contextLost = false; lastTime = 0; onContextLost?.(false); invalidate(); });
 
-  function updateAnatomy(dt, running, timelineState) {
-    const target = view === 'synapse' ? timelineState.step.state : baseState;
-    let changing = false;
-    for (const name of Object.keys(current)) {
-      // Explicit pause also freezes biochemical changes, not merely particle paths.
-      if (running) current[name] = THREE.MathUtils.damp(current[name], target[name], 3, dt);
-      if (running && Math.abs(current[name] - target[name]) > .001) changing = true;
-    }
-    particles.update(biologicalTime, current, selected);
-    particles.calcium.visible = view === 'synapse' && timelineState.index >= 2;
-    particles.sodium.visible = view === 'synapse' && timelineState.index >= 1;
-    anatomy.vesicleSeeds.forEach((seed, i) => {
-      transform.position.copy(seed.position); transform.position.y += Math.sin(biologicalTime * .55 + seed.phase) * .012;
-      if (i < 5) transform.position.y -= .06 * (.5 + .5 * Math.sin(biologicalTime * 1.2 + seed.phase)) * current.glut;
-      transform.scale.setScalar(seed.radius); transform.updateMatrix(); anatomy.vesicles.setMatrixAt(i, transform.matrix);
-      for (let j = 0; j < 4; j++) {
-        cargoTransform.position.set(transform.position.x + Math.sin(j * 2.4) * .05, transform.position.y + Math.cos(j * 1.5) * .04, transform.position.z + Math.cos(j * 2.4) * .05);
-        cargoTransform.updateMatrix(); anatomy.cargo.setMatrixAt(i * 4 + j, cargoTransform.matrix);
-      }
-    });
-    anatomy.vesicles.instanceMatrix.needsUpdate = true; anatomy.cargo.instanceMatrix.needsUpdate = true;
-    for (const receptor of anatomy.receptors) {
-      const active = receptor.kind === 'ampa' ? timelineState.index >= 1 : timelineState.index >= 2;
-      receptor.material.emissiveIntensity = .06 + (active ? current.activation * .15 : 0) + (selected === receptor.kind ? .13 : 0);
-    }
-    anatomy.mito.outerMat.emissiveIntensity = .05 + current.stress * .18;
-    anatomy.mito.foldMat.emissiveIntensity = .07 + current.stress * .12;
-    anatomy.caspases.visible = false;
-    return changing;
-  }
   function tick(now) {
     frame = 0; if (disposed || contextLost || document.hidden) return;
     const dt = lastTime ? (now - lastTime) / 1000 : 0; lastTime = now;
-    const running = view === 'synapse' && timeline.getState().playing && !exploring && !transitioning;
-    if (running) { biologicalTime += dt; timeline.update(dt); }
+    const running = view === 'synapse' && active.timeline.getState().playing && !exploring && !transitioning;
+    if (running) active.advance(dt);
     const moving = cameraController.update(dt);
     // Disabled OrbitControls still clamp the camera on update; skip them while
     // crossing scales so destination zoom limits cannot truncate the journey.
     if (cameraController.active) camera.lookAt(controls.target);
     else controls.update();
-    const state = timeline.getState();
+    const state = active.timeline.getState();
     if (dirty || moving || running) {
-      updateAnatomy(dt, running, state);
+      active.render({ selected, detail: view === 'synapse' });
+      syncAnchors();
+      updateCellularContext();
       scene.updateMatrixWorld(); camera.updateMatrixWorld();
-      annotations.update({ view, transitioning, selected, hovered, stress: current.stress, calcium: current.ca });
+      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress, calcium: active.state.ca, visibleKeys: state.step.labels, availableKeys: availableKeys() });
       renderer.render(scene, camera); onProgress?.(state.progress); dirty = false;
     }
     if ((running || cameraController.active) && !frame) frame = requestAnimationFrame(tick);
@@ -245,43 +343,74 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   await renderer.compileAsync(scene, camera);
   if (motion.matches) { view = 'hub'; const pose = poseFor(view); limits(pose, false); camera.position.copy(pose.position); controls.target.copy(pose.target); controls.update(); }
   else introTimer = setTimeout(() => navigate('hub', { duration: 4.2, intro: true }), 1900);
-  onView?.({ view, transitioning: false, exploring }); onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+  emitView(); emitTimeline(); invalidate();
   return {
     navigate, select,
     setLabels(value) { annotations.setEnabled(value); invalidate(); },
     resetView() { navigate(view, { duration: 1.5 }); },
     playPause() {
       if (transitioning || view !== 'synapse') return;
-      if (timeline.getState().playing) { timeline.pause(); cameraController.cancel(); }
-      else { exploring = false; lastTime = 0; timeline.play(); }
-      onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+      if (active.timeline.getState().playing) { active.timeline.pause(); cameraController.cancel(); controls.enabled = true; }
+      else {
+        exploring = false; lastTime = 0;
+        if (active.timeline.getState().complete) active.reset();
+        active.timeline.play();
+      }
+      emitTimeline(); invalidate();
     },
     explore() {
       if (transitioning || view !== 'synapse') return;
-      if (!exploring) { exploring = true; timeline.pause(); cameraController.cancel(); controls.enabled = true; }
-      else { exploring = false; lastTime = 0; timeline.play(); }
-      onTimeline?.({ ...timeline.getState(), exploring }); invalidate();
+      if (!exploring) { exploring = true; active.timeline.pause(); cameraController.cancel(); controls.enabled = true; }
+      else {
+        exploring = false; lastTime = 0;
+        if (active.timeline.getState().complete) active.reset();
+        active.timeline.play();
+      }
+      emitTimeline(); invalidate();
     },
     seek(index) {
-      cameraController.cancel(); timeline.seek(THREE.MathUtils.clamp(index, 0, glutamateMechanism.steps.length - 1));
-      Object.assign(current, timeline.getState().step.state); invalidate();
+      if (transitioning || view !== 'synapse') return;
+      selected = null; hovered = null; onSelect?.(null);
+      cameraController.cancel();
+      active.seek(THREE.MathUtils.clamp(index, 0, active.definition.steps.length - 1));
+      if (!exploring && !active.timeline.getState().playing) focusStep(active.timeline.getState().step);
+      emitTimeline(); invalidate();
     },
-    restart() { biologicalTime = 0; exploring = false; timeline.reset(); Object.assign(current, baseState); navigate('synapse', { duration: 1.2 }); },
+    restart() {
+      if (transitioning || view !== 'synapse') return;
+      exploring = false; active.reset(); navigate('synapse', { duration: 1.2 });
+    },
     suspend() {
-      clearIntro(); timeline.pause(); cameraController.cancel(); transitioning = false;
-      // Preserve the current inspected pose, including a partially completed trip.
+      clearIntro(); active.timeline.pause(); navigationId++; cameraController.cancel(); transitioning = false;
+      reconcileVisibility();
       limits({ position: camera.position, target: controls.target }, view === 'synapse');
-      onView?.({ view, transitioning, exploring }); invalidate();
+      controls.enabled = true; emitView(); invalidate();
     },
-    getState() { return { view, transitioning, exploring, selected, time: biologicalTime, timeline: { ...timeline.getState(), step: timeline.getState().step.key }, particles: { ...current }, camera: camera.position.toArray(), target: controls.target.toArray(), controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }; },
+    getState() {
+      return {
+        view, mechanism: active.definition.id, transitioning, exploring, selected, time: active.time, availableKeys: availableKeys(),
+        timeline: { ...active.timeline.getState(), step: active.timeline.getState().step.key },
+        particles: { ...active.state }, camera: camera.position.toArray(), target: controls.target.toArray(),
+        controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+        model: active.model.diagnostics?.(),
+      };
+    },
     dispose() {
       disposed = true; clearIntro(); cancelAnimationFrame(frame); observer.disconnect(); abort.abort();
       controls.removeEventListener('change', controlsChange); controls.removeEventListener('start', controlsStart); controls.dispose();
       annotations.dispose(); interactive.dispose();
-      const geometries = new Set(), materials = new Set(), textures = new Set();
-      scene.traverse(object => { if (object.geometry) geometries.add(object.geometry); if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => materials.add(material)); if (object.isInstancedMesh) object.dispose(); });
-      materials.forEach(material => { Object.values(material).forEach(value => { if (value?.isTexture) textures.add(value); }); material.dispose(); });
-      geometries.forEach(geometry => geometry.dispose()); textures.forEach(texture => texture.dispose()); environmentTarget.dispose(); renderer.dispose();
+      disposeObjects(scene); environmentTarget.dispose(); renderer.dispose();
     },
   };
+}
+
+function disposeObjects(root) {
+  const geometries = new Set(), materials = new Set(), textures = new Set();
+  root.traverse(object => {
+    if (object.geometry) geometries.add(object.geometry);
+    if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => materials.add(material));
+    if (object.isInstancedMesh) object.dispose();
+  });
+  materials.forEach(material => { Object.values(material).forEach(value => { if (value?.isTexture) textures.add(value); }); material.dispose(); });
+  geometries.forEach(geometry => geometry.dispose()); textures.forEach(texture => texture.dispose());
 }

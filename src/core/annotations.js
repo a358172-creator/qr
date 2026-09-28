@@ -3,8 +3,10 @@ export function createAnnotations({
   hotspotLayer, labelLayer, camera, canvas, hotspots = [], anchors = [], onHotspot, onSelect,
 }) {
   const abort = new AbortController();
+  let labelAbort = new AbortController();
   const visited = new Set();
   let width = 0, height = 0, enabled = true, disposed = false, lastState = null;
+  let interfaceBoxes = [];
   const priorities = { nmda: 50, ampa: 49, mitochondria: 48, terminal: 47, spine: 46 };
   const listen = (el, event, callback) => el.addEventListener(event, callback, { signal: abort.signal });
 
@@ -44,17 +46,24 @@ export function createAnnotations({
     return { ...hotspot, el, dot, title, screen: hotspot.position.clone(), width: 0, height: 0, visible: false };
   });
 
-  const labelNodes = anchors.map(anchor => {
+  let labelNodes = [], allNodes = [...hotspotNodes];
+  function setAnchors(nextAnchors) {
+    labelAbort.abort(); labelAbort = new AbortController();
+    labelNodes.forEach(node => node.el.remove());
+    labelNodes = nextAnchors.map(anchor => {
     const el = button(labelLayer, 'anatomy-label', anchor.name);
     el.dataset.key = anchor.key;
     el.dataset.side = anchor.side || 'right';
     const text = document.createElement('span');
     text.textContent = anchor.name;
     el.append(text, document.createElement('i'));
-    listen(el, 'click', () => onSelect?.(anchor.key));
+    el.addEventListener('click', () => onSelect?.(anchor.key), { signal: labelAbort.signal });
     return { ...anchor, el, screen: anchor.position.clone(), width: 0, height: 0, visible: false };
-  });
-  const allNodes = [...hotspotNodes, ...labelNodes];
+    });
+    allNodes = [...hotspotNodes, ...labelNodes];
+    resize(width, height);
+  }
+  setAnchors(anchors);
 
   function show(node, visible, x, y) {
     if (visible) node.el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
@@ -74,6 +83,14 @@ export function createAnnotations({
     if (disposed) return;
     width = Math.max(0, w);
     height = Math.max(0, h);
+    const canvasBox = canvas.getBoundingClientRect();
+    interfaceBoxes = ['.scene-heading', '#narrative', '.masthead', '.scene-footer']
+      .map(selector => document.querySelector(selector))
+      .filter(element => element && !element.hidden)
+      .map(element => {
+        const box = element.getBoundingClientRect();
+        return { x: box.left - canvasBox.left, y: box.top - canvasBox.top, w: box.width, h: box.height };
+      });
     for (const node of allNodes) {
       // Cache the canonical dot offset. A previous mirrored layout must not be
       // measured and then mirrored again after a viewport change.
@@ -103,20 +120,20 @@ export function createAnnotations({
     const mobile = width < 760;
     const bottom = detail ? 180 : 140;
     if (box.x < 12 || box.x + box.w > width - 12 || box.y < 100 || box.y + box.h > height - bottom) return false;
-    if (!mobile && box.x < 260 && box.y < 350) return false;
+    if (interfaceBoxes.some(other => overlaps(box, other))) return false;
     return !occupied.some(other => overlaps(box, other));
   }
 
   function update(state) {
     if (disposed) return;
     lastState = state;
-    const { view, transitioning = false, selected = null, hovered = null, stress = 0, calcium = 0 } = state;
+    const { view, transitioning = false, selected = null, hovered = null, stress = 0, calcium = 0, visibleKeys, availableKeys } = state;
     const mobile = width < 760;
     const occupied = [];
     const ready = enabled && !transitioning && width > 0 && height > 0;
     const score = node => (document.activeElement === node.el ? 300 : 0)
       + (node.key === selected ? 200 : node.key === hovered ? 100 : 0)
-      + (priorities[node.key] || node.priority || 0);
+      + (visibleKeys?.includes(node.key) ? 60 : 0) + (priorities[node.key] || node.priority || 0);
 
     for (const node of [...hotspotNodes].sort((a, b) => Number(b.available) - Number(a.available))) {
       const point = ready && view === 'hub' && (!mobile || node.available) ? projection(node) : null;
@@ -135,7 +152,9 @@ export function createAnnotations({
       node.el.classList.toggle('selected', selected === node.key);
       node.el.classList.toggle('hovered', hovered === node.key);
       const relevant = node.key !== 'caspases' && (node.key !== 'ros' || stress >= .15 || emphasized)
-        && (node.key !== 'calcium' || calcium >= .05 || emphasized);
+        && (node.key !== 'calcium' || calcium >= .05 || emphasized)
+        && (!visibleKeys || visibleKeys.includes(node.key) || emphasized)
+        && (!availableKeys || availableKeys.includes(node.key));
       const point = ready && view === 'synapse' && relevant && (!mobile || labelCount < 3) ? projection(node) : null;
       if (!point) { show(node, false); continue; }
       const side = node.side || 'right';
@@ -168,8 +187,9 @@ export function createAnnotations({
     if (disposed) return;
     disposed = true;
     abort.abort();
+    labelAbort.abort();
     allNodes.forEach(node => node.el.remove());
   }
 
-  return { update, resize, setEnabled, setVisited, dispose };
+  return { update, resize, setAnchors, setEnabled, setVisited, dispose };
 }

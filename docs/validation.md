@@ -1,71 +1,64 @@
 # Validación del atlas neuronal
 
-Fecha: 27 de septiembre de 2026.
+Fecha: 28 de septiembre de 2026.
 
 ## Alcance
 
-Esta revisión corresponde al atlas con una neurona, una dendrita navegable y una sinapsis glutamatérgica. Los otros cuatro mecanismos son únicamente marcadores; no se han desarrollado sus escenas.
+Dos mecanismos disponibles en la dendrita: excitotoxicidad glutamatérgica y disfunción mitocondrial. El segundo corresponde exclusivamente al panel D de la referencia aportada. Señalización celular, microglía y apoptosis general siguen sin escena propia. No se implementan los paneles A, B ni C en esta ampliación.
 
-## Entorno y compilación
+## Entorno y pruebas
 
-Node.js 24.20.0, Vite 7.3.6 y Three.js 0.180.0. Chromium 153 mediante Playwright instalado en una carpeta ignorada, sin añadir dependencias al proyecto. El navegador utiliza SwiftShader, sin GPU física.
+Node.js 24.20.0, Vite 7.3.6 y Three.js 0.180.0. Chromium mediante Playwright instalado en una carpeta ignorada, sin añadir dependencias al proyecto. Render por software con SwiftShader; no se ha medido rendimiento de una GPU física.
 
-- `npm run build`: correcto, sin advertencias.
-- `npm test`: correctos los tres archivos de pruebas.
-- Ejecutados individualmente: **17 pruebas aprobadas** — 6 de cámara, 7 del reloj narrativo y 4 de geometría.
-- `git diff --check`: correcto.
+`npm test` pasa en los cinco archivos de pruebas: **32 casos** — 6 de cámara, 7 del reloj narrativo, 4 de geometría neuronal, 10 de sesiones y contratos de mecanismos, y 5 del microambiente mitocondrial. En este entorno, el resumen del ejecutor agrupa el resultado por archivo.
 
-## Geometría
+`npm run build` compila sin advertencias y valida **12 archivos y 20 referencias locales**, incluidos los módulos diferidos. `git diff --check` no encuentra errores de espacio.
 
-Se comprueban normales y caras exteriores de espinas mushroom, finas y cortas en distintas orientaciones; posiciones, colores e índices finitos; unión del soma con ramificaciones en una sola superficie conectada; continuidad de ramas terminales con radios inferiores al tamaño de vóxel. Se corrigieron discontinuidades en ramas finas y la orientación de las caras de las espinas.
+## Geometría y estados
 
-La imagen se construye con geometría 3D procedural: no es un render prerregistrado ni una imagen de fondo. El soma, la dendrita y sus bifurcaciones usan una unión de campos de distancia. La sinapsis tiene ventanas geométricas de corte, membranas con relieve, receptores separados por color y una mitocondria con crestas tridimensionales.
+Se mantienen las pruebas de continuidad del soma y las ramas y de orientación de las espinas. El segundo módulo añade comprobaciones de geometría finita, membranas mitocondriales separadas y crestas con volumen. Se verifican múltiples cruces de Ca²⁺ por el canal, límites de partículas, desplazamiento y pigmentación local de lípidos y el trayecto conceptual de AIF.
 
-## Interacciones verificadas en Chromium
+Las pruebas comparan matrices, colores, posiciones y cantidades tras restaurar el mismo tiempo y estado. Explorar conserva el reloj, las intensidades y el estado del modelo exactamente. Cada sesión mantiene una historia independiente; cambiar de mecanismo no mezcla sus variables. Reiniciar recupera el estado basal, y continuar tras completar vuelve al principio.
 
-- Selección del punto disponible y entrada en la misma sinapsis del mundo compartido.
-- Selección de AMPA, apertura de su explicación y cierre con Escape, restaurando el foco al canvas.
-- Reproducción, pausa y modo Explorar: tiempo narrativo, tiempo biológico e intensidades permanecen exactamente constantes durante la pausa.
-- Órbita por teclado durante la exploración sin avanzar el mecanismo.
-- Continuar desde el instante conservado; estado de Explorar correcto después de abrir Referencias.
-- Selección de las seis etapas, aparición de estrés oxidativo, reinicio y limpieza del estado.
-- Mostrar/ocultar anotaciones y volver a la dendrita con indicador de visita.
-- Cambio de escritorio a 390 px: punto interactivo visible y funcional. Revisión de ancho de 320 px sin desbordamiento horizontal.
-- Ayuda y referencias en diálogos nativos.
-- Transición macro→micro después de más de cuatro segundos de inactividad: conserva la posición inicial y termina en la escala sináptica sin salto inicial.
-- Sin errores de JavaScript ni errores de shaders en la ejecución funcional.
+La bicapa utiliza 1.098 instancias por capa de cabezas/colas y dos llamadas de dibujo para estos elementos. La reducción de segmentos conserva todos los lípidos y elimina un 40 % de sus triángulos: 131.760 frente a 219.600. La vista mitocondrial inicial registra aproximadamente 216.528 triángulos y 18 llamadas de dibujo; varía según etapa y encuadre. El contexto neuronal se atenúa durante la entrada y se oculta en la vista interior.
 
-## Compilación de producción
+## Interacciones comprobadas en Chromium
 
-La compilación se sirvió con un servidor estático sin fallback de rutas bajo `/qr/`. Se verificaron recursos locales, selección de estructuras, la última etapa, el hotspot móvil y la apertura directa de `/qr/#references`. No aparecieron errores de consola, shaders ni respuestas HTTP fallidas. Los diagnósticos de desarrollo no están expuestos en producción.
+- Hotspot mitocondrial, carga diferida y entrada al nuevo microambiente.
+- Las seis etapas: Ca²⁺, especies reactivas, lípidos, mitocondria, AIF e integración.
+- Play, pausa, Explorar, giro por teclado y Continuar. Tiempo, intensidades, partículas y diagnósticos conservados durante la pausa.
+- Selección real mediante raycast sobre la mitocondria y selección mediante etiquetas/selector nativo. PTP muestra su descripción conceptual completa.
+- AIF avanza hacia el contexto nuclear; al explorar se congela exactamente en su posición.
+- Finalización hasta los 60 segundos narrativos y repetición desde el estado basal.
+- Entrada con movimiento normal: posición inicial conservada, controles bloqueados durante el viaje y habilitados al finalizar. Regreso continuo a la dendrita.
+- Entrada posterior al módulo glutamatérgico: selección de AMPA, sus seis etapas y su estado de ROS siguen funcionando.
+- A 390 × 844 y 320 × 740, los dos hotspots son visibles y permiten entrar y regresar. Ambos módulos admiten selección sin desbordamiento horizontal.
+- Sin errores de JavaScript o shaders en estos recorridos.
 
-También se comprobó la alternativa sin WebGL: muestra el aviso y permite abrir las referencias. Con JavaScript desactivado, el aviso y el enlace bibliográfico siguen disponibles.
+La primera revisión detectó tres problemas corregidos: el fondo dendrítico competía con el corte intracelular, algunos encuadres interferían con los textos y el segundo hotspot quedaba fuera del hub móvil. La cámara y las anotaciones reservan espacio para la interfaz; el hub móvil se centra entre las regiones disponibles.
 
-## Rendimiento y límites
+## Producción y transferencia
 
-La vista sináptica verificada a 960 × 720 registró **38 llamadas de dibujo** y **463.320 triángulos procesados**. Las partículas y vesículas están instanciadas. La aplicación utiliza un único bucle; una escena pausada y sin interacción deja de solicitar fotogramas.
+La compilación se sirvió mediante un servidor estático sin fallback bajo `/qr/`. Chromium abrió ambos mecanismos, seleccionó estructuras, recorrió etapas, cargó los módulos diferidos y abrió directamente `#references`. La vista móvil conserva los dos hotspots. No se detectaron errores de JavaScript, shaders, recursos HTTP ni rutas ausentes. Los diagnósticos de desarrollo no se exponen en producción.
 
-No se ha medido fluidez en una GPU física ni se afirma mantener 60 FPS en todos los dispositivos. El modelo requiere WebGL 2. Proporciones, colores, duraciones y partículas son ilustrativos; no representa concentraciones reales ni una reconstrucción molecular. La distribución de mitocondrias se simplifica para la lectura educativa.
+También se comprobó la alternativa sin WebGL: el aviso permite abrir las doce referencias. Sin JavaScript permanece disponible el aviso y su enlace bibliográfico.
+
+`npm run package` genera la web compilada y el proyecto editable. Los ZIP incluyen las nuevas escenas, contenidos, pruebas y documentación; su extracción conserva los recursos relativos.
 
 ## Capturas
 
-Las capturas estables utilizan movimiento reducido.
+Las capturas utilizan movimiento reducido y muestran geometría 3D real, no imágenes insertadas en el canvas.
 
-- [Neurona](previews/atlas-neuron.png)
-- [Dendrita](previews/atlas-hub.png)
-- [Sinapsis](previews/atlas-synapse.png)
-- [Mitocondria y actividad redox](previews/atlas-detail.png)
-- [Dendrita móvil](previews/atlas-mobile-hub.png)
-- [Sinapsis móvil](previews/atlas-mobile-synapse.png)
+- [Microambiente del panel D](previews/panel-d-desktop.png)
+- [Mitocondria, crestas y PTP](previews/panel-d-hero.png)
+- [Lípidos y peroxidación](previews/panel-d-membrane.png)
+- [Microambiente móvil](previews/panel-d-mobile.png)
+- [Hub móvil con dos regiones](previews/atlas-mobile-hub.png)
 
-## Publicación
+## Límites
 
-La compilación mantiene rutas relativas para GitHub Pages. No se han realizado push, despliegues ni cambios de configuración remota.
+La escena necesita WebGL 2. No se garantiza una tasa de fotogramas en todos los dispositivos. El render por software valida funcionamiento, no rendimiento de una GPU física.
 
-## Paquetes de transferencia
+Las dimensiones, colores, tiempos e intensidades son convenciones de ilustración. Las proteínas no son modelos atomísticos. PTP no afirma una composición molecular ni un canal de paso para AIF; el contexto nuclear comprime distancias y no coloca un núcleo en la dendrita. Las etapas no establecen una cadena inevitable ni una predicción de lesión. Véanse la [correspondencia del panel D](panel-d.md) y las [notas científicas](scientific-notes.md).
 
-`npm run package` genera una web estática y un proyecto editable en ZIP, con instrucciones y sumas SHA-256. La compilación verifica ocho archivos y nueve referencias locales, incluidos imports diferidos. El workflow de GitHub Pages ejecuta las pruebas antes de compilar.
-
-Se comprobaron los CRC de ambos ZIP con un lector independiente, su extracción y las sumas SHA-256. Los archivos del ZIP web son idénticos a `dist/`. El proyecto editable extraído compila correctamente; esta comprobación reutilizó las dependencias locales instaladas, sin efectuar una nueva descarga con `npm ci`.
-
-El ZIP web extraído se sirvió con un servidor estático desde `/` y `/atlas/`. En ambos casos, Chromium cargó WebGL, abrió la sinapsis y mostró las referencias sin errores de consola, shaders ni recursos HTTP ausentes. La prueba corresponde a archivos locales servidos por HTTP; no constituye un despliegue en un hosting remoto.
+No se ha realizado push ni desplegado en un hosting remoto.

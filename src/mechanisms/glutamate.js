@@ -1,10 +1,31 @@
+import { structures } from '../content.js';
+
 // Narrative intensities and durations are artistic controls, not concentrations,
 // measured kinetics, or a prediction of neuronal injury. Positions are local to
 // the synapse model; the scene manager places that model within the dendrite.
 export const glutamateMechanism = {
-  id: 'glutamate-excitotoxicity',
+  id: 'glutamate',
   title: 'Excitotoxicidad glutamatérgica',
   description: 'De la comunicación sináptica a la pérdida de regulación del calcio.',
+  eyebrow: '02 / MICROAMBIENTE SINÁPTICO',
+  heading: ['La intimidad', 'de una conexión.'],
+  navLabel: 'Sinapsis',
+  scaleIndex: '02',
+  scaleLabel: 'ESCALA SINÁPTICA',
+  overviewCamera: 'synapseOverview',
+  cameraPoses: {
+    synapseOverview: { position: [2.15, 1.25, 14], target: [0, -.25, 0] },
+  },
+  content: {
+    ...structures,
+    terminal: { category: 'COMPARTIMENTO PRESINÁPTICO', title: 'Terminal presináptica', text: 'El extremo del axón establece contacto con la espina dendrítica. Las vesículas almacenan el neurotransmisor y lo liberan hacia la hendidura sináptica.', note: 'La sección de la membrana es un recurso de ilustración para ver el interior.' },
+    vesicles: { category: 'ALMACENAMIENTO Y LIBERACIÓN', title: 'Vesículas sinápticas', text: 'Pequeños compartimentos delimitados por membrana que almacenan glutamato. Su fusión con la membrana presináptica permite liberar el neurotransmisor.', note: 'Las partículas y su movimiento son conceptuales.' },
+    spine: { category: 'COMPARTIMENTO POSTSINÁPTICO', title: 'Espina dendrítica', text: 'La cabeza ensanchada recibe el contacto sináptico. Un cuello estrecho la conecta con la dendrita y contribuye a organizar la señalización local.', note: 'La forma corresponde a una espina tipo mushroom, una de varias morfologías posibles.' },
+  },
+  async createScene(context) {
+    const { createGlutamateEnvironment } = await import('../scene/glutamate-environment.js');
+    return createGlutamateEnvironment(context);
+  },
   steps: [
     {
       key: 'glutamate',
