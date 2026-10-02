@@ -7,6 +7,7 @@ export function bindInteractions() {
     if (!next || next.id === mechanism?.id) return;
     mechanism = next;
     $('#atlas').dataset.mechanism = next.id;
+    $('#atlas').dataset.section = String(Boolean(next.isolatedContext));
     $('#timeline-track').replaceChildren();
     stepButtons = next.steps.map((step, index) => {
       const button = document.createElement('button'); button.type = 'button'; button.dataset.step = index;

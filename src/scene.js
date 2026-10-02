@@ -99,6 +99,11 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       const model = await definition.createScene({ texture: anatomy.texture, anatomy, particles });
       if (disposed) { disposeObjects(model.root); throw new Error('Atlas disposed during scene creation'); }
       if (id !== 'glutamate') {
+        // Prepare new materials while the loading state is visible, before the
+        // camera starts its journey through this specimen.
+        try { await renderer.compileAsync(model.root, camera, scene); }
+        catch (error) { disposeObjects(model.root); throw error; }
+        if (disposed) { disposeObjects(model.root); throw new Error('Atlas disposed during shader preparation'); }
         const site = hotspotConfigs.find(item => item.id === id);
         // A magnified open section sits at its dendritic site, in front of the
         // intact tissue. The camera visits that site before entering the section.
@@ -130,6 +135,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   function reconcileVisibility() {
     for (const [id, session] of sessions) {
       session.model.root.visible = id === 'glutamate' || (view === 'synapse' && session === active);
+      if (view !== 'synapse' || session !== active) session.leave();
     }
   }
   function updateCellularContext() {
@@ -137,8 +143,12 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     // without an opaque macro-scale branch behind the intracellular specimen.
     const section = active.definition.isolatedContext && active.model.root.visible;
     const shortViewport = THREE.MathUtils.clamp((900 - height) / 180, 0, 1);
-    const distance = camera.position.distanceTo(active.model.root.position) / Math.max(1 + shortViewport * .18, .69 / camera.aspect);
-    const opacity = section ? THREE.MathUtils.smoothstep(distance, 5.8, 10.5) : 1;
+    const portraitFit = active.definition.portraitFit ?? .69;
+    const distance = camera.position.distanceTo(active.model.root.position) / Math.max(1 + shortViewport * .18, portraitFit / camera.aspect);
+    const overview = active.definition.cameraPoses[active.definition.overviewCamera];
+    const detailDistance = vector(...overview.position).distanceTo(vector(...overview.target)) * active.model.root.scale.x;
+    const inner = Math.max(5.8, detailDistance * 1.14), outer = Math.max(10.5, inner * 1.8);
+    const opacity = section ? THREE.MathUtils.smoothstep(distance, inner, outer) : 1;
     cellularContext.visible = opacity > .002;
     for (const [material, baseline] of contextMaterials) {
       const transparent = opacity < .999 ? true : baseline.transparent;
@@ -162,7 +172,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       localTarget.y -= shortViewport * .70;
       const target = localTarget.applyMatrix4(active.model.root.matrixWorld);
       // On portrait displays preserve receptor readability while leaving room for the narrative.
-      const factor = Math.max(1 + shortViewport * .18, .69 / camera.aspect);
+      const factor = Math.max(1 + shortViewport * .18, (definition.portraitFit ?? .69) / camera.aspect);
       const offset = vector(...local.position).sub(vector(...local.target)).multiplyScalar(active.model.root.scale.x * factor);
       return { target, position: target.clone().add(offset) };
     }
@@ -175,6 +185,8 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         target.set(0, 0, 0);
         available.forEach(item => target.add(item.position));
         target.multiplyScalar(1 / available.length);
+        // Keep the upper hotspot below the editorial heading on short phones.
+        target.y += .9 * THREE.MathUtils.clamp((820 - height) / 80, 0, 1);
         offset.multiplyScalar(1.22);
       }
     }
@@ -216,8 +228,13 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       try {
         const nextSession = await getSession(id);
         if (token !== navigationId || disposed) return;
-        if (active !== nextSession && active.definition.id !== 'glutamate') active.model.root.visible = false;
-        active = nextSession; active.model.root.visible = true;
+        const previousSession = active;
+        active = nextSession;
+        if (previousSession !== active) {
+          if (previousSession.definition.id !== 'glutamate') previousSession.model.root.visible = false;
+          previousSession.leave();
+        }
+        active.model.root.visible = true;
         syncAnchors(); annotations.setAnchors(active.anchors);
       } catch (error) {
         if (token !== navigationId || disposed) return;
@@ -232,7 +249,9 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     if (nextView !== 'synapse' && exitPose) poses.push(exitPose);
     if (nextView === 'synapse' && previousView !== 'synapse' && active.definition.entryCamera) {
       const membrane = poseFor('synapse', active.definition.entryCamera);
-      const region = { target: membrane.target.clone(), position: membrane.target.clone().add(vector(1, 2.5, 10)) };
+      const overview = active.definition.cameraPoses[active.definition.overviewCamera];
+      const regionDistance = Math.max(10, vector(...overview.position).distanceTo(vector(...overview.target)) * active.model.root.scale.x * 2);
+      const region = { target: membrane.target.clone(), position: membrane.target.clone().add(vector(1, 2.5, regionDistance)) };
       poses.push(region, membrane);
     }
     poses.push(pose);
@@ -323,7 +342,9 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     const dt = lastTime ? (now - lastTime) / 1000 : 0; lastTime = now;
     const running = view === 'synapse' && active.timeline.getState().playing && !exploring && !transitioning;
     if (running) active.advance(dt);
-    const moving = cameraController.update(dt);
+    // A slow render must not consume an entire cinematic leg in one frame.
+    // Biological time keeps its own clock and is unaffected by this limit.
+    const moving = cameraController.update(Math.min(dt, .1));
     // Disabled OrbitControls still clamp the camera on update; skip them while
     // crossing scales so destination zoom limits cannot truncate the journey.
     if (cameraController.active) camera.lookAt(controls.target);
@@ -331,10 +352,15 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     const state = active.timeline.getState();
     if (dirty || moving || running) {
       active.render({ selected, detail: view === 'synapse' });
+      // The wider anatomical landmark may reappear when zooming out. Its
+      // parked glutamate session must not bring particles into another module.
+      if (active.definition.id !== 'glutamate') {
+        particles.selectable.forEach(mesh => { mesh.visible = false; });
+      }
       syncAnchors();
       updateCellularContext();
       scene.updateMatrixWorld(); camera.updateMatrixWorld();
-      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress, calcium: active.state.ca, visibleKeys: state.step.labels, availableKeys: availableKeys() });
+      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress ?? active.state.ros, calcium: active.state.ca, visibleKeys: state.step.labels, availableKeys: availableKeys() });
       renderer.render(scene, camera); onProgress?.(state.progress); dirty = false;
     }
     if ((running || cameraController.active) && !frame) frame = requestAnimationFrame(tick);
@@ -392,6 +418,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         timeline: { ...active.timeline.getState(), step: active.timeline.getState().step.key },
         particles: { ...active.state }, camera: camera.position.toArray(), target: controls.target.toArray(),
         controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+        contextParticlesVisible: particles.selectable.some(mesh => mesh.visible),
         model: active.model.diagnostics?.(),
       };
     },

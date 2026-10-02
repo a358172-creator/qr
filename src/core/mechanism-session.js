@@ -17,8 +17,11 @@ export function createMechanismSession(definition, model, onChange) {
       const total = definition.steps.reduce((sum, step) => sum + step.duration, 0);
       const consumed = Math.max(0, (after.progress - before.progress) * total);
       time += consumed;
-      const mix = 1 - Math.exp(-3 * consumed);
-      for (const key of Object.keys(state)) state[key] += (after.step.state[key] - state[key]) * mix;
+      for (const key of Object.keys(state)) {
+        const rate = definition.responseRates?.[key] ?? 3;
+        const mix = 1 - Math.exp(-rate * consumed);
+        state[key] += (after.step.state[key] - state[key]) * mix;
+      }
     },
     seek(index) {
       if (!Number.isInteger(index) || index < 0 || index >= definition.steps.length) {
@@ -30,6 +33,10 @@ export function createMechanismSession(definition, model, onChange) {
       timeline.seek(index);
     },
     reset() { time = 0; Object.assign(state, initial); timeline.reset(); },
+    leave() {
+      timeline.pause();
+      if (definition.resetOnExit) { time = 0; Object.assign(state, initial); timeline.reset(); }
+    },
     render({ selected = null, detail = true } = {}) {
       const frame = timeline.getState();
       model.update({ time, state, stepIndex: frame.index, elapsed: frame.elapsed, selected, detail });

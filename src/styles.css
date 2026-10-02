@@ -698,9 +698,9 @@ canvas:active {
 }
 .structure-picker:focus-within { outline:1px solid #b7cbd3; outline-offset:4px }
 @media(min-width:641px) and (max-width:1100px) {
-  .atlas[data-view=synapse][data-mechanism=mitochondrial] .scene-heading h1,
-  .atlas[data-view=synapse][data-mechanism=mitochondrial] .scene-heading .heading-line,
-  .atlas[data-view=synapse][data-mechanism=mitochondrial] .scene-heading>p:last-of-type { display:none }
+  .atlas[data-view=synapse][data-section=true] .scene-heading h1,
+  .atlas[data-view=synapse][data-section=true] .scene-heading .heading-line,
+  .atlas[data-view=synapse][data-section=true] .scene-heading>p:last-of-type { display:none }
 }
 @media(max-width:640px) {
   .structure-picker { font-size:9px; padding:8px 12px 8px 0 }

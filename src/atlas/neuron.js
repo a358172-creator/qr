@@ -90,7 +90,7 @@ export function createNeuron() {
     { id:'synapse', position:synapseOrigin.clone(), normal:point(0,1,.15).normalize() },
     { id:'mitochondria', position:point(-4.3,-1.12,.1), normal:point(0,1,.2).normalize() },
     { id:'signaling', position:point(-7.4,-2.0,.2), normal:point(0,.6,1).normalize() },
-    { id:'microglia', position:point(-11.9,-6.0,-.6), normal:point(-.2,0,1).normalize() },
+    { id:'microglia', position:point(-2.5,3.7,-.8), normal:point(-.2,0,1).normalize() },
     { id:'apoptosis', position:point(-8.9,-3.0,1), normal:point(0,0,1) },
   ];
   root.updateMatrixWorld(true);

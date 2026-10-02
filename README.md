@@ -1,8 +1,8 @@
 # NEURO·VISTA
 
-**Atlas 3D interactivo de mecanismos de neurotoxicidad.** La exploración comienza en una neurona y se aproxima a la dendrita, que permite entrar en dos microambientes celulares. Una cámara recorre estas escalas dentro de un mismo mundo 3D.
+**Atlas 3D interactivo de mecanismos de neurotoxicidad.** La exploración comienza en una neurona y se aproxima a la dendrita, que permite entrar en tres microambientes celulares. Una cámara recorre estas escalas dentro de un mismo mundo 3D.
 
-Los módulos disponibles son **excitotoxicidad glutamatérgica** y **disfunción mitocondrial, especies reactivas y daño de membranas**. El segundo traduce exclusivamente las relaciones del **panel D** de la referencia científica aportada en un compartimento 3D; no añade los paneles A, B o C. Señalización celular, activación microglial y apoptosis general permanecen como regiones futuras.
+Los módulos disponibles son **excitotoxicidad glutamatérgica**, **disfunción mitocondrial, especies reactivas y daño de membranas** y **remodelado microglial**. El segundo representa exclusivamente el **panel D** de la referencia científica aportada; el tercero desarrolla el **panel C**, con una microglía ramificada que se aproxima a una espina alterada y una espina vecina conservada. El panel A y el módulo independiente de apoptosis permanecen sin implementar.
 
 ## Ejecutar
 
@@ -22,25 +22,19 @@ npm run preview
 
 El resultado está en `dist/`. La aplicación necesita WebGL 2 para mostrar el modelo. Si no está disponible, muestra un aviso y permite acceder a las referencias.
 
-## Compartir y subir la web
+## Subir la web
 
-```bash
-npm run package
-```
-
-Genera `release/neurovista-web.zip`, listo para descomprimir y subir al hosting, y `release/neurovista-proyecto.zip`, con el proyecto editable. El ZIP web contiene `index.html`, `assets/` y `.nojekyll`; no necesita Node.js en el servidor. También se generan instrucciones breves y sumas SHA-256.
-
-Sigue [PUBLICAR.md](PUBLICAR.md) para subir los archivos, utilizar GitHub Pages o entregar el proyecto a otra persona. Cada compilación verifica las rutas y la presencia de los recursos locales.
+Tras `npm run build`, se puede servir el contenido de `dist/` en un hosting estático. La web compilada no necesita Node.js en el servidor. Cada compilación verifica las rutas y la presencia de los recursos locales. La configuración de GitHub Pages se describe más abajo; no es necesario generar archivos de entrega ni paquetes ZIP.
 
 ## Explorar
 
-- La introducción acerca la cámara desde la neurona a la dendrita. El punto de excitotoxicidad glutamatérgica abre el detalle de esa misma sinapsis. El de disfunción mitocondrial conduce hacia una región de membrana y su compartimento intracelular.
+- La introducción acerca la cámara desde la neurona a la dendrita. El punto de excitotoxicidad glutamatérgica abre el detalle de esa misma sinapsis. El de disfunción mitocondrial conduce hacia una región de membrana y su compartimento intracelular. El de microglía revela dos espinas y la célula ramificada próxima a ellas.
 - Arrastrar para orbitar y usar la rueda o un gesto de pinza para acercarse, con límites de cámara. Durante el recorrido narrativo, pausar o pulsar **Explorar** para moverla libremente.
 - Con el canvas enfocado: flechas para orbitar, `+` / `−` para zoom y `Home` para restablecer la vista.
 - Seleccionar estructuras directamente, desde sus etiquetas o mediante el selector **Estructuras** para abrir una explicación breve. El selector incluye las estructuras disponibles en la etapa actual y funciona con teclado. `Escape` cierra la información.
-- Reproducir, pausar, avanzar, retroceder o elegir una de las seis etapas de cada mecanismo. El glutamatérgico conserva glutamato → AMPA → NMDA → Ca²⁺ → mitocondria → ROS. El mitocondrial presenta entrada de Ca²⁺, señales reactivas, daño de membranas, disfunción mitocondrial, AIF y contexto nuclear, e integración del daño.
+- Reproducir, pausar, avanzar, retroceder o elegir una de las seis etapas de cada mecanismo. El glutamatérgico conserva glutamato → AMPA → NMDA → Ca²⁺ → mitocondria → ROS. El mitocondrial presenta entrada de Ca²⁺, señales reactivas, daño de membranas, disfunción mitocondrial, AIF y contexto nuclear, e integración del daño. El microglial pasa de una sinapsis conservada a alteración local, señales de complemento y caspasa-3, aproximación de un proceso, contacto y remodelado.
 - **Explorar** detiene el reloj narrativo y el movimiento biológico. **Continuar** reanuda desde el instante conservado. **Reiniciar** vuelve al comienzo del módulo.
-- **Volver a la dendrita** invierte la aproximación y permite elegir otro mecanismo. Cada recorrido conserva su etapa y estado por separado. La navegación de escala también permite regresar a la neurona.
+- **Volver a la dendrita** invierte la aproximación y permite elegir otro mecanismo. Los módulos glutamatérgico y mitocondrial conservan su etapa y estado por separado. El módulo microglial vuelve al estado funcional inicial al salir; entrar de nuevo comienza un recorrido nuevo. La navegación de escala también permite regresar a la neurona.
 - `prefers-reduced-motion` omite la introducción y los desplazamientos animados de cámara. La narrativa comienza pausada.
 
 ## Arquitectura
@@ -61,21 +55,26 @@ Sigue [PUBLICAR.md](PUBLICAR.md) para subir los archivos, utilizar GitHub Pages 
 | `src/mechanisms/registry.js` | Registro de módulos y carga diferida por identificador |
 | `src/mechanisms/glutamate.js` | Definición del primer mecanismo, contenido, seis etapas y fábrica de escena |
 | `src/mechanisms/mitochondrial-dysfunction.js` | Definición del panel D, seis etapas, siete cámaras, estados y contenido de estructuras |
+| `src/mechanisms/microglia.js` | Definición del panel C, seis etapas, encuadres, contenido y reinicio al salir |
 | `src/scene/geometry.js` | Superficies orgánicas, texturas procedurales y materiales |
 | `src/scene/anatomy.js` | Terminal, espina, receptores y mitocondria en corte con crestas |
 | `src/scene/glutamate-environment.js` | Adaptación de la anatomía sináptica existente al contrato compartido de módulos |
 | `src/scene/mitochondrial-environment.js` | Membrana, proteínas estilizadas, especies reactivas, peroxidación local y señal AIF |
 | `src/scene/mitochondrial-organelle.js` | Mitocondria en corte, membranas externa e interna y crestas |
+| `src/scene/microglia-environment.js` | Dendrita, dos espinas, señales locales y coordinación del contacto y remodelado |
+| `src/scene/microglia-cell.js` | Superficie ramificada de la microglía y deformación de sus procesos con soma estable |
 | `src/scene/particles.js` | Partículas instanciadas y trayectorias de glutamato, Na⁺, Ca²⁺ y ROS |
 | `src/scene/molecular-particles.js` | Utilidades de partículas instanciadas y formas diferenciadas de especies |
 | `content/` | Leyendas editoriales, alcance del modelo y bibliografía |
-| `docs/panel-d.md`, `docs/scientific-notes.md` | Correspondencia científica del segundo mecanismo y límites de ambos recorridos |
+| `docs/panel-c.md`, `docs/panel-d.md`, `docs/scientific-notes.md` | Correspondencia científica de los paneles C y D y límites de los tres recorridos |
 
 El soma y las ramas se construyen mediante una unión suave de campos de distancia, convertida en una superficie continua. Las espinas y la anatomía sináptica usan superficies procedurales; las secciones de membrana revelan su interior. La sinapsis se coloca sobre la dendrita y permanece en las mismas coordenadas durante la exploración.
 
 La anatomía se genera localmente: no se descargan modelos GLB/GLTF ni texturas. Three.js es la única dependencia de ejecución; Vite sirve y compila la aplicación. Esta arquitectura no añade dependencias, backend ni claves API.
 
 Cada definición de mecanismo aporta contenido, etapas, encuadres y una fábrica de objetos 3D. El registro carga su módulo cuando se solicita; una sesión mantiene su estado y tiempo. El gestor conserva un único renderer, cámara, OrbitControls y sistema de selección, anotaciones e interfaz. Los módulos reutilizan el mismo controlador de timeline y no crean otra página ni sus propios controles. Para añadir uno se implementan su definición y fábrica, se registra su carga y se habilita su región en el catálogo.
+
+La microglía mantiene el soma y las uniones proximales estables mientras deforma sus procesos distales. El proceso principal sigue la región de contacto cuando la espina se retrae. La espina vecina conserva su geometría durante la secuencia. La pausa detiene también estas deformaciones; la cámara y la selección permanecen disponibles. La propiedad `resetOnExit` de su definición restablece su sesión al abandonar el módulo.
 
 ## GitHub Pages
 
@@ -91,10 +90,12 @@ Representación conceptual, no simulación cuantitativa ni reconstrucción molec
 
 El segundo mecanismo utiliza como referencia principal el panel D aportado por el usuario. NO, O₂•⁻, ONOO⁻ y ROS mitocondrial tienen formas y etiquetas diferenciadas. El peroxinitrito requiere la reacción entre NO y superóxido; la liberación de AA por cPLA₂ se distingue de la peroxidación lipídica. PTP es una representación funcional sin estructura molecular afirmada. AIF se desplaza hacia un contexto nuclear a distancia comprimida, sin atravesar ese poro ni situar un núcleo dentro de la dendrita. La apoptosis aparece sólo como posible consecuencia conceptual final. Las fuentes primarias y los matices están documentados en [panel-d.md](docs/panel-d.md).
 
+El tercero utiliza exclusivamente el panel C. C1q y C3 se muestran como pocos complejos estilizados, y CASP3 permanece como señal local intracelular. El complemento no se presenta como marcador universal de daño ni la caspasa-3 como señal extracelular de reclutamiento. El contacto microglial y la reducción de una espina ilustran remodelado local, sin implicar apoptosis de toda la neurona. La eliminación excesiva durante el desarrollo se menciona como posible alteración de la organización de los circuitos, sin calcular riesgo individual. Las fuentes y los límites de esta interpretación se documentan en [panel-c.md](docs/panel-c.md).
+
 El aspecto y la velocidad de render dependen de la GPU, del navegador y de WebGL 2. Una captura o una prueba con render por software no acredita el rendimiento en otros dispositivos.
 
 ## Revisión visual y pruebas
 
-`npm test` comprueba la continuidad y orientación de la geometría, las transiciones de cámara y la pausa del reloj narrativo. Las pruebas de sesión verifican historias independientes, congelación del estado durante la exploración, reanudación, navegación y reinicio coherentes, límites de tiempo y consistencia de las definiciones del panel D.
+`npm test` ejecuta las comprobaciones de geometría, cámara, reloj narrativo y sesiones. Las pruebas de sesión cubren historias independientes, congelación del estado durante la exploración, reanudación, navegación y reinicio, incluido el restablecimiento opcional al salir de un módulo.
 
 Consultar el [registro de validación](docs/validation.md) para conocer las comprobaciones realizadas y sus límites.

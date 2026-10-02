@@ -11,6 +11,8 @@ export function createGlutamateEnvironment({ anatomy, particles }) {
     initialState: { glut: .12, activation: .04, ca: 0, stress: 0, damage: 0 },
     update({ time, state, stepIndex, selected, detail }) {
       particles.update(time, state, selected);
+      particles.glutamate.visible = detail;
+      particles.ros.visible = detail && state.stress > .015;
       particles.calcium.visible = detail && stepIndex >= 2;
       particles.sodium.visible = detail && stepIndex >= 1;
       anatomy.vesicleSeeds.forEach((seed, i) => {

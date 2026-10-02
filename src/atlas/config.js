@@ -5,6 +5,7 @@ export const mechanisms = [
   { id: 'mitochondrial', title: 'Disfunción mitocondrial', scene: 'mitochondrial', available: true,
     description: 'Panel D · especies reactivas y daño de membranas.' },
   { id: 'signaling', title: 'Señalización celular', scene: null, available: false },
-  { id: 'microglia', title: 'Activación microglial', scene: null, available: false },
+  { id: 'microglia', title: 'Microglía', scene: 'microglia', available: true,
+    description: 'Panel C · reconocimiento y remodelado de una conexión alterada.' },
   { id: 'apoptosis', title: 'Apoptosis', scene: null, available: false },
 ];

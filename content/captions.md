@@ -6,7 +6,7 @@
 
 La dendrita conecta las escalas del atlas. Una de sus espinas conduce al primer módulo disponible: excitotoxicidad glutamatérgica. Neurona, dendrita y sinapsis pertenecen al mismo entorno tridimensional.
 
-El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivamente en el panel D de la referencia. Señalización celular, microglía y apoptosis general permanecen como marcadores.
+El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivamente en el panel D de la referencia. El tercero abre **Remodelado microglial**, basado exclusivamente en el panel C. El panel A y la apoptosis general permanecen sin implementar.
 
 ## Primer mecanismo · sinapsis glutamatérgica
 
@@ -49,3 +49,18 @@ Las seis etapas se mantienen en `src/mechanisms/glutamate.js`; las explicaciones
 NO se reconoce por puntos azul grisáceos; O₂•⁻ por pares coral; ONOO⁻ por tríos magenta; ROS mitocondrial por pequeños grupos rosados. Las etiquetas y el selector **Estructuras** complementan el color. PTP no representa una estructura molecular determinada ni un canal de paso para AIF.
 
 Las etapas, cámaras, etiquetas y explicaciones del segundo mecanismo se mantienen en `src/mechanisms/mitochondrial-dysfunction.js`. La correspondencia científica se documenta en [panel D](../docs/panel-d.md).
+
+## Tercer mecanismo · panel C
+
+1. **Sinapsis dendrítica.** Dos espinas conservan su forma y sus contactos. Cerca de ellas, la microglía explora el entorno con movimientos discretos de sus procesos.
+2. **Una conexión cambia de estado.** En una de las espinas aumenta la entrada de Ca²⁺ por NMDAR y la señal de ROS. La espina vecina conserva su morfología.
+3. **Señales en la sinapsis alterada.** La cabeza cambia ligeramente. C1q, C3 y una señal local de caspasa-3 sitúan los componentes del panel C alrededor de esta conexión.
+4. **Un proceso se aproxima.** Un proceso microglial se extiende hacia la conexión alterada. El soma permanece próximo y la espina conservada queda al margen del contacto.
+5. **Contacto y remodelado.** El proceso alcanza la región sináptica. La cabeza de la espina se reduce y retrae gradualmente: una representación conceptual del remodelado local.
+6. **Remodelado de la conectividad sináptica.** Una eliminación excesiva de conexiones durante el desarrollo puede alterar la organización de los circuitos neuronales.
+
+La microglía se reconoce por su silueta ramificada y sus procesos de distintas longitudes y profundidades. C1q adopta una forma de ramillete y C3 una forma compacta; las etiquetas y el selector **Estructuras** permiten distinguirlos sin depender sólo del color. CASP3 es una señal intracelular local, no un marcador de apoptosis global ni una señal que atraiga directamente a la microglía.
+
+**Explorar** conserva el tiempo, las señales y la forma de la espina y los procesos. **Continuar** retoma ese mismo instante. Al **volver a la dendrita**, este módulo se restablece: una nueva entrada comienza con las dos espinas conservadas. Los otros dos recorridos mantienen sus propios estados pausados.
+
+Las etapas, cámaras, etiquetas y explicaciones del tercer mecanismo se mantienen en `src/mechanisms/microglia.js`. La correspondencia científica y los límites de la secuencia se documentan en [panel C](../docs/panel-c.md).

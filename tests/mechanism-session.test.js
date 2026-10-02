@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createMechanismSession } from '../src/core/mechanism-session.js';
 import { glutamateMechanism } from '../src/mechanisms/glutamate.js';
 import { mitochondrialMechanism } from '../src/mechanisms/mitochondrial-dysfunction.js';
+import { microgliaMechanism } from '../src/mechanisms/microglia.js';
 
 const definition = {
   id: 'test',
@@ -151,6 +152,53 @@ test('a mechanism-owned baseline is used when the model has no initial state', (
   assert.deepEqual(session.state, mitochondrialMechanism.initialState);
 });
 
+test('a mechanism can reset its temporary state on exit without leaking a final-stage model', () => {
+  const session = createMechanismSession({ ...definition, resetOnExit: true }, specimen());
+  session.timeline.play();
+  session.advance(7.5);
+  session.leave();
+  assert.equal(session.time, 0);
+  assert.equal(session.timeline.getState().index, 0);
+  assert.equal(session.timeline.getState().playing, false);
+  assert.equal(session.timeline.getState().complete, false);
+  assert.deepEqual(session.state, session.model.initialState);
+  session.render();
+  assert.deepEqual(session.model.frames.at(-1).state, session.model.initialState);
+  session.timeline.play(); session.advance(.25);
+  near(session.time, .25);
+});
+
+test('exit preserves the existing modules’ paused histories unless reset is requested', () => {
+  const session = createMechanismSession(definition, specimen());
+  session.timeline.play(); session.advance(4.5);
+  const before = { time: session.time, state: { ...session.state }, index: session.timeline.getState().index };
+  session.leave(); session.advance(100);
+  assert.equal(session.timeline.getState().playing, false);
+  assert.equal(session.time, before.time);
+  assert.equal(session.timeline.getState().index, before.index);
+  assert.deepEqual(session.state, before.state);
+});
+
+test('microglial extension and pruning remain gradual, freeze exactly and reset on exit', () => {
+  const session = createMechanismSession(microgliaMechanism, { update() {} });
+  session.seek(2);
+  session.timeline.play();
+  // Approach starts at the next stage; it does not snap to its final extent.
+  session.advance(9.99);
+  session.advance(.02);
+  session.advance(.5);
+  assert.ok(session.state.approach > 0 && session.state.approach < .3);
+  session.advance(5);
+  assert.ok(session.state.approach > .7 && session.state.approach < .9);
+  session.timeline.pause();
+  const paused = snapshot(session);
+  session.advance(30);
+  assert.deepEqual(snapshot(session), paused);
+  session.leave();
+  assert.deepEqual(session.state, microgliaMechanism.initialState);
+  assert.equal(session.time, 0);
+});
+
 test('completion consumes only the remaining narrative duration and then stays frozen', () => {
   const session = createMechanismSession(definition, specimen());
   session.timeline.play();
@@ -190,8 +238,7 @@ test('invalid frame durations cannot corrupt a playing mechanism', () => {
   }
 });
 
-test('panel D defines resolvable cameras, labels and complete finite states for every stage', () => {
-  const mechanism = mitochondrialMechanism;
+for (const mechanism of [mitochondrialMechanism, microgliaMechanism]) test(`${mechanism.id} defines resolvable cameras, labels and complete finite states for every stage`, () => {
   assert.equal(mechanism.steps.length, 6);
   assert.equal(new Set(mechanism.steps.map(step => step.key)).size, 6);
   const stateKeys = Object.keys(mechanism.initialState).sort();
@@ -214,7 +261,10 @@ test('panel D defines resolvable cameras, labels and complete finite states for 
     }
     assert.notDeepEqual(pose.position, pose.target);
   }
-  for (const key of ['nmda', 'calcium', 'nnos', 'no', 'sgc', 'pkc', 'nox2', 'superoxide', 'peroxynitrite', 'cpla2', 'aa', 'eicosanoids', 'membrane', 'mitochondria', 'ptp', 'aif', 'ros', 'dna']) {
-    assert.ok(mechanism.content[key]?.text, `Missing panel D structure ${key}`);
+  const keys = mechanism.id === 'mitochondrial'
+    ? ['nmda', 'calcium', 'nnos', 'no', 'sgc', 'pkc', 'nox2', 'superoxide', 'peroxynitrite', 'cpla2', 'aa', 'eicosanoids', 'membrane', 'mitochondria', 'ptp', 'aif', 'ros', 'dna']
+    : ['microglia', 'process', 'healthySpine', 'damagedSpine', 'c1q', 'c3', 'caspase3', 'nmda', 'calcium', 'ros'];
+  for (const key of keys) {
+    assert.ok(mechanism.content[key]?.text, `Missing structure ${key}`);
   }
 });
