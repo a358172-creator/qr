@@ -4,6 +4,7 @@ import { createMechanismSession } from '../src/core/mechanism-session.js';
 import { glutamateMechanism } from '../src/mechanisms/glutamate.js';
 import { mitochondrialMechanism } from '../src/mechanisms/mitochondrial-dysfunction.js';
 import { microgliaMechanism } from '../src/mechanisms/microglia.js';
+import { plasticityMechanism } from '../src/mechanisms/synaptic-plasticity.js';
 
 const definition = {
   id: 'test',
@@ -238,7 +239,36 @@ test('invalid frame durations cannot corrupt a playing mechanism', () => {
   }
 });
 
-for (const mechanism of [mitochondrialMechanism, microgliaMechanism]) test(`${mechanism.id} defines resolvable cameras, labels and complete finite states for every stage`, () => {
+test('plasticity remodels gradually, preserves biology while zooming and resets on exit', () => {
+  const model = specimen(plasticityMechanism.initialState);
+  const session = createMechanismSession(plasticityMechanism, model);
+  session.seek(3);
+  session.timeline.play();
+  session.advance(9.99);
+  session.advance(.02);
+  session.advance(.5);
+  assert.ok(session.state.remodeling > .12 && session.state.remodeling < .25);
+  session.advance(5);
+  assert.ok(session.state.remodeling > .6 && session.state.remodeling < .9);
+  session.timeline.pause();
+  const paused = snapshot(session);
+  for (const viewDistance of [9, 12, 17]) {
+    session.advance(30);
+    session.render({ selected: 'actin', viewDistance });
+    assert.equal(model.frames.at(-1).viewDistance, viewDistance);
+    assert.deepEqual(snapshot(session), paused);
+  }
+  session.seek(0);
+  assert.equal(session.state.remodeling, 0);
+  session.seek(5);
+  assert.equal(session.state.remodeling, 1);
+  session.leave();
+  assert.deepEqual(session.state, plasticityMechanism.initialState);
+  assert.equal(session.time, 0);
+  assert.equal(session.timeline.getState().playing, false);
+});
+
+for (const mechanism of [mitochondrialMechanism, microgliaMechanism, plasticityMechanism]) test(`${mechanism.id} defines resolvable cameras, labels and complete finite states for every stage`, () => {
   assert.equal(mechanism.steps.length, 6);
   assert.equal(new Set(mechanism.steps.map(step => step.key)).size, 6);
   const stateKeys = Object.keys(mechanism.initialState).sort();
@@ -250,6 +280,12 @@ for (const mechanism of [mitochondrialMechanism, microgliaMechanism]) test(`${me
     for (const key of step.labels) {
       assert.ok(mechanism.content[key]?.title, `Missing title for ${key}`);
       assert.ok(mechanism.content[key]?.text, `Missing explanation for ${key}`);
+    }
+    let lastPhase = -1;
+    for (const phase of step.labelPhases || []) {
+      assert.ok(phase.after > lastPhase && phase.after < step.duration);
+      for (const key of phase.labels) assert.ok(step.labels.includes(key) && mechanism.content[key]?.text);
+      lastPhase = phase.after;
     }
   }
   assert.ok(mechanism.cameraPoses[mechanism.entryCamera]);
@@ -263,7 +299,9 @@ for (const mechanism of [mitochondrialMechanism, microgliaMechanism]) test(`${me
   }
   const keys = mechanism.id === 'mitochondrial'
     ? ['nmda', 'calcium', 'nnos', 'no', 'sgc', 'pkc', 'nox2', 'superoxide', 'peroxynitrite', 'cpla2', 'aa', 'eicosanoids', 'membrane', 'mitochondria', 'ptp', 'aif', 'ros', 'dna']
-    : ['microglia', 'process', 'healthySpine', 'damagedSpine', 'c1q', 'c3', 'caspase3', 'nmda', 'calcium', 'ros'];
+    : mechanism.id === 'microglia'
+      ? ['microglia', 'process', 'healthySpine', 'damagedSpine', 'c1q', 'c3', 'caspase3', 'nmda', 'calcium', 'ros']
+      : ['nmda', 'calcium', 'psd95', 'disc1', 'kalirin7', 'actin', 'spine', 'psd', 'terminal', 'dendrite', 'glutamate'];
   for (const key of keys) {
     assert.ok(mechanism.content[key]?.text, `Missing structure ${key}`);
   }

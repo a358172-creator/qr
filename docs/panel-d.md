@@ -1,6 +1,6 @@
 # Panel D · disfunción mitocondrial y daño de membranas
 
-El alcance científico de este módulo procede exclusivamente del **panel D de la imagen aportada por el usuario**. La imagen no incluye datos suficientes para atribuir una publicación original; no se inventa esa procedencia. Los paneles A, B y C no se implementan en este trabajo. El mecanismo glutamatérgico existente conserva su recorrido.
+El alcance científico de este módulo procede exclusivamente del **panel D de la imagen aportada por el usuario**. La imagen no incluye datos suficientes para atribuir una publicación original; no se inventa esa procedencia. Las relaciones de los paneles A, B y C quedan fuera de esta escena. Los recorridos glutamatérgico, microglial y de plasticidad conservan sus propias escenas y narrativas dentro del atlas.
 
 La escena transforma las relaciones del panel en un compartimento tridimensional: membrana postsináptica superior, NMDAR incrustado, señales citoplasmáticas distribuidas en profundidad y una mitocondria con dos membranas y crestas expuestas mediante un corte de ilustración. La organización espacial, los tamaños, los colores, las cantidades y los tiempos son recursos educativos. No son escalas anatómicas calibradas, concentraciones ni una simulación cinética.
 

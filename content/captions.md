@@ -6,7 +6,7 @@
 
 La dendrita conecta las escalas del atlas. Una de sus espinas conduce al primer módulo disponible: excitotoxicidad glutamatérgica. Neurona, dendrita y sinapsis pertenecen al mismo entorno tridimensional.
 
-El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivamente en el panel D de la referencia. El tercero abre **Remodelado microglial**, basado exclusivamente en el panel C. El panel A y la apoptosis general permanecen sin implementar.
+El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivamente en el panel D de la referencia. El tercero abre **Remodelado microglial**, basado exclusivamente en el panel C. El cuarto abre **Plasticidad sináptica**, basado exclusivamente en el panel A. El módulo independiente de apoptosis permanece sin implementar.
 
 ## Primer mecanismo · sinapsis glutamatérgica
 
@@ -61,6 +61,23 @@ Las etapas, cámaras, etiquetas y explicaciones del segundo mecanismo se mantien
 
 La microglía se reconoce por su silueta ramificada y sus procesos de distintas longitudes y profundidades. C1q adopta una forma de ramillete y C3 una forma compacta; las etiquetas y el selector **Estructuras** permiten distinguirlos sin depender sólo del color. CASP3 es una señal intracelular local, no un marcador de apoptosis global ni una señal que atraiga directamente a la microglía.
 
-**Explorar** conserva el tiempo, las señales y la forma de la espina y los procesos. **Continuar** retoma ese mismo instante. Al **volver a la dendrita**, este módulo se restablece: una nueva entrada comienza con las dos espinas conservadas. Los otros dos recorridos mantienen sus propios estados pausados.
+**Explorar** conserva el tiempo, las señales y la forma de la espina y los procesos. **Continuar** retoma ese mismo instante. Al **volver a la dendrita**, este módulo se restablece: una nueva entrada comienza con las dos espinas conservadas. Los recorridos glutamatérgico y mitocondrial mantienen sus propios estados pausados; plasticidad también se restablece al salir.
 
 Las etapas, cámaras, etiquetas y explicaciones del tercer mecanismo se mantienen en `src/mechanisms/microglia.js`. La correspondencia científica y los límites de la secuencia se documentan en [panel C](../docs/panel-c.md).
+
+## Cuarto mecanismo · panel A
+
+1. **Arquitectura postsináptica.** Una cabeza amplia y un cuello estrecho continúan hacia la dendrita. Bajo la membrana, la densidad postsináptica y la red tridimensional de actina organizan la espina.
+2. **Activación de NMDAR.** El glutamato contextualiza la apertura del receptor. Una entrada moderada de Ca²⁺ atraviesa su canal y se dispersa dentro del microdominio postsináptico.
+3. **Organización postsináptica.** PSD-95 destaca junto a la membrana y el receptor; después, el foco incluye DISC1 a mayor profundidad. Ambos complejos están presentes desde el comienzo.
+4. **Kalirin-7 y el entorno de actina.** Un complejo próximo a los filamentos sitúa la relación funcional de Kalirin-7 con el remodelado de la espina.
+5. **Remodelado de actina.** Los filamentos cambian lentamente de orientación y ramificación. La cabeza ajusta de forma sutil su volumen, conservando la continuidad con el cuello y la dendrita.
+6. **Plasticidad estructural de la espina dendrítica.** La organización postsináptica y el citoesqueleto contribuyen a mantener y remodelar la estructura de la conexión.
+
+La membrana utiliza tonos lavanda y rosados; NMDAR, índigo; Ca²⁺, coral; PSD-95, verde azulado discreto; DISC1, azul grisáceo; Kalirin-7, verde menta; y actina, magenta profundo. Las formas, posiciones, etiquetas y explicaciones complementan el color. La densidad postsináptica es un entramado volumétrico; PSD-95 es una de las proteínas representadas en esa región.
+
+El recorrido conserva un entorno fisiológico, sin ROS, lesiones de membrana, microglía ni apoptosis. El orden de presentación distribuye la atención entre componentes coexistentes: no afirma una cadena molecular obligatoria. La entrada de calcio, las ramificaciones y el cambio de forma son ilustrativos, sin concentraciones ni escalas temporales biológicas.
+
+Seleccionar **Actina** destaca los filamentos y atenúa discretamente la membrana, los complejos y la terminal. **Explorar** conserva las posiciones y la geometría biológica mientras permite orbitar, acercarse y seleccionar. La transparencia responde a la distancia de observación para mostrar el interior. **Continuar** retoma el instante conservado; **Volver a la dendrita** restablece este módulo a su arquitectura basal.
+
+Las etapas, cámaras, etiquetas y explicaciones se mantienen en `src/mechanisms/synaptic-plasticity.js`. La correspondencia científica y las fuentes se documentan en [panel A](../docs/panel-a.md).

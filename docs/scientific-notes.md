@@ -1,6 +1,6 @@
 # Alcance científico del atlas
 
-El atlas contiene tres recorridos: **excitotoxicidad glutamatérgica**, **disfunción mitocondrial, especies reactivas y daño de membranas** y **remodelado microglial**. La dendrita permite acceder a los tres como regiones de una misma ilustración. El panel A y el módulo independiente de apoptosis permanecen sin implementar.
+El atlas contiene cuatro recorridos: **excitotoxicidad glutamatérgica**, **disfunción mitocondrial, especies reactivas y daño de membranas**, **remodelado microglial** y **plasticidad sináptica**. La dendrita permite acceder a los cuatro como regiones de una misma ilustración. El módulo independiente de apoptosis permanece sin implementar.
 
 ## Convenciones compartidas
 
@@ -21,7 +21,7 @@ Referencias primarias verificadas para la narrativa:
 
 ## Módulo mitocondrial · panel D
 
-El segundo recorrido se basa exclusivamente en el panel D de la imagen científica aportada por el usuario. No se ha atribuido una procedencia bibliográfica a esa imagen porque no se proporcionó. Este módulo no incorpora relaciones de los otros paneles; C tiene un recorrido propio, descrito más abajo. La correspondencia entre cada relación de D, su representación y las fuentes de apoyo se detalla en [panel-d.md](panel-d.md).
+El segundo recorrido se basa exclusivamente en el panel D de la imagen científica aportada por el usuario. No se ha atribuido una procedencia bibliográfica a esa imagen porque no se proporcionó. Este módulo no incorpora relaciones de los otros paneles; C y A tienen recorridos propios, descritos más abajo. La correspondencia entre cada relación de D, su representación y las fuentes de apoyo se detalla en [panel-d.md](panel-d.md).
 
 La entrada por NMDAR conduce a ramas de señalización representadas espacialmente: nNOS–NO y sGC–cGMP–PKG; PKC–NOX2–O₂•⁻; cPLA₂–AA–eicosanoides; peroxidación local de lípidos; disfunción mitocondrial y ROS; PTP y traslado conceptual de AIF hacia un contexto nuclear. Las seis etapas ordenan la lectura, sin establecer una sucesión biológica obligatoria.
 
@@ -44,3 +44,15 @@ C1q y C3 se representan con formas estilizadas distintas y pocos elementos. C3 r
 CASP3 permanece dentro de la región alterada. [Ertürk et al. (2014)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6827581/) describen cambios locales de espinas y dendritas dependientes de caspasa-3 sin muerte de toda la neurona en condiciones experimentales. La escena distingue esa participación local de apoptosis global y no presenta caspasa-3 como señal extracelular de reclutamiento microglial. Su coexistencia con complemento no afirma una cadena directa entre ambos.
 
 El contacto microglial no implica siempre eliminación. Las seis etapas ordenan la lectura de una posibilidad de remodelado; sus procesos pueden coexistir y no constituyen una secuencia obligatoria. La advertencia final sobre eliminación excesiva durante el desarrollo procede del texto de la figura, sin extrapolar edades, frecuencias ni riesgo clínico individual. Los 60 segundos, las proporciones y la intensidad de las señales son recursos didácticos. La correspondencia detallada y las fuentes se encuentran en [panel-c.md](panel-c.md).
+
+## Módulo de plasticidad sináptica · panel A
+
+El cuarto recorrido representa las relaciones del panel A en una conexión fisiológica. Una espina con cabeza amplia y cuello estrecho mantiene su continuidad con la dendrita. NMDAR permite una entrada moderada de Ca²⁺; PSD-95, DISC1 y Kalirin-7 aportan contexto para la organización postsináptica y el remodelado de una red tridimensional de actina. No se incorporan ROS, microglía, lesión de membrana, disfunción mitocondrial ni apoptosis a esta escena.
+
+[Niethammer et al. (1996)](https://pubmed.ncbi.nlm.nih.gov/8601796/) identificaron interacciones entre subunidades de NMDAR y miembros de la familia PSD-95. El modelo sitúa PSD-95 junto al receptor y bajo la membrana para facilitar su lectura, sin reconstruir dominios de unión ni estequiometría. La densidad postsináptica representa una región rica en proteínas, distinta de la proteína PSD-95 seleccionable dentro de ella.
+
+[Hayashi-Takagi et al. (2010)](https://www.nature.com/articles/nn.2487) estudiaron la regulación de la morfología y función de espinas mediante DISC1 y su relación con Kalirin-7. [Xie et al. (2007)](https://pubmed.ncbi.nlm.nih.gov/18031682/) relacionaron Kalirin-7 con plasticidad estructural y funcional dependiente de actividad. Sus resultados apoyan la inclusión de esos componentes; los intermediarios adicionales estudiados en esas publicaciones quedan fuera del alcance del panel A. Los cambios sucesivos de foco no afirman una cadena obligatoria NMDAR–PSD-95–DISC1–Kalirin-7–actina ni indican que las proteínas aparezcan o se activen de forma idéntica.
+
+[Matsuzaki et al. (2004)](https://pmc.ncbi.nlm.nih.gov/articles/4158816/) observaron cambios de tamaño de espinas tras estimulación local por glutamato, con dependencia de NMDAR y polimerización de actina en su preparación experimental. En el atlas, la red se reorienta y añade ramificación localizada mientras la cabeza cambia ligeramente de forma. Estas deformaciones no cuantifican fuerza sináptica, aprendizaje ni potenciación duradera, y no representan una respuesta universal.
+
+Las formas de los complejos, la distribución de filamentos y las trayectorias del calcio son convenciones de una ilustración biomédica, sin resolución molecular ni concentraciones calibradas. La dispersión intracelular del Ca²⁺ no modela transporte dirigido hacia una proteína específica. La transparencia de la membrana y el énfasis al seleccionar actina facilitan observar el interior; no describen pérdida de integridad celular. Las seis etapas duran 60 segundos de presentación y pueden recorrerse en ambos sentidos. La correspondencia detallada y los límites se documentan en [panel-a.md](panel-a.md).

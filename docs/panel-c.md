@@ -2,7 +2,7 @@
 
 El módulo utiliza **exclusivamente el panel C de la figura científica aportada por el usuario**. La ruta mencionada en la solicitud, `reference/mechanisms-reference.png`, no estaba presente al preparar el contenido. La referencia disponible es la imagen de la conversación; su procedencia bibliográfica no se atribuye a una publicación desconocida.
 
-La figura reúne una espina alterada, glutamato, Ca²⁺, ROS, C1q, C3, caspasa-3 y microglía. Su idea central se transforma en una interacción espacial: una conexión cambia de estado, presenta componentes asociados con reconocimiento y remodelado, recibe el contacto de un proceso microglial y reduce su volumen. Otra espina permanece conservada como referencia morfológica. No se desarrollan el panel A ni nuevas versiones de B o D.
+La figura reúne una espina alterada, glutamato, Ca²⁺, ROS, C1q, C3, caspasa-3 y microglía. Su idea central se transforma en una interacción espacial: una conexión cambia de estado, presenta componentes asociados con reconocimiento y remodelado, recibe el contacto de un proceso microglial y reduce su volumen. Otra espina permanece conservada como referencia morfológica. Este módulo se limita al panel C; los recorridos glutamatérgico, mitocondrial y de plasticidad conservan sus propias escenas y narrativas.
 
 ## Correspondencia con las seis etapas
 

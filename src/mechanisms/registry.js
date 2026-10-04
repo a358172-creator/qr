@@ -3,6 +3,7 @@ const loaders = {
   glutamate: () => import('./glutamate.js'),
   mitochondrial: () => import('./mitochondrial-dysfunction.js'),
   microglia: () => import('./microglia.js'),
+  signaling: () => import('./synaptic-plasticity.js'),
 };
 
 export async function loadMechanism(id) {

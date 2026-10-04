@@ -37,9 +37,9 @@ export function createMechanismSession(definition, model, onChange) {
       timeline.pause();
       if (definition.resetOnExit) { time = 0; Object.assign(state, initial); timeline.reset(); }
     },
-    render({ selected = null, detail = true } = {}) {
+    render({ selected = null, detail = true, viewDistance } = {}) {
       const frame = timeline.getState();
-      model.update({ time, state, stepIndex: frame.index, elapsed: frame.elapsed, selected, detail });
+      model.update({ time, state, stepIndex: frame.index, elapsed: frame.elapsed, selected, detail, viewDistance });
     },
   };
 }

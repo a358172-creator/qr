@@ -189,6 +189,9 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         target.y += .9 * THREE.MathUtils.clamp((820 - height) / 80, 0, 1);
         offset.multiplyScalar(1.22);
       }
+    } else if (nextView === 'hub' && width < 1000) {
+      // Leave space for the editorial heading beside all four dendritic regions.
+      target.x -= 2 * (1 - THREE.MathUtils.smoothstep(width, 640, 1000));
     }
     return { target, position: target.clone().add(offset) };
   }
@@ -351,7 +354,10 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     else controls.update();
     const state = active.timeline.getState();
     if (dirty || moving || running) {
-      active.render({ selected, detail: view === 'synapse' });
+      const shortViewport = active.definition.isolatedContext ? THREE.MathUtils.clamp((900 - height) / 180, 0, 1) : 0;
+      const fit = Math.max(1 + shortViewport * .18, (active.definition.portraitFit ?? .69) / camera.aspect);
+      const viewDistance = camera.position.distanceTo(controls.target) / (active.model.root.scale.x * fit);
+      active.render({ selected, detail: view === 'synapse', viewDistance });
       // The wider anatomical landmark may reappear when zooming out. Its
       // parked glutamate session must not bring particles into another module.
       if (active.definition.id !== 'glutamate') {
@@ -360,7 +366,11 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       syncAnchors();
       updateCellularContext();
       scene.updateMatrixWorld(); camera.updateMatrixWorld();
-      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress ?? active.state.ros, calcium: active.state.ca, visibleKeys: state.step.labels, availableKeys: availableKeys() });
+      let visibleLabels = state.step.labels;
+      for (const phase of state.step.labelPhases || []) {
+        if (state.elapsed >= phase.after) visibleLabels = phase.labels;
+      }
+      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress ?? active.state.ros, calcium: active.state.ca, visibleKeys: visibleLabels, availableKeys: availableKeys() });
       renderer.render(scene, camera); onProgress?.(state.progress); dirty = false;
     }
     if ((running || cameraController.active) && !frame) frame = requestAnimationFrame(tick);
