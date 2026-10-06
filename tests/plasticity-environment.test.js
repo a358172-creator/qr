@@ -22,7 +22,8 @@ function snapshot() {
 }
 
 test('plasticity microdomain uses finite indexed geometry with a bounded rendering budget',()=>{
-  frame(5,1,52);
+  // Include fully occupied particle pools, not just an empty final overview.
+  frame(1,0,12,{state:{...complete,glut:1,ca:1}});
   let meshCount=0,triangles=0;
   specimen.root.traverse(object=>{
     if(!object.geometry) return;
@@ -36,6 +37,20 @@ test('plasticity microdomain uses finite indexed geometry with a bounded renderi
   const keys=specimen.selectable.map(object=>object.userData.key);
   for(const key of ['nmda','calcium','psd95','disc1','kalirin7','actin','spine','psd']) assert.ok(keys.includes(key),key);
   for(const key of ['ros','caspases','mitochondria','microglia']) assert.ok(!keys.includes(key),`${key} does not belong to physiological plasticity`);
+});
+
+test('presynaptic cutaway exposes a selectable tissue wall behind its vesicles, not an empty outline',()=>{
+  frame();
+  const ray=new THREE.Raycaster(new THREE.Vector3(0,1.7,4),new THREE.Vector3(0,0,-1));
+  const outer=named('Contextual presynaptic terminal');
+  assert.equal(ray.intersectObject(outer).length,0,'the anterior inspection opening remains genuinely cut away');
+  const hits=ray.intersectObjects(specimen.selectable).filter(hit=>hit.object.userData.key==='terminal');
+  assert.ok(hits.length>0,'the exposed terminal interior supports direct structure selection');
+  assert.ok(hits.every(hit=>hit.point.z<-.8),'its far wall sits behind the vesicle compartment');
+  const inner=named('Inner presynaptic membrane'),normalOpacity=inner.material.opacity;
+  frame(0,0,0,{selected:'actin'});
+  assert.ok(inner.material.opacity<normalOpacity,'actin focus dims the complete presynaptic compartment');
+  frame();assert.equal(inner.material.opacity,normalOpacity);
 });
 
 test('closed dendritic shaft uses outward normals and a single translucent surface',()=>{

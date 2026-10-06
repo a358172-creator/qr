@@ -28,6 +28,13 @@ export function bindInteractions() {
     const entry = mechanism?.content[key]; if (!entry) return;
     $('#panel-index').textContent = entry.category; $('#detail-title').textContent = entry.title;
     $('#detail-text').textContent = entry.text; $('#detail-note').textContent = entry.note;
+    $('#detail-observation').hidden = !entry.observe;
+    $('#detail-observe').textContent = entry.observe || '';
+    $('#detail-expansion').open = false;
+    $('#detail-expansion').hidden = !entry.detail;
+    $('#detail-expanded-text').textContent = entry.detail || '';
+    $('#focus-structure-btn').setAttribute('aria-label', `Enfocar ${entry.title} y pausar para explorar`);
+    $('#context-panel').scrollTop = 0;
     $('#context-panel').hidden = false;
     $('#structure-select').value = key;
   }
@@ -56,6 +63,7 @@ export function bindInteractions() {
     $('#scale-name').textContent = detail ? mechanism.scaleLabel : 'ESCALA CELULAR';
     $('#scale-index').textContent = detail ? mechanism.scaleIndex : view === 'neuron' ? '00' : '01';
     all('.transport button, .timeline-track button').forEach(button => { button.disabled = transitioning; });
+    $('#focus-structure-btn').disabled = transitioning;
     $('#region-toast').hidden = true;
     if (detail && !transitioning) {
       const state = scene?.getState();
@@ -98,6 +106,16 @@ export function bindInteractions() {
   on($('#reset-btn'), 'click', () => scene?.resetView());
   on($('#labels-btn'), 'click', () => { labels = !labels; $('#labels-btn').setAttribute('aria-pressed', String(labels)); scene?.setLabels(labels); });
   on($('#panel-close'), 'click', () => { closeCallout(); $('#synapse-canvas').focus({ preventScroll: true }); });
+  on($('#detail-expansion'), 'toggle', event => {
+    if (event.currentTarget.open && !$('#context-panel').hidden) scene?.pauseForInspection();
+  });
+  on($('#focus-structure-btn'), 'click', () => {
+    if (!scene?.focusSelected()) return;
+    $('#context-panel').hidden = true;
+    // The selected geometry stays highlighted; choosing it again can reopen its explanation.
+    $('#structure-select').value = '';
+    $('#synapse-canvas').focus({ preventScroll: true });
+  });
   on($('#references-btn'), 'click', () => openDialog('#references'));
   on($('#error-references-btn'), 'click', () => openDialog('#references'));
   on($('#help-btn'), 'click', () => openDialog('#help'));
@@ -114,7 +132,7 @@ export function bindInteractions() {
     updateView, updateTimeline, select,
     showRegion(entry) { clearTimeout(toastTimer); $('#region-toast').textContent = entry.error ? entry.title : `${entry.title} · Próximamente`; $('#region-toast').hidden = false; toastTimer = setTimeout(() => { $('#region-toast').hidden = true; }, 3600); },
     setProgress(value) { $('#timeline-track').style.setProperty('--progress', value); },
-    unavailable() { all('.scale-navigation button, .transport button, .view-tools button, .view-tools select, .timeline-track button').forEach(button => { button.disabled = true; }); $('#narrative').hidden = true; },
+    unavailable() { all('.scale-navigation button, .transport button, .view-tools button, .view-tools select, .timeline-track button').forEach(button => { button.disabled = true; }); $('#narrative').hidden = true; $('#context-panel').hidden = true; },
     available() { all('.scale-navigation button, .transport button, .view-tools button, .view-tools select, .timeline-track button').forEach(button => { button.disabled = false; }); updateView({ view: currentView, transitioning: false }); },
     dispose() { abort.abort(); clearTimeout(toastTimer); },
   };

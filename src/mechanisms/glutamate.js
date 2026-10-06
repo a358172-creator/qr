@@ -18,9 +18,9 @@ export const glutamateMechanism = {
   },
   content: {
     ...structures,
-    terminal: { category: 'COMPARTIMENTO PRESINÁPTICO', title: 'Terminal presináptica', text: 'El extremo del axón establece contacto con la espina dendrítica. Las vesículas almacenan el neurotransmisor y lo liberan hacia la hendidura sináptica.', note: 'La sección de la membrana es un recurso de ilustración para ver el interior.' },
-    vesicles: { category: 'ALMACENAMIENTO Y LIBERACIÓN', title: 'Vesículas sinápticas', text: 'Pequeños compartimentos delimitados por membrana que almacenan glutamato. Su fusión con la membrana presináptica permite liberar el neurotransmisor.', note: 'Las partículas y su movimiento son conceptuales.' },
-    spine: { category: 'COMPARTIMENTO POSTSINÁPTICO', title: 'Espina dendrítica', text: 'La cabeza ensanchada recibe el contacto sináptico. Un cuello estrecho la conecta con la dendrita y contribuye a organizar la señalización local.', note: 'La forma corresponde a una espina tipo mushroom, una de varias morfologías posibles.' },
+    terminal: { category: 'COMPARTIMENTO PRESINÁPTICO', title: 'Terminal presináptica', text: 'El extremo del axón establece contacto con la espina dendrítica. Las vesículas almacenan el neurotransmisor y lo liberan hacia la hendidura sináptica.', observe: 'Reconoce las vesículas dentro de la terminal y el espacio que separa su membrana de la espina.', note: 'La sección de la membrana es un recurso de ilustración para ver el interior.' },
+    vesicles: { category: 'ALMACENAMIENTO Y LIBERACIÓN', title: 'Vesículas sinápticas', text: 'Pequeños compartimentos delimitados por membrana que almacenan glutamato. Su fusión con la membrana presináptica permite liberar el neurotransmisor.', observe: 'Localiza los compartimentos redondeados dentro de la terminal, próximos a la región de liberación del glutamato.', note: 'Las partículas y su movimiento son conceptuales.' },
+    spine: { category: 'COMPARTIMENTO POSTSINÁPTICO', title: 'Espina dendrítica', text: 'La cabeza ensanchada recibe el contacto sináptico. Un cuello estrecho la conecta con la dendrita y contribuye a organizar la señalización local.', observe: 'Sigue la cabeza ensanchada hacia el cuello y comprueba su continuidad con la dendrita.', note: 'La forma corresponde a una espina tipo mushroom, una de varias morfologías posibles.' },
   },
   async createScene(context) {
     const { createGlutamateEnvironment } = await import('../scene/glutamate-environment.js');

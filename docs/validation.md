@@ -1,6 +1,6 @@
 # Validación del atlas neuronal
 
-Revisión del panel A: 3 de octubre de 2026. Las comprobaciones previas de C se conservan como antecedentes.
+Revisión de modelos, animación y lectura: 6 de octubre de 2026. Las comprobaciones previas de A y C se conservan como antecedentes.
 
 ## Alcance
 
@@ -10,9 +10,23 @@ Cuatro mecanismos disponibles en la dendrita: excitotoxicidad glutamatérgica, d
 
 Node.js 24.20.0, Vite 7.3.6 y Three.js 0.180.0. Chromium mediante Playwright instalado en una carpeta ignorada, sin añadir dependencias al proyecto. Se utiliza SwiftShader para el render de comprobación; no equivale a una medición de rendimiento en una GPU física.
 
-`npm test` pasa. Las pruebas cubren **60 casos** en nueve archivos: 6 de cámara, 7 del reloj narrativo, 4 de geometría neuronal, 16 de sesiones y contratos, 5 del microambiente mitocondrial, 4 de la célula microglial, 6 del entorno de C, 6 de actina y 6 del entorno de A. El ejecutor de este entorno agrupa su resumen por archivo.
+`npm test` pasa. Las pruebas cubren **68 casos** en diez archivos: 6 de cámara, 8 del reloj narrativo, 4 de geometría neuronal, 18 de sesiones y contratos, 5 del microambiente mitocondrial, 4 de la célula microglial, 6 del entorno de C, 6 de actina, 7 del entorno de A y 4 de partículas. El ejecutor de este entorno agrupa su resumen por archivo.
 
 `npm run build` pasa sin advertencias y comprueba **17 archivos y 39 referencias locales**, incluidos los módulos diferidos. `git diff --check` pasa. No se generan paquetes ZIP ni archivos de entrega.
+
+## Refinamiento de modelos y lectura
+
+- La respuesta biológica se integra por cada tramo consumido de una etapa, antes de notificar la siguiente. Una prueba compara un fotograma de 6,25 segundos con 625 de 0,01 segundos y con la solución analítica. Las pausas en frontera no consumen el tiempo sobrante y el tiempo final coincide con la duración del recorrido.
+- La fase del calcio glutamatérgico depende del reloj, sin cambiar bruscamente al variar su intensidad. Se comprueban cruces por los poros NMDA, reversibilidad, selección y límites de las nubes móviles.
+- La terminal del panel A conserva la pared interna de su corte. La PSD tiene tres profundidades conectadas, bifurcaciones y dominios proteicos pequeños, con acabado mate. Se mantiene por debajo de 120.000 triángulos incluso con ambas reservas moleculares completas.
+- La actina resuelve las uniones de las ramas una vez por fotograma, evitando cálculos recursivos repetidos. La comparación de cuatro fotogramas antes y después conservó posiciones, normales y diagnóstico byte por byte; esta comprobación no mide FPS de dispositivos físicos.
+- Se añaden 27 explicaciones ampliadas y 48 indicaciones «Qué observar». El texto inicial sigue siendo breve. «Comprender el mecanismo» pausa la animación; «Enfocar estructura» centra la geometría seleccionada y deja libre el modelo al cerrar la ficha.
+
+En navegador se comprobó en los cuatro módulos que ampliar la explicación pausa el recorrido, enfocar conserva el estado biológico y la selección, y girar la cámara no altera ese estado. Las explicaciones se pueden reabrir y la reproducción continúa hasta completar cada recorrido. A 390 y 320 px se verificaron lectura con desplazamiento, cierre siempre visible, enfoque y regreso sin desbordamiento horizontal. No se detectaron errores de JavaScript ni shaders en las comprobaciones completadas.
+
+El enfoque con movimiento normal también se activó durante la reproducción: no desplaza bruscamente la cámara al pulsar, pausa la biología y conserva exactamente su estado durante el viaje. El muestreo registró 13 posiciones de cámara distintas y confirmó que los controles se habilitan al terminar, conservando la selección. Este recuento verifica la transición, no el rendimiento en una GPU física.
+
+La composición incorpora un fondo degradado suave detrás de la narrativa para mantener el contraste cuando la dendrita pasa bajo el texto. Las fichas tienen encabezado fijo, texto de mayor tamaño y un despliegue nativo accesible por teclado. Las pruebas extensas con render por software se dividieron por módulos para completar la revisión dentro del tiempo de ejecución del entorno.
 
 ## Geometría y estados del panel A
 
@@ -68,6 +82,8 @@ Para esta comprobación de trayectoria se mantuvo una interfaz de 800 × 720 con
 
 ## Compilación estática bajo `/qr/`
 
+La revisión del 6 de octubre repitió el recorrido sobre la compilación refinada: en los cuatro módulos se abrió una explicación ampliada durante la reproducción, se comprobó la pausa y se enfocó la estructura antes de regresar a la dendrita. Pasaron la carga bajo `/qr/`, las veinte referencias mediante enlace directo, la ausencia de diagnósticos de desarrollo y las alternativas sin WebGL y sin JavaScript. No se detectaron errores HTTP, JavaScript ni shaders.
+
 La compilación se sirvió desde un servidor estático local sin fallback de rutas, bajo `/qr/`. Chromium abrió los cuatro módulos, seleccionó sus estructuras y comprobó el reinicio de A. Los recursos diferidos cargaron correctamente. Los diagnósticos de desarrollo no están expuestos en producción.
 
 La compilación final conserva los cuatro hotspots a 800, 641, 390 y 320 px: se verificaron entrada por clic real, selección de actina y regreso. La comprobación móvil también permite seleccionar Kalirin-7. La entrada directa por `#references` muestra las veinte referencias. Se comprobaron las alternativas sin WebGL y sin JavaScript, así como el acceso a las notas desde el aviso gráfico. No se detectaron errores HTTP, JavaScript ni shaders en la comprobación final.
@@ -78,8 +94,13 @@ Se verificó el resultado compilado; no se ha publicado en un servidor remoto.
 
 ## Capturas de revisión
 
-Las capturas muestran el canvas 3D real en la compilación estática.
+Las capturas muestran el canvas 3D real. Las del refinamiento se tomaron en el navegador de desarrollo; las revisiones anteriores de paneles se tomaron en la compilación estática.
 
+- [Paredes internas y PSD refinadas](previews/refined-plasticity.png)
+- [Explicación ampliada de actina](previews/refined-explanation.png)
+- [Actina enfocada en 3D](previews/refined-actin-focus.png)
+- [Enfoque a 390 px](previews/refined-mobile-390.png)
+- [Enfoque a 320 px](previews/refined-mobile-320.png)
 - [Arquitectura de la espina al inicio](previews/panel-a-desktop.png)
 - [PSD-95 y DISC1 en su contexto](previews/panel-a-organization.png)
 - [Remodelado de actina](previews/panel-a-actin.png)

@@ -30,6 +30,53 @@ function snapshot(session) {
 
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-10, `${actual} ≈ ${expected}`);
 
+test('biological response follows each stage equally across large and small frames', () => {
+  const gradual = { ...definition, responseRates: { calcium: .17, stress: .4 } };
+  const run = durations => {
+    const session = createMechanismSession(gradual, specimen());
+    session.timeline.play();
+    for (const dt of durations) session.advance(dt);
+    return snapshot(session);
+  };
+  const large = run([6.25]);
+  const small = run(Array(625).fill(.01));
+  const boundaries = run([2, 3, 1.25]);
+  for (const actual of [small, boundaries]) {
+    near(actual.time, large.time);
+    near(actual.timeline.elapsed, large.timeline.elapsed);
+    assert.equal(actual.timeline.index, large.timeline.index);
+    for (const key of Object.keys(large.state)) near(actual.state[key], large.state[key]);
+  }
+  // Independent analytical expectation: each target acts only for its duration.
+  for (const key of Object.keys(large.state)) {
+    let expected = 0;
+    [2, 3, 1.25].forEach((duration, index) => {
+      const target = gradual.steps[index].state[key];
+      expected = target + (expected - target) * Math.exp(-gradual.responseRates[key] * duration);
+    });
+    near(large.state[key], expected);
+  }
+});
+
+test('boundary and completion observers receive the already integrated biological state', () => {
+  const notifications = [];
+  let session;
+  session = createMechanismSession(definition, specimen(), () => notifications.push(snapshot(session)));
+  session.timeline.play();
+  session.advance(100);
+  assert.deepEqual(notifications.map(value => value.time), [0, 2, 5, 10]);
+  assert.deepEqual(notifications.map(value => value.timeline.index), [0, 1, 2, 2]);
+  assert.equal(notifications.at(-1).timeline.complete, true);
+  let calcium = 0, stress = 0;
+  definition.steps.forEach((step, index) => {
+    const decay = Math.exp(-3 * step.duration);
+    calcium = step.state.calcium + (calcium - step.state.calcium) * decay;
+    stress = step.state.stress + (stress - step.state.stress) * decay;
+    near(notifications[index + 1].state.calcium, calcium);
+    near(notifications[index + 1].state.stress, stress);
+  });
+});
+
 test('switching mechanisms preserves independent clocks and biochemical histories', () => {
   const glutamate = createMechanismSession(glutamateMechanism, specimen(glutamateMechanism.steps[0].state));
   const mitochondrial = createMechanismSession(mitochondrialMechanism, specimen(mitochondrialMechanism.initialState));
@@ -217,8 +264,12 @@ test('completion consumes only the remaining narrative duration and then stays f
 
 test('a pause at a stage boundary prevents unused frame time reaching the model', () => {
   let session;
+  let shouldPause = true;
   session = createMechanismSession(definition, specimen(), frame => {
-    if (frame.index === 1 && frame.playing) session.timeline.pause();
+    if (frame.index === 1 && frame.playing && shouldPause) {
+      shouldPause = false;
+      session.timeline.pause();
+    }
   });
   session.timeline.play();
   session.advance(100);
@@ -226,6 +277,16 @@ test('a pause at a stage boundary prevents unused frame time reaching the model'
   assert.equal(session.timeline.getState().index, 1);
   assert.equal(session.timeline.getState().elapsed, 0);
   assert.equal(session.timeline.getState().playing, false);
+  near(session.state.calcium, .5 * (1 - Math.exp(-6)));
+  assert.equal(session.state.stress, 0);
+  const paused = snapshot(session);
+  session.advance(100);
+  assert.deepEqual(snapshot(session), paused);
+  session.timeline.play();
+  session.advance(.5);
+  near(session.time, 2.5);
+  near(session.state.calcium, .8 + (paused.state.calcium - .8) * Math.exp(-1.5));
+  near(session.state.stress, .3 * (1 - Math.exp(-1.5)));
 });
 
 test('invalid frame durations cannot corrupt a playing mechanism', () => {

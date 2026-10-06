@@ -35,7 +35,9 @@ export function createParticles(root, channels, receptors) {
       set(glutamate,i,position,(.037+(i%3)*.006)*fade(q)*weight);
     }
     for(let i=0;i<28;i++){
-      const q=(t*(.17+ca*.08)+i*.618033)%1,c=channels[i%channels.length];
+      // Concentration controls visible ion density, not the phase of ions
+      // already in flight. A shared clock keeps pause and seeking reversible.
+      const q=(t*.21+i*.618033)%1,c=channels[i%channels.length];
       if(q<.35)position.set(c.x,c.y+.49-q/.35*.69,c.z);
       else caPaths[i].getPoint((q-.35)/.65,position);
       const weight=THREE.MathUtils.clamp(3+ca*25-i,0,1);
@@ -53,7 +55,12 @@ export function createParticles(root, channels, receptors) {
       position.set(a.x+(q>.6?Math.sin(i)*.12*(q-.6):0),a.y+.39-q*.97,a.z);
       set(sodium,i,position,.022*fade(q)*THREE.MathUtils.clamp(3+activation*6-i,0,1));
     }
-    for(const mesh of [glutamate,calcium,ros,sodium])mesh.instanceMatrix.needsUpdate=true;
+    for(const mesh of [glutamate,calcium,ros,sodium]){
+      mesh.instanceMatrix.needsUpdate=true;
+      // Raycasting caches this sphere; moving instances must refresh it even
+      // though frustum culling is disabled for the small molecular clouds.
+      mesh.computeBoundingSphere();
+    }
     for(const mesh of [glutamate,calcium,ros]){
       mesh.material.emissiveIntensity=mesh.userData.key===selected?.38:.18;
     }

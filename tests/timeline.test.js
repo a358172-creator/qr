@@ -34,6 +34,35 @@ test('variable frame duration preserves overflow and reports every crossed step'
   assert.deepEqual(entered, [0, 1, 2]);
 });
 
+test('a long frame reports consumed stage segments before boundary notifications', () => {
+  const events = [];
+  const timeline = createTimeline({
+    steps,
+    onAdvance: (dt, state) => events.push(['advance', state.index, dt, state.time]),
+    onChange: state => events.push(['change', state.index, state.elapsed]),
+  });
+  timeline.play();
+  timeline.update(6.25);
+  assert.deepEqual(events, [
+    ['change', 0, 0],
+    ['advance', 0, 2, 2],
+    ['change', 1, 0],
+    ['advance', 1, 3, 5],
+    ['change', 2, 0],
+    ['advance', 2, 1.25, 6.25],
+  ]);
+  timeline.pause();
+  const pausedEvents = [...events];
+  timeline.update(100);
+  assert.deepEqual(events, pausedEvents);
+  timeline.play();
+  timeline.update(100);
+  assert.deepEqual(events.slice(-2), [
+    ['advance', 2, 3.75, 10],
+    ['change', 2, 5],
+  ]);
+});
+
 test('a boundary callback may pause before the next step consumes time', () => {
   const timeline = createTimeline({ steps, onChange: state => {
     if (state.index === 1 && state.playing) timeline.pause();

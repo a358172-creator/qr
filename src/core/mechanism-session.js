@@ -5,24 +5,24 @@ export function createMechanismSession(definition, model, onChange) {
   const initial = { ...(model.initialState || definition.initialState || definition.steps[0].state) };
   const state = { ...initial };
   let time = 0;
-  const timeline = createTimeline({ steps: definition.steps, onChange });
+  const timeline = createTimeline({
+    steps: definition.steps,
+    onChange,
+    onAdvance(consumed, frame) {
+      time = frame.time;
+      // Each stage has its own response target. Integrating its exact share of
+      // a frame preserves the same trajectory at high and low frame rates.
+      for (const key of Object.keys(state)) {
+        const rate = definition.responseRates?.[key] ?? 3;
+        const mix = -Math.expm1(-rate * consumed);
+        state[key] += (frame.step.state[key] - state[key]) * mix;
+      }
+    },
+  });
   return {
     definition, model, timeline, state,
     get time() { return time; },
-    advance(dt) {
-      if (!timeline.getState().playing || !Number.isFinite(dt) || dt <= 0) return;
-      const before = timeline.getState();
-      timeline.update(dt);
-      const after = timeline.getState();
-      const total = definition.steps.reduce((sum, step) => sum + step.duration, 0);
-      const consumed = Math.max(0, (after.progress - before.progress) * total);
-      time += consumed;
-      for (const key of Object.keys(state)) {
-        const rate = definition.responseRates?.[key] ?? 3;
-        const mix = 1 - Math.exp(-rate * consumed);
-        state[key] += (after.step.state[key] - state[key]) * mix;
-      }
-    },
+    advance(dt) { timeline.update(dt); },
     seek(index) {
       if (!Number.isInteger(index) || index < 0 || index >= definition.steps.length) {
         throw new RangeError('Timeline step index is outside the sequence.');

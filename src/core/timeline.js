@@ -3,7 +3,7 @@
  * Pausing never changes elapsed time. Camera exploration can therefore pause
  * this controller, move independently, and resume at the same narrative instant.
  */
-export function createTimeline({ steps, onChange, onComplete } = {}) {
+export function createTimeline({ steps, onChange, onComplete, onAdvance } = {}) {
   if (!Array.isArray(steps) || !steps.length) {
     throw new TypeError('A timeline requires at least one step.');
   }
@@ -65,10 +65,14 @@ export function createTimeline({ steps, onChange, onComplete } = {}) {
     // frame rate. Callbacks may pause the sequence at a boundary.
     while (playing && remaining > 0) {
       const available = durations[index] - elapsed;
-      if (remaining < available) { elapsed += remaining; break; }
-      remaining -= available;
+      const consumed = Math.min(remaining, available);
+      elapsed = consumed === available ? durations[index] : elapsed + consumed;
+      remaining -= consumed;
+      // Integrate the outgoing stage before publishing the next one. Its
+      // absolute time also avoids deriving elapsed seconds from progress ratios.
+      if (consumed > 0) onAdvance?.(consumed, { ...getState(), time: starts[index] + elapsed });
+      if (consumed < available) break;
       if (index === steps.length - 1) {
-        elapsed = durations[index];
         playing = false;
         complete = true;
         notify();

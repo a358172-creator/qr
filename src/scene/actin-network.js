@@ -157,17 +157,14 @@ export function createActinNetwork({ texture } = {}) {
   }
 
   function sample(path, t, out = new THREE.Vector3()) {
-    const growth = path.growing ? .18 + .82 * smooth(frame.remodeling, path.growthStart, .98) : 1;
-    path.curve.getPoint(t * growth, out);
+    path.curve.getPoint(t * path.growth, out);
     if (path.parent === null) return deform(out);
     const origin = path.curve.points[0];
     // Branch orientation and elongation are local changes around a real
     // bifurcation, in addition to the small expansion of the whole head.
-    out.sub(origin).applyAxisAngle(rotationAxis, frame.remodeling * .095 * Math.sin(path.phase)).add(origin);
+    out.sub(origin).applyQuaternion(path.rotation).add(origin);
     deform(out);
-    const staticOrigin = deform(origin.clone());
-    const attachedOrigin = sample(paths[path.parent], path.parentT);
-    return out.sub(staticOrigin).add(attachedOrigin);
+    return out.sub(path.staticOrigin).add(path.attachedOrigin);
   }
 
   const center = new THREE.Vector3(), previous = new THREE.Vector3(), next = new THREE.Vector3();
@@ -179,9 +176,22 @@ export function createActinNetwork({ texture } = {}) {
     if (!lastFrame || lastFrame[0] !== t || lastFrame[1] !== r) {
       frame.time = t; frame.remodeling = r;
       headLength = 0; totalLength = 0; branchFrames = [];
+      // A junction has one pose per biological frame. Resolve these in parent
+      // order once, instead of recursively rebuilding the same attachments for
+      // every vertex and every tangent sample of a child filament.
+      for (const path of paths) {
+        path.growth = path.growing ? .18 + .82 * smooth(r, path.growthStart, .98) : 1;
+        if (path.parent === null) continue;
+        path.rotation ??= new THREE.Quaternion();
+        path.rotation.setFromAxisAngle(rotationAxis, r * .095 * Math.sin(path.phase));
+        path.staticOrigin ??= new THREE.Vector3();
+        path.attachedOrigin ??= new THREE.Vector3();
+        deform(path.staticOrigin.copy(path.curve.points[0]));
+        sample(paths[path.parent], path.parentT, path.attachedOrigin);
+      }
       for (const path of paths) {
         let pathLength = 0;
-        const growth = path.growing ? .18 + .82 * smooth(r, path.growthStart, .98) : 1;
+        const growth = path.growth;
         for (let row = 0; row <= path.rows; row++) {
           const u = row / path.rows;
           sample(path, u, center);

@@ -284,6 +284,42 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     if (key && !availableKeys().includes(key)) return;
     selected = key; onSelect?.(key); invalidate();
   }
+  function pauseForInspection() {
+    if (transitioning || contextLost || view !== 'synapse') return false;
+    exploring = true;
+    active.timeline.pause(); cameraController.cancel(); controls.enabled = true;
+    emitTimeline(); invalidate();
+    return true;
+  }
+  function focusSelected() {
+    if (!selected || transitioning || contextLost || view !== 'synapse') return false;
+    const objects = active.model.selectable.filter(object => object.userData.key === selected && object.visible);
+    const bounds = new THREE.Box3();
+    active.model.root.updateMatrixWorld(true);
+    for (const object of objects) {
+      // Particle instances move even when their underlying geometry is reused.
+      if (object.isInstancedMesh) object.computeBoundingBox();
+      bounds.expandByObject(object, true);
+    }
+    const anchor = active.anchors.find(item => item.key === selected);
+    if (bounds.isEmpty() && !anchor) return false;
+    const target = bounds.isEmpty() ? anchor.position.clone() : bounds.getCenter(new THREE.Vector3());
+    const overview = poseFor('synapse');
+    const overviewDistance = overview.position.distanceTo(overview.target);
+    const radius = bounds.isEmpty() ? 0 : bounds.getSize(new THREE.Vector3()).length() / 2;
+    const halfField = Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.min(1, camera.aspect));
+    // Keep cellular context around even very small proteins; repeated inspection
+    // uses the same limits instead of zooming progressively through the membrane.
+    const distance = THREE.MathUtils.clamp(radius / Math.sin(halfField) * 1.25, overviewDistance * .52, overviewDistance);
+    const position = camera.position.clone().sub(controls.target).normalize().multiplyScalar(distance).add(target);
+    pauseForInspection();
+    controls.enabled = false;
+    cameraController.move(position, target, { duration: 1.25, onComplete() {
+      limits(overview, true); controls.enabled = true; invalidate();
+    } });
+    invalidate();
+    return true;
+  }
   function focusStep(step) {
     const pose = poseFor('synapse', step.camera);
     if (step.focus) {
@@ -381,7 +417,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   else introTimer = setTimeout(() => navigate('hub', { duration: 4.2, intro: true }), 1900);
   emitView(); emitTimeline(); invalidate();
   return {
-    navigate, select,
+    navigate, select, pauseForInspection, focusSelected,
     setLabels(value) { annotations.setEnabled(value); invalidate(); },
     resetView() { navigate(view, { duration: 1.5 }); },
     playPause() {

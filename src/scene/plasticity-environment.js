@@ -30,7 +30,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
     const surface = membraneSurface(kind==='post'?POST:PRE,kind);
     let geometry = surface.geometry;
     if (kind==='pre') {
-      geometry = gridGeometry(54,56,surface.sample); surface.geometry.dispose();
+      geometry = gridGeometry(48,52,surface.sample); surface.geometry.dispose();
     }
     const material = tissueMaterial(texture, {color:kind==='post'?0xf2ddea:0xbeb0ca,
       vertexColors:kind==='post',side:THREE.FrontSide,opacity:kind==='post'?.80:.46,
@@ -38,13 +38,17 @@ export function createPlasticityEnvironment({ texture } = {}) {
     const membrane = register(new THREE.Mesh(geometry,material),kind==='post'?'spine':'terminal',kind==='post'?'Continuous mushroom membrane':'Contextual presynaptic terminal');
     membrane.renderOrder=2;
     (kind==='post'?membraneMaterials:terminalMaterials).push({material,opacity:material.opacity});
-    if(kind==='post') {
-      rememberMorph(geometry);
-      const innerMaterial=tissueMaterial(texture,{color:0xc3a6ba,vertexColors:true,side:THREE.BackSide,
-        opacity:.72,roughness:.75,bumpScale:.007,relief:.002,emissive:0x513f50,emissiveIntensity:.10});
-      const inner=new THREE.Mesh(geometry,innerMaterial);inner.name='Inner mushroom membrane';inner.scale.set(.99,1,.99);root.add(inner);
-      membraneMaterials.push({material:innerMaterial,opacity:.72});
-    }
+    if(kind==='post') rememberMorph(geometry);
+    // Both cutaways retain their far wall: otherwise the presynaptic terminal
+    // reads as an empty outline with free-floating vesicles. The inset shares
+    // the real section boundary and keeps the vesicles inside a tissue volume.
+    const innerMaterial=tissueMaterial(texture,{color:kind==='post'?0xc3a6ba:0x9c90ad,
+      vertexColors:kind==='post',side:THREE.BackSide,opacity:kind==='post'?.72:.58,
+      roughness:.78,bumpScale:.007,relief:.002,emissive:kind==='post'?0x513f50:0x3f364c,emissiveIntensity:.08});
+    const inner=new THREE.Mesh(geometry,innerMaterial);
+    inner.scale.set(.99,1,.99);
+    register(inner,kind==='post'?'spine':'terminal',kind==='post'?'Inner mushroom membrane':'Inner presynaptic membrane');
+    (kind==='post'?membraneMaterials:terminalMaterials).push({material:innerMaterial,opacity:innerMaterial.opacity});
     const edgeMat = physical(kind==='post'?0xd2a9c2:0xb8a5c7,{roughness:.65,transparent:true,opacity:kind==='post'?.84:.46,depthWrite:false,bumpMap:texture,bumpScale:.008});
     const parts=[];
     for(const side of [0,1]) {
@@ -103,14 +107,15 @@ export function createPlasticityEnvironment({ texture } = {}) {
   // A porous, irregular three-dimensional protein mesh under the membrane,
   // deliberately avoiding a plate, disk, or solid slab.
   const latticeParts=[],scaffoldRng=random(694),scaffoldCurves=[];
-  for(let i=0;i<15;i++) {
+  for(let i=0;i<18;i++) {
     const angle=scaffoldRng()*Math.PI*2,turn=.8+scaffoldRng()*1.2;
-    const origin=v3(Math.cos(angle)*(.68+scaffoldRng()*.32),-.57-scaffoldRng()*.10,Math.sin(angle)*.51);
-    const destination=v3(Math.cos(angle+Math.PI+turn*.2)*(.63+scaffoldRng()*.37),-.51-scaffoldRng()*.13,Math.sin(angle+Math.PI+turn*.2)*.50);
-    const middle=origin.clone().lerp(destination,.49).add(v3((scaffoldRng()-.5)*.38,(scaffoldRng()-.5)*.15,(scaffoldRng()-.5)*.29));
+    const depth=-.45-(i%3)*.095;
+    const origin=v3(Math.cos(angle)*(.68+scaffoldRng()*.32),depth+(scaffoldRng()-.5)*.04,Math.sin(angle)*.51);
+    const destination=v3(Math.cos(angle+Math.PI+turn*.2)*(.63+scaffoldRng()*.37),depth+(scaffoldRng()-.5)*.05,Math.sin(angle+Math.PI+turn*.2)*.50);
+    const middle=origin.clone().lerp(destination,.49).add(v3((scaffoldRng()-.5)*.38,(scaffoldRng()-.5)*.09,(scaffoldRng()-.5)*.29));
     const curve=new THREE.CatmullRomCurve3([origin,origin.clone().lerp(middle,.50).add(v3(.03,.04,-.02)),middle,middle.clone().lerp(destination,.58).add(v3(-.02,-.025,.03)),destination]);
     scaffoldCurves.push(curve);
-    latticeParts.push(new THREE.TubeGeometry(curve,26,.014+scaffoldRng()*.005,5,false));
+    latticeParts.push(new THREE.TubeGeometry(curve,22,.015+scaffoldRng()*.006,5,false));
   }
   // Short unequal forks attach to the long paths at varying depths. Their
   // irregular spacing avoids reading the PSD as a rectangular fabric or grid.
@@ -120,9 +125,35 @@ export function createPlasticityEnvironment({ texture } = {}) {
     const tip=start.clone().addScaledVector(side,.13+scaffoldRng()*.26).addScaledVector(tangent,.08+scaffoldRng()*.12);
     tip.x=THREE.MathUtils.clamp(tip.x,-1.04,1.04);tip.z=THREE.MathUtils.clamp(tip.z,-.58,.58);tip.y=THREE.MathUtils.clamp(tip.y,-.78,-.43);
     const middle=start.clone().lerp(tip,.52).add(v3(.025*Math.sin(i),-.025,.015*Math.cos(i)));
-    latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start,middle,tip]),12,.011+scaffoldRng()*.004,5,false));
+    latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start,middle,tip]),10,.012+scaffoldRng()*.004,5,false));
   }
-  const psdMat=physical(0x8aa3a1,{roughness:.74,transparent:true,opacity:.57,depthWrite:false,emissive:0x244341,emissiveIntensity:.04});
+  // Cross-links join adjacent depths rather than stacking disconnected sheets.
+  // Small elongated domains sit on the scaffold itself, giving the density a
+  // granular protein volume distinct from the finer, pink actin filaments.
+  for(let i=0;i<12;i++) {
+    const from=scaffoldCurves[i].getPoint(.27+(i%3)*.21),neighbor=scaffoldCurves[i+1];
+    let nearest=neighbor.getPoint(0),distance=Infinity;
+    for(let j=0;j<=20;j++) {
+      const candidate=neighbor.getPoint(j/20),d=from.distanceToSquared(candidate);
+      if(d<distance) {nearest=candidate;distance=d;}
+    }
+    const middle=from.clone().lerp(nearest,.53).add(v3(.025,-.013,.015));
+    latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([from,middle,nearest]),8,.014,5,false));
+  }
+  for(let i=0;i<24;i++) {
+    const curve=scaffoldCurves[i%scaffoldCurves.length],u=.19+scaffoldRng()*.62;
+    const center=curve.getPoint(u),tangent=curve.getTangent(u);
+    const domain=new THREE.SphereGeometry(1,10,6),position=domain.attributes.position;
+    for(let j=0;j<position.count;j++) {
+      const x=position.getX(j),y=position.getY(j),z=position.getZ(j);
+      const relief=1+.12*Math.sin(x*3+i)*Math.cos(y*4-i)*Math.sin(z*3+1);
+      position.setXYZ(j,x*relief,y*relief,z*relief);
+    }
+    domain.scale(.047+scaffoldRng()*.025,.024+scaffoldRng()*.012,.025+scaffoldRng()*.013);
+    domain.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(v3(1,0,0),tangent));
+    domain.translate(center.x,center.y,center.z);domain.computeVertexNormals();latticeParts.push(domain);
+  }
+  const psdMat=physical(0x6f958c,{roughness:.81,clearcoat:.02,transparent:true,opacity:.72,depthWrite:false,emissive:0x24433a,emissiveIntensity:.025});
   const psd=register(new THREE.Mesh(merge(latticeParts),psdMat),'psd','Porous postsynaptic protein scaffold');rememberMorph(psd.geometry);
 
   const proteinSpecs=[
@@ -186,7 +217,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
     viewOpacity=THREE.MathUtils.lerp(.55,.80,facing)*(actinFocus?.68:1);
     for(const {material,opacity} of membraneMaterials) material.opacity=viewOpacity*opacity/.80;
     for(const {material,opacity} of terminalMaterials) material.opacity=opacity*(actinFocus?.65:1);
-    psdMat.opacity=(.47+.20*values.scaffold)*(actinFocus?.55:1);psdMat.emissiveIntensity=selected==='psd'?.28:.035+values.scaffold*.12;
+    psdMat.opacity=(.66+.17*values.scaffold)*(actinFocus?.55:1);psdMat.emissiveIntensity=selected==='psd'?.19:.025+values.scaffold*.075;
     receptorMat.opacity=actinFocus?.65:1;receptorMat.transparent=true;
     receptorMat.emissiveIntensity=selected==='nmda'?.36:.07+values.activation*.15;
     for(const {subunit,dx,dz} of receptorSubunits) subunit.position.set(dx*.028*values.activation,0,dz*.028*values.activation);
