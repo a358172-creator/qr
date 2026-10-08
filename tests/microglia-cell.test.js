@@ -89,6 +89,29 @@ test('contact follows a remodelling spine without moving the soma or leaving the
   assert.ok(membraneDistance < .035, 'the visible process membrane must reach the target, not just the diagnostic marker');
 });
 
+test('extension bends the process through a volume instead of stretching a straight forceps-like arm', () => {
+  cell.update({ time: 0, approach: 0, contact: 0 });
+  const original = attributes.position.array.slice(), samples = [];
+  for (let index = 0; index < attributes.position.count; index++) {
+    const offset = index * 3, x = original[offset], y = original[offset + 1], z = original[offset + 2];
+    if (x > -.97 && x < -.73 && y > -1.37 && y < -1.16 && z > .28 && z < .53) samples.push(index);
+  }
+  assert.ok(samples.length > 15, 'sample a membrane region along the leading shaft');
+  const initialTip = cell.contactTip.clone();
+  cell.update({ time: 0, approach: 1, contact: 0, target });
+  const axis = target.clone().sub(initialTip).normalize();
+  const displacement = new THREE.Vector3(), transverse = new THREE.Vector3();
+  for (const index of samples) {
+    const offset = index * 3;
+    displacement.set(attributes.position.getX(index) - original[offset], attributes.position.getY(index) - original[offset + 1], attributes.position.getZ(index) - original[offset + 2]);
+    displacement.addScaledVector(axis, -displacement.dot(axis));
+    transverse.add(displacement);
+  }
+  transverse.divideScalar(samples.length);
+  assert.ok(transverse.length() > .08, 'the shaft must develop a smooth lateral arc, not only translate along the target vector');
+  assert.ok(Math.abs(transverse.z) > .025, 'the bend must have depth, rather than exist only in the camera plane');
+});
+
 test('paused frames and revisited stages restore exactly the same surface, normals and selected state', () => {
   const frame = { time: 26.71, approach: .73, contact: .12, pruning: 0, selected: 'process', target };
   cell.update(frame);

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { createPlasticityEnvironment } from '../src/scene/plasticity-environment.js';
+import { plasticityMechanism } from '../src/mechanisms/synaptic-plasticity.js';
 
 const specimen=createPlasticityEnvironment({texture:new THREE.Texture()});
 const named=name=>specimen.root.getObjectByName(name);
@@ -53,22 +54,25 @@ test('presynaptic cutaway exposes a selectable tissue wall behind its vesicles, 
   frame();assert.equal(inner.material.opacity,normalOpacity);
 });
 
-test('closed dendritic shaft uses outward normals and a single translucent surface',()=>{
-  const shaft=named('Supporting dendritic shaft'),positions=shaft.geometry.attributes.position,normals=shaft.geometry.attributes.normal,uv=shaft.geometry.attributes.uv;
+test('dendritic shaft retains outward normals and an open, anatomically matched neck junction',()=>{
+  const shaft=named('Supporting dendritic shaft'),positions=shaft.geometry.attributes.position,normals=shaft.geometry.attributes.normal;
   assert.equal(shaft.material.side,THREE.FrontSide,'opposing transparent faces must not form striping');
-  const rings=new Map();
+  const center=x=>new THREE.Vector3(x,-3.65-.014*x*x-.035*Math.sin(x*.65),-.014*x*x);
   for(let i=0;i<positions.count;i++) {
-    const u=uv.getY(i);
-    if(!rings.has(u)) rings.set(u,{sum:new THREE.Vector3(),count:0});
-    // The repeated seam vertex is excluded from the ring centre.
-    if(uv.getX(i)<1) { rings.get(u).sum.add(new THREE.Vector3().fromBufferAttribute(positions,i));rings.get(u).count++; }
-  }
-  for(const ring of rings.values()) ring.sum.divideScalar(ring.count);
-  for(let i=0;i<positions.count;i++) {
-    const radial=new THREE.Vector3().fromBufferAttribute(positions,i).sub(rings.get(uv.getY(i)).sum).normalize();
+    const radial=new THREE.Vector3().fromBufferAttribute(positions,i).sub(center(positions.getX(i))).normalize();
     const normal=new THREE.Vector3().fromBufferAttribute(normals,i);
     assert.ok(radial.dot(normal)>.90,'the visible side of a closed organic shaft faces outward');
   }
+  const base=membrane.geometry.attributes.position,{center:x,width,depth,shaftRadius}=specimen.diagnostics().junction;
+  for(let i=0;i<=100;i++) {
+    const p=new THREE.Vector3().fromBufferAttribute(base,i),c=center(p.x);
+    assert.ok(Math.abs(Math.hypot(p.y-c.y,p.z-c.z)-shaftRadius)<1e-6,'every neck base point meets the shaft surface');
+    assert.ok(Math.abs(((p.x-x)/width)**2+((p.z-c.z)/depth)**2-1)<1e-6,'the same oval bounds the shaft aperture');
+  }
+  const ray=new THREE.Raycaster(new THREE.Vector3(x,-3,center(x).z),new THREE.Vector3(0,-1,0));
+  shaft.material.side=THREE.DoubleSide;
+  const hits=ray.intersectObject(shaft);shaft.material.side=THREE.FrontSide;
+  assert.ok(hits.length&&hits.every(hit=>hit.point.y<-3.9),'no shaft roof closes the neck lumen');
 });
 
 test('mushroom membrane has a continuous broad head and narrow immobile neck with small reversible growth',()=>{
@@ -83,18 +87,30 @@ test('mushroom membrane has a continuous broad head and narrow immobile neck wit
   let previous=1;
   for(const amount of [.2,.4,.6,.8,1]) {
     const data=frame(4,amount,40);
-    assert.ok(data.headRadialScale>previous&&data.headRadialScale<=1.1);previous=data.headRadialScale;
+    assert.ok(data.headRadialScale>previous&&data.headRadialScale<=1.17);previous=data.headRadialScale;
     const positions=membrane.geometry.attributes.position.array;
     for(let i=0;i<original.length;i+=3) {
       if(original[i+1]<=-2.1) assert.deepEqual(Array.from(positions.slice(i,i+3)),Array.from(original.slice(i,i+3)),'neck and attachment never scale');
       else {
-        assert.ok(Math.abs(positions[i]-original[i])<.20);
-        assert.ok(Math.abs(positions[i+1]-original[i+1])<.041);
-        assert.ok(Math.abs(positions[i+2]-original[i+2])<.16);
+        assert.ok(Math.abs(positions[i]-original[i])<.34);
+        assert.ok(Math.abs(positions[i+1]-original[i+1])<.066);
+        assert.ok(Math.abs(positions[i+2]-original[i+2])<.18);
       }
     }
   }
   frame();assert.deepEqual(membrane.geometry.attributes.position.array,original,'seeking the first stage exactly restores the basal surface');
+});
+
+test('basal and remodeled stages retain identical camera framing for direct anatomical comparison',()=>{
+  const first=plasticityMechanism.steps[0],last=plasticityMechanism.steps.at(-1);
+  assert.deepEqual(plasticityMechanism.cameraPoses[first.camera],plasticityMechanism.cameraPoses[last.camera]);
+  assert.equal(first.state.remodeling,0);assert.equal(last.state.remodeling,1);
+  const sizes=['PSD-95 scaffold complex','DISC1 structural complex','Kalirin-7 actin-adjacent complex'].map(name=>{
+    const object=named(name);object.geometry.computeBoundingBox();return object.geometry.boundingBox.getSize(new THREE.Vector3());
+  });
+  assert.ok(sizes[0].x>sizes[0].y*1.7,'PSD-95 spreads beneath the membrane');
+  assert.ok(sizes[1].y>sizes[1].x*1.8,'DISC1 has a distinct elongated intracellular silhouette');
+  assert.ok(sizes[2].x>sizes[0].x*1.15,'Kalirin-7 forms a larger extended curve near actin');
 });
 
 test('protein proximity forms an intracellular architecture without moving them along a molecular chain',()=>{
@@ -126,6 +142,22 @@ test('controlled calcium crosses only the NMDAR pore and stays within a small ph
   frame(0,1,14);assert.equal(pool.count,0,'stale activation cannot contaminate the reset state');
   assert.equal(specimen.diagnostics().remodeling,0);
   frame(5,1,58);assert.equal(pool.count,0,'structural overview does not retain a flowing ion pool');
+});
+
+test('calcium disperses into cytosol without protein coordinates serving as delivery targets',()=>{
+  const pool=named('particles:calcium'),matrix=new THREE.Matrix4(),ion=new THREE.Vector3();
+  for(const remodeling of [0,1]) for(let index=0;index<8;index++) {
+    const time=(2.999999-index*.173)/.14;
+    const data=frame(4,remodeling,time,{state:{...complete,ca:1,remodeling}});
+    pool.getMatrixAt(index,matrix);ion.setFromMatrixPosition(matrix);
+    assert.ok(ion.y<data.channel[1]-.4,'dispersion stays in the cytosolic head');
+    for(const [name,coordinates] of Object.entries(data.proteins)) {
+      assert.ok(ion.distanceTo(new THREE.Vector3(...coordinates))>.25,`ion ${index} must not be directed to ${name}`);
+    }
+    const frozen=pool.instanceMatrix.array.slice();
+    frame(4,remodeling,time,{selected:'calcium',state:{...complete,ca:1,remodeling}});
+    assert.deepEqual(pool.instanceMatrix.array,frozen,'inspection cannot advance dispersion');
+  }
 });
 
 test('pause keeps biology exact while camera transparency and actin selection only change appearance',()=>{

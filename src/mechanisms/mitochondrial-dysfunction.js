@@ -21,11 +21,11 @@ export const mitochondrialMechanism = {
   cameraPoses: {
     mitoOverview: { position: [3.15, 1.7, 13.8], target: [0, -.1, 0] },
     nmdaCalcium: { position: [1.9, 3.0, 12.3], target: [0, .65, 0] },
-    redoxPathways: { position: [2.8, 2.1, 12.0], target: [0, .5, 0] },
+    redoxPathways: { position: [2.1, 2.6, 13.4], target: [0, .80, 0] },
     membraneDamage: { position: [-2.4, 2.6, 11.5], target: [-.9, .8, 0] },
-    mitochondriaFocus: { position: [2.4, 1.45, 11.6], target: [0, 0, 0] },
+    mitochondriaFocus: { position: [1.65, 1.6, 13.1], target: [-.75, 0, 0] },
     aifFocus: { position: [3.1, .9, 16.0], target: [1.0, -.8, 0] },
-    damageOverview: { position: [3.1, 2.3, 14.3], target: [0, -.2, 0] },
+    damageOverview: { position: [3.1, 1.95, 14.3], target: [0, -.55, 0] },
   },
   steps: [
     {
@@ -40,11 +40,12 @@ export const mitochondrialMechanism = {
     {
       key: 'reactive-species',
       title: 'Señales que se ramifican',
-      caption: 'nNOS produce NO; PKC y NOX2 favorecen O₂•⁻. NO activa sGC–cGMP–PKG y, al reaccionar con O₂•⁻, puede formar ONOO⁻.',
+      caption: 'NO de nNOS participa en sGC–cGMP–PKG. Otra fracción difunde hacia el superóxido producido por NOX2 fuera de esta membrana: su encuentro puede formar ONOO⁻.',
       duration: 11,
       state: state(.94, .88, 0, .08, 0, 0),
       camera: 'redoxPathways',
-      labels: ['nnos', 'no', 'sgc', 'pkc', 'nox2'],
+      labels:['nnos','sgc','pkc','nox2','peroxynitrite'],
+      labelPhases:[{after:0,labels:['nnos','sgc','pkc','nox2']},{after:5,labels:['nox2','peroxynitrite','sgc']}],
     },
     {
       key: 'membrane-damage',
@@ -67,7 +68,7 @@ export const mitochondrialMechanism = {
     {
       key: 'aif-nuclear-injury',
       title: 'AIF · una señal hacia el núcleo',
-      caption: 'En ciertos contextos de daño, AIF puede liberarse de la mitocondria y desplazarse hacia el núcleo, donde participa en alteraciones del ADN.',
+      caption: 'AIF puede liberarse y alcanzar el núcleo en ciertos contextos de daño independiente de caspasas. Su salida no se representa a través del PTP ni como consecuencia automática de este.',
       duration: 10,
       state: state(.8, .86, .92, .95, 1, .45),
       camera: 'aifFocus',
@@ -76,7 +77,7 @@ export const mitochondrialMechanism = {
     {
       key: 'damage-integration',
       title: 'Señalización asociada con daño celular',
-      caption: 'Calcio, especies reactivas, membranas y mitocondrias están conectados. El esquema señala una posible progresión hacia daño y apoptosis; no un destino inevitable.',
+      caption: 'Estas rutas pueden coexistir y reforzarse según el contexto. La señalización por NO, los mediadores lipídicos y las ROS también tienen funciones fisiológicas; ninguna rama predice por sí sola muerte neuronal.',
       duration: 10,
       state: state(.74, .86, .92, .94, 1, .65, .8),
       camera: 'damageOverview',
@@ -118,7 +119,7 @@ export const mitochondrialMechanism = {
       title: 'sGC–cGMP–PKG',
       text: 'NO activa la guanilato ciclasa soluble, que favorece la formación de cGMP y la señalización por PKG. El panel D reúne estos participantes en una misma rama.',
       observe: 'Busca la agrupación próxima a la rama de NO y relaciónala con la etiqueta sGC–cGMP–PKG.',
-      note: 'La agrupación visual representa una secuencia de señalización, no una única proteína.',
+      note: 'sGC y PKG tienen siluetas separadas; las partículas intermedias representan cGMP. La distancia y el flujo son ilustrativos.',
     },
     pkc: {
       category: 'RAMA DE NOX2',
@@ -132,8 +133,8 @@ export const mitochondrialMechanism = {
       title: 'NOX2 · NADPH oxidasa',
       text: 'El complejo NOX2 produce superóxido. Su activación puede conectar la actividad de NMDAR con una señal oxidativa que aumenta durante la sobrecarga.',
       detail: 'NOX2 aporta una fuente de especies reactivas distinta de la región mitocondrial. En estudios neuronales, su participación vincula la activación de NMDAR con producción de superóxido mediante señales que incluyen PKC. El atlas conserva ambas fuentes del panel D; su importancia relativa depende de las condiciones y no se calcula a partir del número de partículas visibles.',
-      observe: 'Localiza NOX2 asociado a la membrana y distingue su región de producción de la señal próxima a la mitocondria.',
-      note: 'La distribución de sus productos es conceptual: no representa su transporte entre compartimentos.',
+      observe: 'Localiza NOX2 atravesando la bicapa y su producto sobre la cara extracelular, separado de las ROS mitocondriales.',
+      note: 'En esta localización plasmática, el superóxido se representa en el lado extracelular; otras localizaciones de NOX2 no se dibujan.',
     },
     superoxide: {
       category: 'ESPECIE REACTIVA DE OXÍGENO',
@@ -146,7 +147,7 @@ export const mitochondrialMechanism = {
       category: 'QUÍMICA OXIDATIVA Y NITROSATIVA',
       title: 'ONOO⁻ · peroxinitrito',
       text: 'La reacción entre NO y O₂•⁻ puede formar peroxinitrito. Este oxidante puede contribuir al daño de lípidos y otros componentes celulares.',
-      observe: 'Compara la forma del marcador ONOO⁻ con las especies NO y O₂•⁻ que participan en su formación.',
+      observe: 'Observa la convergencia de NO y O₂•⁻ fuera de la membrana y la aparición posterior de ONOO⁻ en el mismo punto.',
       note: 'La proximidad visual expresa una relación química; no simula cada colisión molecular.',
     },
     cpla2: {
@@ -183,7 +184,7 @@ export const mitochondrialMechanism = {
       category: 'ORGÁNULO INTRACELULAR',
       title: 'Mitocondria · membranas y crestas',
       text: 'La mitocondria participa en el metabolismo energético y el manejo de Ca²⁺. La sobrecarga y el estrés oxidativo pueden alterar sus membranas y comprometer la producción de ATP.',
-      detail: 'La doble membrana y los pliegues internos permiten distinguir la arquitectura del orgánulo. Su funcionamiento reúne producción de energía, manejo de calcio y procesos redox que pueden influirse mutuamente. Cuando aumenta la carga celular, el recorrido destaca cambios mitocondriales y una señal de especies reactivas; el marcador PTP permite explorar después la vulnerabilidad de la membrana interna.',
+      detail: 'La membrana externa delimita el orgánulo; un espacio real la separa de la interna. Las crestas son invaginaciones continuas de esa membrana interna hacia la matriz, donde se observan pequeños gránulos de contexto. Su funcionamiento reúne producción de energía, manejo de calcio y procesos redox que pueden influirse mutuamente. Cuando aumenta la carga celular, el recorrido destaca cambios mitocondriales y una señal de especies reactivas; el marcador PTP permite explorar después la vulnerabilidad de la membrana interna.',
       observe: 'Gira la vista para distinguir ambas membranas y las crestas; compara su aspecto a medida que aumenta el estrés.',
       note: 'El corte permite ver la membrana interna y sus crestas; no representa una lesión abierta.',
     },
@@ -198,8 +199,8 @@ export const mitochondrialMechanism = {
     aif: {
       category: 'SEÑAL MITOCONDRIAL HACIA EL NÚCLEO',
       title: 'AIF · factor inductor de apoptosis',
-      text: 'AIF es una proteína mitocondrial que, en ciertos contextos de daño, puede liberarse y alcanzar el núcleo. Allí puede participar en alteraciones de la cromatina y del ADN.',
-      detail: 'El desplazamiento de AIF conecta un cambio mitocondrial con un posible efecto nuclear. Estudios de daño excitotóxico han relacionado su traslado con alteraciones celulares, dentro de mecanismos que dependen del contexto. La animación comprime la distancia para mantener ambos extremos visibles: la región mitocondrial indica el origen y la pequeña referencia de ADN señala un destino nuclear distante.',
+      text: 'AIF es una proteína mitocondrial que, tras liberación en ciertos contextos, puede alcanzar el núcleo y participar en daño de cromatina y ADN independiente de caspasas.',
+      detail: 'AIF parte de la región intermembranal, alejada del marcador de transición de permeabilidad. Su movilización requiere un contexto que no se reduce a apertura del PTP; esta vía puede operar sin la cascada de caspasas ilustrada en B. Estudios de daño excitotóxico han relacionado su traslado con alteraciones celulares, dentro de mecanismos que dependen del contexto. La animación comprime la distancia para mantener ambos extremos visibles: la región mitocondrial indica el origen y la pequeña referencia de ADN señala un destino nuclear distante.',
       observe: 'Sigue AIF desde la región mitocondrial hacia la referencia de ADN y distingue su recorrido del marcador PTP.',
       note: 'Su nombre no implica una apoptosis inevitable. La relación PTP–AIF del panel es conceptual, no un paso directo por el poro.',
     },

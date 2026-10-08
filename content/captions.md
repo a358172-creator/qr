@@ -6,7 +6,7 @@
 
 La dendrita conecta las escalas del atlas. Una de sus espinas conduce al primer módulo disponible: excitotoxicidad glutamatérgica. Neurona, dendrita y sinapsis pertenecen al mismo entorno tridimensional.
 
-El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivamente en el panel D de la referencia. El tercero abre **Remodelado microglial**, basado exclusivamente en el panel C. El cuarto abre **Plasticidad sináptica**, basado exclusivamente en el panel A. El módulo independiente de apoptosis permanece sin implementar.
+El segundo punto disponible abre **Disfunción mitocondrial**, el tercero **Remodelado microglial** y el cuarto **Plasticidad sináptica**, conservando el alcance de los paneles D, C y A descrito en la documentación heredada. La Figura 1 original no está accesible en esta fase. B incluye una alternativa intrínseca contextual; no se añade un módulo independiente de apoptosis.
 
 ## Primer mecanismo · sinapsis glutamatérgica
 
@@ -16,6 +16,8 @@ El segundo punto disponible abre **Disfunción mitocondrial**, basado exclusivam
 4. **Ca²⁺ · cuando se pierde el equilibrio.** El calcio es una señal esencial. Una entrada excesiva o sostenida puede superar la capacidad de regulación de la neurona.
 5. **La respuesta mitocondrial.** La mitocondria participa en la regulación del Ca²⁺. Una carga excesiva puede comprometer su función energética.
 6. **ROS · un equilibrio vulnerable.** La disfunción mitocondrial y el estrés oxidativo pueden reforzarse. Esta secuencia es conceptual: el daño no es inevitable.
+7. **Posibilidad local · caspasa-3 y remodelado.** Una señal intracelular local coincide con cambios del citoesqueleto y reducción de la cabeza. No demuestra apoptosis de toda la neurona ni exige representar liberación de citocromo c.
+8. **Alternativa intrínseca · señalización apoptótica.** En otro contexto, el citocromo c puede salir del espacio intermembranal al citosol y favorecer Apaf-1/caspasa-9 y caspasas ejecutoras. No es la continuación obligatoria de la etapa anterior. El retorno gradual de la cabeza a una referencia basal distingue esta alternativa; no significa recuperación biológica de una lesión.
 
 Pausar o elegir **Explorar** conserva el instante de la secuencia y permite estudiar el volumen. **Continuar** reanuda el recorrido; **Volver a la dendrita** recupera su contexto espacial.
 
@@ -32,9 +34,9 @@ Pausar o elegir **Explorar** conserva el instante de la secuencia y permite estu
 
 Representación conceptual con fines educativos. Las escalas, concentraciones y dinámicas se encuentran simplificadas.
 
-La ubicación de la mitocondria en la espina facilita la explicación y no representa todas las sinapsis. Se omiten visualmente la recaptación, los astrocitos, Mg²⁺, coagonistas y numerosas vías reguladoras. Las etapas pueden coexistir y retroalimentarse. La escena no estima susceptibilidad según la edad ni riesgo individual.
+La mitocondria ocupa la dendrita proximal conectada con el cuello. No se presupone una mitocondria en cada cabeza. Se omiten visualmente recaptación, astrocitos, Mg²⁺, coagonistas y numerosas vías reguladoras. Las etapas pueden coexistir y retroalimentarse; las dos últimas presentan posibilidades diferentes. La escena no estima susceptibilidad por edad ni riesgo individual, tampoco representa resultados experimentales propios.
 
-Las seis etapas se mantienen en `src/mechanisms/glutamate.js`; las explicaciones de estructuras, en `src/content.js`. Estas leyendas documentan su lectura editorial.
+Las ocho etapas (73 segundos didácticos) se mantienen en `src/mechanisms/glutamate.js`; las explicaciones de estructuras, en `src/content.js`. La permeabilización externa relacionada con citocromo c se distingue de la transición de permeabilidad interna de D. La correspondencia y sus límites se documentan en [panel B](../docs/panel-b.md).
 
 
 ## Segundo mecanismo · panel D
@@ -43,8 +45,8 @@ Las seis etapas se mantienen en `src/mechanisms/glutamate.js`; las explicaciones
 2. **Señales que se ramifican.** nNOS produce NO; PKC y NOX2 participan en la formación de superóxido. NO puede activar sGC–cGMP–PKG o reaccionar con superóxido para formar peroxinitrito.
 3. **Lípidos bajo estrés.** cPLA₂ libera AA, precursor de eicosanoides. La peroxidación cambia localmente el orden y la pigmentación de los lípidos.
 4. **Un equilibrio mitocondrial vulnerable.** El corte revela las membranas y crestas; ROS y el marcador conceptual PTP destacan la alteración funcional.
-5. **AIF · una señal hacia el núcleo.** AIF se desplaza hacia un contexto nuclear cuya distancia está comprimida para facilitar la lectura.
-6. **Señalización asociada con daño celular.** Una vista integrada muestra relaciones posibles; no predice apoptosis ni implementa su módulo independiente.
+5. **AIF · una señal hacia el núcleo.** AIF se desplaza hacia un contexto nuclear cuya distancia está comprimida. Puede participar en daño independiente de caspasas; su liberación no se representa como paso a través de PTP.
+6. **Señalización asociada con daño celular.** Una vista integrada muestra procesos paralelos e interdependientes. No predice apoptosis ni convierte la participación de AIF en apoptosis clásica.
 
 NO se reconoce por puntos azul grisáceos; O₂•⁻ por pares coral; ONOO⁻ por tríos magenta; ROS mitocondrial por pequeños grupos rosados. Las etiquetas y el selector **Estructuras** complementan el color. PTP no representa una estructura molecular determinada ni un canal de paso para AIF.
 
@@ -56,8 +58,8 @@ Las etapas, cámaras, etiquetas y explicaciones del segundo mecanismo se mantien
 2. **Una conexión cambia de estado.** En una de las espinas aumenta la entrada de Ca²⁺ por NMDAR y la señal de ROS. La espina vecina conserva su morfología.
 3. **Señales en la sinapsis alterada.** La cabeza cambia ligeramente. C1q, C3 y una señal local de caspasa-3 sitúan los componentes del panel C alrededor de esta conexión.
 4. **Un proceso se aproxima.** Un proceso microglial se extiende hacia la conexión alterada. El soma permanece próximo y la espina conservada queda al margen del contacto.
-5. **Contacto y remodelado.** El proceso alcanza la región sináptica. La cabeza de la espina se reduce y retrae gradualmente: una representación conceptual del remodelado local.
-6. **Remodelado de la conectividad sináptica.** Una eliminación excesiva de conexiones durante el desarrollo puede alterar la organización de los circuitos neuronales.
+5. **Contacto y remodelado.** El extremo curvo alcanza la superficie real de la cabeza y sigue su retracción localizada. No se visualiza fagocitosis completa.
+6. **Remodelado de la conectividad sináptica.** Persiste un remanente de la cabeza conectado con la dendrita, mientras la vecina conserva su estructura. El contacto o el complemento no obligan a eliminar una conexión.
 
 La microglía se reconoce por su silueta ramificada y sus procesos de distintas longitudes y profundidades. C1q adopta una forma de ramillete y C3 una forma compacta; las etiquetas y el selector **Estructuras** permiten distinguirlos sin depender sólo del color. CASP3 es una señal intracelular local, no un marcador de apoptosis global ni una señal que atraiga directamente a la microglía.
 

@@ -151,7 +151,7 @@ export function createAnnotations({
       const emphasized = selected === node.key || hovered === node.key || document.activeElement === node.el;
       node.el.classList.toggle('selected', selected === node.key);
       node.el.classList.toggle('hovered', hovered === node.key);
-      const relevant = node.key !== 'caspases' && (node.key !== 'ros' || stress >= .15 || emphasized)
+      const relevant = (node.key !== 'ros' || stress >= .15 || emphasized)
         && (node.key !== 'calcium' || calcium >= .05 || emphasized)
         && (!visibleKeys || visibleKeys.includes(node.key) || emphasized)
         && (!availableKeys || availableKeys.includes(node.key));

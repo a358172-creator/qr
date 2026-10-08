@@ -75,6 +75,41 @@ export function membraneSurface(profile, kind) {
 }
 export function membraneGeometry(profile, kind) { return membraneSurface(profile, kind).geometry; }
 
+/** Local spine/shaft junction shared by the isolated A, B and C specimens.
+ * The shaft omits this oval roof; the neck's basal ring is fitted to exactly
+ * the same surface. Nothing changes in the macro-scale hub anatomy. */
+export function createSpineShaftJunction({centerX=.20,halfWidth=.43,halfDepth=.31,shaftRadius=.40,shaftY,shaftZ=()=>0,baseY=-3.52,blendY=-3.0}) {
+  const radius=x=>typeof shaftRadius==='function'?shaftRadius(x):shaftRadius;
+  const point=angle=>{
+    const x=centerX+halfWidth*Math.cos(angle),z=halfDepth*Math.sin(angle),r=radius(x);
+    return v3(x,shaftY(x)+Math.sqrt(Math.max(0,r*r-z*z)),shaftZ(x)+z);
+  };
+  const roofHalf=x=>{
+    const q=(x-centerX)/halfWidth;
+    return Math.abs(q)<1?Math.asin(halfDepth/radius(x)*Math.sqrt(Math.max(0,1-q*q))):0;
+  };
+  function fitSurface(surface) {
+    const original=surface.sample;
+    surface.sample=(u,v,inset=0)=>{
+      const p=original(u,v,inset),height=surface.curve.getPoint(u).y;
+      const weight=THREE.MathUtils.smoothstep(-height,-blendY,-baseY);
+      if(weight>0) {
+        const attachment=point(1.28+v*Math.PI*2);
+        attachment.y+=(height-baseY)*.75;
+        p.lerp(attachment,weight);
+      }
+      return p;
+    };
+    const positions=surface.geometry.attributes.position,uv=surface.geometry.attributes.uv;
+    for(let i=0;i<positions.count;i++) {
+      const p=surface.sample(uv.getY(i),uv.getX(i));positions.setXYZ(i,p.x,p.y,p.z);
+    }
+    positions.needsUpdate=true;surface.geometry.computeVertexNormals();
+    return surface;
+  }
+  return {point,roofHalf,fitSurface};
+}
+
 export function organicLobe(seed = 1) {
   const g = new THREE.SphereGeometry(1, 20, 14), p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {

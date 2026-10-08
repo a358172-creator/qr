@@ -1,0 +1,102 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "deviceScaleFactor": 0.5,
+  "motion": "normal",
+  "quick": true,
+  "modules": {},
+  "consoleErrors": [],
+  "consoleDetails": [],
+  "httpErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "runs": [
+    {
+      "modules": [
+        "B"
+      ],
+      "startedAt": "2026-10-08T21:36:23.118Z",
+      "status": "failed",
+      "quick": true,
+      "finishedAt": "2026-10-08T21:37:00.679Z",
+      "cameraSampling": {
+        "initial": {
+          "samples": 1,
+          "distinctPositions": 1,
+          "finite": true,
+          "first": [
+            1.0000000000000002,
+            6.999999999999998,
+            22.000000000000004,
+            -0.5,
+            0.20000000000000004,
+            0
+          ],
+          "last": [
+            1.0000000000000002,
+            6.999999999999998,
+            22.000000000000004,
+            -0.5,
+            0.20000000000000004,
+            0
+          ]
+        },
+        "enter:glutamate": {
+          "samples": 407,
+          "distinctPositions": 8,
+          "finite": true,
+          "first": [
+            1.0000000000000002,
+            6.999999999999998,
+            22.000000000000004,
+            -0.5,
+            0.20000000000000004,
+            0
+          ],
+          "last": [
+            1.225208487451146,
+            5.850302509956064,
+            19.65256378645526,
+            -0.15113562122545338,
+            0.3283243176702553,
+            0.24442727175286708
+          ]
+        }
+      }
+    }
+  ],
+  "motionWarmup": "Stable hub with reduced motion; normal movement enabled for mechanism entry and stage transitions. Opening intro is not tested.",
+  "webgl": {
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "error": "page.waitForFunction: Timeout 20000ms exceeded.\n    at enter (/workspaces/qr/scripts/capture-phase1.mjs:139:16)\n    at async file:///workspaces/qr/scripts/capture-phase1.mjs:188:5",
+  "failureState": {
+    "view": "synapse",
+    "mechanism": "glutamate",
+    "transitioning": true,
+    "cameraMoving": true,
+    "controlsEnabled": false,
+    "camera": [
+      1.225208487451146,
+      5.850302509956064,
+      19.65256378645526
+    ],
+    "target": [
+      -0.15113562122545338,
+      0.3283243176702553,
+      0.24442727175286708
+    ],
+    "timeline": {
+      "index": 0,
+      "elapsed": 0,
+      "playing": false,
+      "complete": false,
+      "progress": 0,
+      "step": "glutamate"
+    },
+    "hidden": false
+  }
+}

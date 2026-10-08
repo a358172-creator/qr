@@ -1,11 +1,15 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { v3, random, gridGeometry, membraneSurface, organicLobe, surfaceTexture, tissueMaterial, physical } from './geometry.js';
+import { v3, random, gridGeometry, membraneSurface, createSpineShaftJunction, organicLobe, surfaceTexture, tissueMaterial, physical } from './geometry.js';
+import { createMitochondrialOrganelle } from './mitochondrial-organelle.js';
 
-export function createAnatomy({ includeDendrite = false } = {}) {
-  const root = new THREE.Group(), texture = surfaceTexture(), selectable = [], receptors = [];
+export function createAnatomy({ includeDendrite = false, proximalMito = false, texture = surfaceTexture() } = {}) {
+  const root = new THREE.Group(), selectable = [], receptors = [];
+  const spineSurfaces = [];
   const membranes = [], receptorMaterials = new Map(), labelAnchors = [];
   const anchor = (key, name, position, side = 'left', priority = 1) => labelAnchors.push({ key, name, position: v3(...position), side, priority });
+  const proximalShaftY=x=>-3.72-.012*x*x, proximalShaftRadius=x=>.49+.025*Math.sin(x*1.8);
+  const junction=proximalMito?createSpineShaftJunction({shaftY:proximalShaftY,shaftRadius:proximalShaftRadius}):null;
   const profiles = {
     pre: [[0,.91],[.55,.92],[1.25,.95],[1.71,1.06],[1.97,1.39],[1.84,1.95],[1.29,2.44],[.68,2.88],[.48,3.56],[.44,4.27],[.48,5.6]],
     post: [[.43,-3.52],[.34,-3.16],[.265,-2.68],[.38,-2.20],[.92,-1.86],[1.52,-1.46],[1.82,-.96],[1.79,-.59],[1.50,-.35],[.86,-.23],[0,-.20]],
@@ -16,17 +20,19 @@ export function createAnatomy({ includeDendrite = false } = {}) {
   };
   for (const type of ['pre', 'post']) {
     const surface = membraneSurface(profiles[type], type);
-    const outer = new THREE.Mesh(surface.geometry, tissueMaterial(texture, { side: THREE.FrontSide, fadeBase: type === 'post' }));
+    if(type==='post'&&junction) junction.fitSurface(surface);
+    const outer = new THREE.Mesh(surface.geometry, tissueMaterial(texture, { side: THREE.FrontSide, fadeBase: type === 'post', ...(proximalMito ? {roughness:.72,bumpScale:.009,relief:.0025} : {}) }));
     const inner = new THREE.Mesh(surface.geometry, tissueMaterial(texture, {
       side: THREE.BackSide, color: type === 'pre' ? 0xc3b5d4 : 0xe0c2ce,
       opacity: 1, transparent: false, depthWrite: true, roughness: .79, bumpScale: .008, relief: .003, emissive: type === 'pre' ? 0x6a557b : 0x76515f, emissiveIntensity: .16, fadeBase: type === 'post',
     }));
-    inner.scale.set(.982, 1, .982); outer.renderOrder = 1; inner.renderOrder = 0;
+    if(!(type==='post'&&junction)) inner.scale.set(.982,1,.982);
+    outer.renderOrder = 1; inner.renderOrder = 0;
     outer.userData.tissue = type;
     // The intact tissue is selectable, while the section window remains open to
     // receptors and organelles. It has no invisible pick-blocking proxy mesh.
     outer.userData.key = type === 'pre' ? 'terminal' : 'spine';
-    root.add(inner, outer); membranes.push(outer, inner); selectable.push(outer);
+    root.add(inner, outer); if (type === 'post') spineSurfaces.push(surface.geometry); membranes.push(outer, inner); selectable.push(outer);
 
     const opened = Array.from({length: 101}, (_, i) => THREE.MathUtils.lerp(...surface.windowRange, i / 100));
     const lipParts = [], coreParts = [];
@@ -41,9 +47,11 @@ export function createAnatomy({ includeDendrite = false } = {}) {
         return surface.sample(t, side, v * .045);
       });
       root.add(new THREE.Mesh(sectionWall, edgeMaterials[type]));
+      if (type === 'post') spineSurfaces.push(sectionWall);
     }
     const lipGeometry = mergeGeometries(lipParts), coreGeometry = mergeGeometries(coreParts);
     lipParts.forEach(g => g.dispose()); coreParts.forEach(g => g.dispose());
+    if (type === 'post') spineSurfaces.push(lipGeometry, coreGeometry);
     root.add(new THREE.Mesh(lipGeometry, edgeMaterials[type]));
     root.add(new THREE.Mesh(coreGeometry, physical(type === 'pre' ? 0x756180 : 0x916f88, { roughness: .65 })));
 
@@ -61,11 +69,12 @@ export function createAnatomy({ includeDendrite = false } = {}) {
       fibres.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 25, .007, 5, false));
     }
     const fibreGeometry = mergeGeometries(fibres); fibres.forEach(g => g.dispose());
+    if (type === 'post') spineSurfaces.push(fibreGeometry);
     root.add(new THREE.Mesh(fibreGeometry, physical(type === 'pre' ? 0xb7a2cb : 0xd5aabf,
       { roughness: .67, transparent: true, opacity: .37, depthWrite: false })));
   }
 
-  if (includeDendrite) {
+  if (includeDendrite && !proximalMito) {
     const curve = new THREE.CatmullRomCurve3([v3(-9,-4.1,-.7),v3(-4.8,-3.89,-.3),v3(-2.8,-3.64,-.15),v3(-.2,-3.62,0),v3(2.4,-3.47,-.13),v3(5,-3.73,-.5),v3(9,-4.15,-1.1)]);
     const frames = curve.computeFrenetFrames(120, false);
     const shaftGeometry = gridGeometry(120, 24, (u, v) => {
@@ -75,6 +84,34 @@ export function createAnatomy({ includeDendrite = false } = {}) {
     });
     const dendrite = new THREE.Mesh(shaftGeometry, tissueMaterial(texture, { vertexColors: false, color: 0x987eae, opacity: .92 }));
     dendrite.userData.key = 'dendrite'; root.add(dendrite); membranes.push(dendrite); selectable.push(dendrite);
+  }
+
+
+  if (includeDendrite && proximalMito) {
+    // Two angular patches preserve both openings: an oval roof shared with the
+    // spine neck, and the lateral teaching section exposing the mitochondrion.
+    const sample = (u, v, inset = 0, band = 0) => {
+      const x = -4.2 + u * 8.4, cy = proximalShaftY(x), roof=junction.roofHalf(x);
+      const window = THREE.MathUtils.smoothstep(x,.50,.95)*(1-THREE.MathUtils.smoothstep(x,3.05,3.70));
+      const half=window*1.15;
+      const a=band===0?THREE.MathUtils.lerp(roof,Math.PI/2-half,v):THREE.MathUtils.lerp(Math.PI/2+half,Math.PI*2-roof,v);
+      const relief=THREE.MathUtils.smoothstep(Math.abs(x-.20),.65,1.1);
+      const r=proximalShaftRadius(x)*(1+.025*relief*Math.sin(a*3+x))-inset;
+      return v3(x, cy + Math.cos(a)*r, Math.sin(a)*r);
+    };
+    const parts=[];
+    for(const [start,end,rows] of [[-4.2,-.23,34],[-.23,.63,32],[.63,4.2,34]]) for(const band of [0,1]) {
+      parts.push(gridGeometry(rows,24,(u,v)=>sample((THREE.MathUtils.lerp(start,end,u)+4.2)/8.4,v,0,band)));
+    }
+    const shaftGeometry=mergeGeometries(parts);parts.forEach(part=>part.dispose());
+    // Both angular patches wind inward. Reverse once and render an opaque
+    // section wall: blending near/far triangles caused a serrated silhouette.
+    const indices=shaftGeometry.index.array;
+    for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];
+    shaftGeometry.computeVertexNormals();
+    const shaft = new THREE.Mesh(shaftGeometry, tissueMaterial(texture,{vertexColors:false,color:0xba9eb3,side:THREE.DoubleSide,transparent:false,depthWrite:true,opacity:1,roughness:.78,bumpScale:.006,relief:.002}));
+    shaft.name='Proximal dendritic section'; shaft.userData.key='dendrite'; root.add(shaft);selectable.push(shaft);
+    for (const side of [0,1]) root.add(new THREE.Mesh(gridGeometry(64,2,(u,v)=>sample((.50+u*3.2+4.2)/8.4,side?0:1,v*.035,side)), edgeMaterials.post));
   }
 
   // The paired active zone and postsynaptic density follow the curved membrane.
@@ -90,6 +127,7 @@ export function createAnatomy({ includeDendrite = false } = {}) {
     contactRims.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 64, .012, 5, true));
   }
   const contactGeometry = mergeGeometries(contactRims); contactRims.forEach(g => g.dispose());
+  spineSurfaces.push(contactGeometry);
   root.add(new THREE.Mesh(contactGeometry, physical(0xcbb5ca, { roughness: .63, transparent: true, opacity: .6, depthWrite: false })));
 
   const vesicleGeometry = organicLobe(19);
@@ -113,13 +151,13 @@ export function createAnatomy({ includeDendrite = false } = {}) {
     transform.position.copy(p);transform.scale.setScalar(radius);transform.updateMatrix();vesicles.setMatrixAt(i,transform.matrix);
     vesicles.setColorAt(i,new THREE.Color().setHSL(.765 + rng()*.035,.19,.62 + rng()*.11));
   }
-  vesicles.instanceMatrix.setUsage(THREE.DynamicDrawUsage); vesicles.userData.key='glutamate'; root.add(vesicles);selectable.push(vesicles);
+  vesicles.instanceMatrix.setUsage(THREE.DynamicDrawUsage); vesicles.userData.key='vesicles'; root.add(vesicles);selectable.push(vesicles);
   const cargo = new THREE.InstancedMesh(new THREE.SphereGeometry(.023,8,6),physical(0xd7b28b,{emissive:0x4d2611,emissiveIntensity:.05,roughness:.61}),vesicleSeeds.length*4);
   vesicleSeeds.forEach((s,i)=>{for(let j=0;j<4;j++){transform.position.copy(s.position).add(v3(Math.sin(j*2.4)*.05,Math.cos(j*1.5)*.04,Math.cos(j*2.4)*.05));transform.scale.setScalar(1);transform.updateMatrix();cargo.setMatrixAt(i*4+j,transform.matrix);}});
   cargo.instanceMatrix.setUsage(THREE.DynamicDrawUsage); root.add(cargo);
 
   function receptor(kind,x,z,scale=1) {
-    const mat = physical(kind==='nmda'?0x8988c9:0x69a99d,{roughness:.53,emissive:kind==='nmda'?0x403765:0x1f4b43,emissiveIntensity:.06,bumpMap:texture,bumpScale:.016});
+    const mat = physical(kind==='nmda'?0x8988c9:0x69a99d,{roughness:proximalMito?.68:.53,clearcoat:.025,emissive:kind==='nmda'?0x403765:0x1f4b43,emissiveIntensity:.06,bumpMap:texture,bumpScale:proximalMito?.006:.016});
     const parts=[], group = new THREE.Group();
     const addLobe = (seed, scale, pos, angle=0) => {
       const g=organicLobe(seed);g.scale(...scale);g.rotateZ(angle);g.translate(...pos);parts.push(g);
@@ -144,7 +182,8 @@ export function createAnatomy({ includeDendrite = false } = {}) {
   const ampa1=receptor('ampa',-.97,.48,1.05);receptor('ampa',-.55,-.53,.87);
   const nmda1=receptor('nmda',.20,.63,1.10);const nmda2=receptor('nmda',.96,.12,.97);receptor('nmda',.47,-.52,.82);
 
-  const mito=createMitochondrion(texture);mito.group.position.set(.18,-1.12,.45);mito.group.rotation.set(.10,-.13,-.29);mito.group.userData.key='mitochondria';root.add(mito.group);selectable.push(mito.group);
+  const mito=createMitochondrialOrganelle(texture);mito.group.scale.setScalar(proximalMito ? .40 : .43);
+  mito.group.position.set(...(proximalMito ? [1.65,-3.72,0] : [.18,-1.12,.45]));mito.group.rotation.set(.05,-.09,proximalMito ? -.035 : -.29);mito.group.userData.key='mitochondria';root.add(mito.group);selectable.push(mito.group);
   const caspases=new THREE.Group(), casMat=physical(0xb086a5,{emissive:0x7f315a,emissiveIntensity:.22,transparent:true,opacity:0});
   caspases.userData.key='caspases';const casGeo=organicLobe(13);
   for(let i=0;i<4;i++)for(let j=0;j<3;j++){
@@ -158,50 +197,9 @@ export function createAnatomy({ includeDendrite = false } = {}) {
   anchor('ampa','AMPA',ampa1.position.toArray().map((v,i)=>v+(i===1?.28:0)),'left',3);
   anchor('nmda','NMDA',[1.12,.17,.28],'right',3);
   anchor('calcium','Ca²⁺',[-.36,-.76,.94],'left',2);
-  anchor('mitochondria','Mitocondria',[1.11,-1.25,.69],'right',3);
+  anchor('mitochondria','Mitocondria',proximalMito ? [2.18,-3.62,.2] : [1.11,-1.25,.69],'right',3);
   anchor('spine','Espina dendrítica',[-.32,-2.40,.15],'left',2);
-  anchor('ros','ROS',[1.14,-1.67,.78],'right',1);
-  anchor('caspases','Caspasas',[-.4,-1.82,.4],'left',1);
-  return {root,texture,membranes,selectable,receptors,receptorMaterials,vesicles,vesicleSeeds,cargo,mito,caspases,casMat,labelAnchors,nmdaChannels:[nmda1.position.clone(),nmda2.position.clone()]};
-}
-
-function createMitochondrion(texture){
-  const group=new THREE.Group();
-  // Open curved double membrane: the near-facing wedge is removed so that the
-  // inner folds are real geometry, visible from oblique viewpoints.
-  const point=(u,v,scale=1)=>{
-    const x=(u*2-1)*.98, r=Math.sqrt(Math.max(.00001,1-(u*2-1)**2)) * (1 + .065*Math.sin(u*Math.PI*3));
-    const a=.30*Math.PI+v*1.40*Math.PI;
-    return v3(x, .22*Math.sin(u*Math.PI)+.055*Math.sin(u*Math.PI*2)+Math.sin(a)*.36*r*scale, Math.cos(a)*.36*r*scale);
-  };
-  const outerMat=physical(0xb87376,{side:THREE.DoubleSide,roughness:.52,bumpMap:texture,bumpScale:.025,emissive:0x5d1b2c,emissiveIntensity:.08});
-  const innerMat=physical(0x794c61,{side:THREE.DoubleSide,roughness:.73,bumpMap:texture,bumpScale:.018});
-  group.add(new THREE.Mesh(gridGeometry(64,48,(u,v)=>point(u,v)),outerMat));
-  group.add(new THREE.Mesh(gridGeometry(64,48,(u,v)=>point(u,v,.85)),innerMat));
-  const rimMat=physical(0xe3b0a6,{roughness:.55,emissive:0x77382e,emissiveIntensity:.06});
-  const rimGeos=[];
-  for(const side of [0,1]){const points=[];for(let i=0;i<=60;i++)points.push(point(i/60,side));rimGeos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),70,.014,7,false));}
-  const rim=new THREE.Mesh(mergeGeometries(rimGeos),rimMat);rimGeos.forEach(g=>g.dispose());group.add(rim);
-  const foldMat=physical(0xcc9391,{side:THREE.DoubleSide,roughness:.58,bumpMap:texture,bumpScale:.020,emissive:0x522638,emissiveIntensity:.1});
-  const foldGeos=[], edgeGeos=[];
-  for(let i=0;i<10;i++){
-    const x=-.78+i*.169, shape=Math.sqrt(1-(x/.99)**2), flip=i%2?1:-1;
-    const bend=.22*Math.sin((x/.99+1)*Math.PI/2)+.055*Math.sin((x/.99+1)*Math.PI);
-    const points=[v3(x-.035,bend+flip*.29*shape,-.04),v3(x+.018,bend+flip*.19*shape,.13),v3(x-.055,bend-flip*.05*shape,.17),v3(x+.035,bend-flip*.19*shape,.11),v3(x+.09,bend-flip*.14*shape,-.025)];
-    const curve=new THREE.CatmullRomCurve3(points);
-    foldGeos.push(gridGeometry(24,8,(u,v)=>{const p=curve.getPoint(u);return v3(p.x+.035*Math.sin(v*Math.PI)+.012*Math.sin(u*14+v*5),p.y+.018*Math.sin(v*Math.PI*2+u*5),p.z-v*.25);}));
-    edgeGeos.push(new THREE.TubeGeometry(curve,26,.014,7,false));
-  }
-  const folds=new THREE.Mesh(mergeGeometries(foldGeos),foldMat);foldGeos.forEach(g=>g.dispose());group.add(folds);
-  const edges=new THREE.Mesh(mergeGeometries(edgeGeos),rimMat);edgeGeos.forEach(g=>g.dispose());group.add(edges);
-  // Matrix granules sit behind the cristae, giving the open organelle depth.
-  const granules = new THREE.InstancedMesh(new THREE.SphereGeometry(.013, 6, 4), physical(0xb78687, { roughness: .9 }), 36);
-  const rng = random(94), transform = new THREE.Object3D();
-  for (let i = 0; i < 36; i++) {
-    const x = (rng() - .5) * 1.55, envelope = Math.sqrt(1 - (x / .99) ** 2);
-    transform.position.set(x, .18 + (rng() - .5) * .4 * envelope, -.14 - rng() * .065);
-    transform.scale.setScalar(.7 + rng() * .7); transform.updateMatrix(); granules.setMatrixAt(i, transform.matrix);
-  }
-  group.add(granules);
-  return {group,outerMat,foldMat};
+  anchor('ros','ROS',proximalMito ? [2.75,-3.76,.26] : [1.14,-1.67,.78],'right',1);
+  anchor('caspases','Caspasa-3 local',[-.4,-1.82,.4],'left',1);
+  return {root,texture,spineSurfaces,postZone,membranes,selectable,receptors,receptorMaterials,vesicles,vesicleSeeds,cargo,mito,caspases,casMat,labelAnchors,nmdaChannels:[nmda1.position.clone(),nmda2.position.clone()]};
 }

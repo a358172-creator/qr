@@ -33,16 +33,16 @@ export const structures = {
     text: 'Los pliegues de la membrana interna, llamados crestas, alojan parte de la maquinaria que produce ATP. La mitocondria también participa en el manejo del calcio y en el equilibrio redox.',
     detail: 'La producción de energía y la regulación del calcio están relacionadas dentro del orgánulo. Una sobrecarga puede comprometer la función mitocondrial y acompañarse de cambios en la producción de especies reactivas. El corte permite relacionar esas funciones con una arquitectura de membranas y crestas, mientras la secuencia muestra una vulnerabilidad progresiva que depende del contexto celular.',
     observe: 'Reconoce el contorno externo y los pliegues internos; después compara su aspecto antes y durante la sobrecarga.',
-    note: 'Se sitúa en la espina por claridad didáctica; no es una localización universal.',
+    note: 'Se representa en el eje dendrítico proximal. El corte no indica rotura de membranas ni una mitocondria dentro de cada espina.',
   },
   ros: {
-    category: 'EQUILIBRIO REDOX', title: 'Estrés oxidativo',
+    category: 'EQUILIBRIO REDOX', title: 'ROS · especies reactivas de oxígeno',
     text: 'Las especies reactivas de oxígeno participan en procesos fisiológicos. Cuando su producción supera las defensas antioxidantes, pueden contribuir al daño de lípidos, proteínas y ácidos nucleicos.',
     detail: 'El término ROS reúne varias especies con propiedades diferentes. En esta escena, la señal próxima a la mitocondria destaca una relación posible entre alteración energética y estrés oxidativo. Ambos procesos pueden reforzarse, aunque la mitocondria no es la única fuente celular de oxidantes; el recorrido del panel D permite explorar otras relaciones sin convertirlas en una secuencia obligatoria.',
     observe: 'Observa la señal magenta próxima a la mitocondria y compárala con la discreta actividad de las primeras etapas.',
     note: 'Los puntos magenta indican actividad conceptual, no moléculas a escala.',
   },
-  caspases: { category: 'VÍAS DE DAÑO', title: 'Señalización de daño', text: 'Las caspasas son proteasas que participan en algunas rutas de muerte celular. Aquí se representan como complejos conceptuales para explorar la señalización asociada al daño. La excitotoxicidad puede involucrar varias vías, incluidas vías independientes de caspasas; la muerte neuronal no es un desenlace inevitable.', note: 'No se representa una secuencia única, exclusiva ni predictiva.' },
+  caspases: { category:'PROTEÓLISIS LOCAL INTRACELULAR',title:'Caspasa-3 · señal local',text:'La actividad localizada de caspasa-3 puede participar en remodelado y retracción de espinas sin muerte de toda la neurona. Aquí se acompaña de cambios locales de F-actina.',detail:'La magnitud, duración y compartimentalización de la actividad importan. Una señal limitada en una espina no equivale a activación extensa de caspasas ejecutoras durante apoptosis neuronal. El recorrido muestra por separado una posible vía intrínseca mitocondrial; no afirma que toda retracción requiera liberación de citocromo c.',observe:'Localiza los complejos dentro de la espina que se retrae; compáralos con la maquinaria citosólica de la posibilidad intrínseca.',note:'Las caspasas tienen funciones letales y no letales. La secuencia es conceptual y dependiente del contexto.' },
 };
 export const steps = [
   { key: 'glutamate', caption: '01 — Las vesículas liberan glutamato hacia la hendidura sináptica. La señal alcanza los receptores de la espina.' },

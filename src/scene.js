@@ -5,7 +5,6 @@ import { createNeuron } from './atlas/neuron.js';
 import { mechanisms } from './atlas/config.js';
 import { createAfferentAxon } from './atlas/axon.js';
 import { createAnatomy } from './scene/anatomy.js';
-import { createParticles } from './scene/particles.js';
 import { createCameraController } from './core/camera.js';
 import { createInteractionManager } from './core/interaction.js';
 import { createAnnotations } from './core/annotations.js';
@@ -60,7 +59,6 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       });
     }
   });
-  const particles = createParticles(anatomy.root, anatomy.nmdaChannels, anatomy.receptors);
   const hotspotConfigs = neuron.hotspots.map(item => {
     const id = item.id === 'synapse' ? 'glutamate' : item.id === 'mitochondria' ? 'mitochondrial' : item.id;
     return { ...item, ...mechanisms.find(mechanism => mechanism.id === id) };
@@ -96,9 +94,9 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     const promise = (async () => {
       const definition = await loadMechanism(id);
       if (disposed) throw new Error('Atlas disposed during module loading');
-      const model = await definition.createScene({ texture: anatomy.texture, anatomy, particles });
+      const model = await definition.createScene({ texture: anatomy.texture, anatomy });
       if (disposed) { disposeObjects(model.root); throw new Error('Atlas disposed during scene creation'); }
-      if (id !== 'glutamate') {
+      if (model.root !== anatomy.root) {
         // Prepare new materials while the loading state is visible, before the
         // camera starts its journey through this specimen.
         try { await renderer.compileAsync(model.root, camera, scene); }
@@ -134,7 +132,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   }
   function reconcileVisibility() {
     for (const [id, session] of sessions) {
-      session.model.root.visible = id === 'glutamate' || (view === 'synapse' && session === active);
+      session.model.root.visible = view === 'synapse' && session === active;
       if (view !== 'synapse' || session !== active) session.leave();
     }
   }
@@ -234,7 +232,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         const previousSession = active;
         active = nextSession;
         if (previousSession !== active) {
-          if (previousSession.definition.id !== 'glutamate') previousSession.model.root.visible = false;
+          previousSession.model.root.visible = false;
           previousSession.leave();
         }
         active.model.root.visible = true;
@@ -394,11 +392,6 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       const fit = Math.max(1 + shortViewport * .18, (active.definition.portraitFit ?? .69) / camera.aspect);
       const viewDistance = camera.position.distanceTo(controls.target) / (active.model.root.scale.x * fit);
       active.render({ selected, detail: view === 'synapse', viewDistance });
-      // The wider anatomical landmark may reappear when zooming out. Its
-      // parked glutamate session must not bring particles into another module.
-      if (active.definition.id !== 'glutamate') {
-        particles.selectable.forEach(mesh => { mesh.visible = false; });
-      }
       syncAnchors();
       updateCellularContext();
       scene.updateMatrixWorld(); camera.updateMatrixWorld();
@@ -460,11 +453,12 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     },
     getState() {
       return {
-        view, mechanism: active.definition.id, transitioning, exploring, selected, time: active.time, availableKeys: availableKeys(),
+        view, mechanism: active.definition.id, transitioning, cameraMoving: cameraController.active, exploring, selected, time: active.time, availableKeys: availableKeys(),
         timeline: { ...active.timeline.getState(), step: active.timeline.getState().step.key },
         particles: { ...active.state }, camera: camera.position.toArray(), target: controls.target.toArray(),
         controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
-        contextParticlesVisible: particles.selectable.some(mesh => mesh.visible),
+        contextParticlesVisible: false, // Molecular pools belong only to isolated specimens.
+        resources: {...renderer.info.memory, sessions:sessions.size},
         model: active.model.diagnostics?.(),
       };
     },

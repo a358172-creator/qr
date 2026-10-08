@@ -49,14 +49,28 @@ function makeSkeleton() {
     paths.push(item);
     return item;
   }
-  PRIMARY_PATHS.forEach(points => add(points.map(p => {
+  PRIMARY_PATHS.forEach((points,index) => {
+    const vertices=points.map(p => {
     const position = point(...p), weight = 1 - smooth(position.y, -2.2, -1.8);
     // Follow the bend of the shared postsynaptic membrane. A straight bundle
     // around x=0 would leave its narrow, laterally displaced neck.
     position.x += (.10 + .16 * Math.sin(position.y * 1.45)) * weight;
     position.z += .045 * Math.sin(position.y * 1.8) * weight;
-    return position;
-  })));
+      return position;
+    });
+    if(index<3) {add(vertices);return;}
+    // Every long head filament branches from one of the three neck-reaching
+    // paths. Resolve the nearest real attachment before building its children;
+    // decorative, disconnected arcs otherwise read as a loose wire basket.
+    let parent=0,parentT=.7,distance=Infinity;
+    for(let root=0;root<3;root++) for(let sample=68;sample<=100;sample++) {
+      const at=sample/100,d=paths[root].curve.getPoint(at).distanceToSquared(vertices[0]);
+      if(d<distance) {distance=d;parent=root;parentT=at;}
+    }
+    vertices[0]=paths[parent].curve.getPoint(parentT);
+    const item=add(vertices,parent,parentT);
+    item.radius=.014+rng()*.003;
+  });
   for (let primary = 0; primary < PRIMARY_PATHS.length; primary++) {
     const parent = paths[primary], count = primary < 3 ? 2 : 3;
     for (let branch = 0; branch < count; branch++) {
@@ -145,10 +159,9 @@ export function createActinNetwork({ texture } = {}) {
     const weight = head(p), r = frame.remodeling;
     const angle = r * .041 * weight * Math.sin(p.y * 1.7 + p.z * 1.2);
     const cosine = Math.cos(angle), sine = Math.sin(angle), x = p.x, z = p.z;
-    const radius = 1 + .10 * r * weight;
-    p.x = (x * cosine - z * sine) * radius;
-    p.z = (x * sine + z * cosine) * radius;
-    p.y += .04 * r * weight;
+    p.x = (x * cosine - z * sine) * (1 + .17 * r * weight);
+    p.z = (x * sine + z * cosine) * (1 + .11 * r * weight);
+    p.y += .065 * r * weight;
     // Tiny reversible excursions never integrate simulation time. The neck is
     // entirely fixed and all movement stops at the same biological frame.
     const phase = x * 2.1 + z * 1.4;

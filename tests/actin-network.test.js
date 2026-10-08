@@ -38,6 +38,15 @@ test('actin forms a finite branched volume concentrated in the head with a spars
   assert.equal(network.selectable.length, 1);
   assert.equal(mesh.userData.key, 'actin');
   assert.ok(geometry.index.array.every(index => index < position.count));
+  // Each extensive head path now has a genuine parent leading to the neck;
+  // branch continuity must hold for the supporting network, not just twigs.
+  const {ranges}=diagnostic;
+  assert.equal(ranges.filter(range=>range.parent===null).length,3);
+  for(const range of ranges.slice(3)) {
+    let ancestor=range,depth=0;
+    while(ancestor.parent!==null) {ancestor=ranges[ancestor.parent];assert.ok(++depth<ranges.length,'the network cannot contain cycles');}
+    assert.ok(ancestor.id<3,'every head filament reaches one of the neck paths');
+  }
 });
 
 test('visible branches stay attached to their parent filaments throughout local growth', () => {

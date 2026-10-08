@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { v3, physical } from './geometry.js';
 
-export function createParticles(root, channels, receptors) {
+export function createParticles(root, channels, receptors, {rosOrigin = null, proximal = false} = {}) {
   const transform = new THREE.Object3D(), position = new THREE.Vector3();
   const geometry = new THREE.SphereGeometry(1, 12, 9);
   const make = (count,color,key,emission) => {
@@ -22,6 +22,7 @@ export function createParticles(root, channels, receptors) {
   // axis. Only below the membrane do ions spread into the cytosol.
   const caPaths = Array.from({length:28},(_,i)=>{
     const c=channels[i%channels.length];
+    if(proximal && i%4===0) return new THREE.CatmullRomCurve3([v3(c.x,c.y-.2,c.z),v3(.15,-1.45,.12),v3(.18,-2.25,.02),v3(.20,-2.80,.04),v3(.14,-3.4,0),v3(1.55,-3.68,.1)],false,'centripetal');
     return new THREE.CubicBezierCurve3(v3(c.x,c.y-.2,c.z),v3(c.x,c.y-.48,c.z),v3(c.x-.25+Math.sin(i)*.15,-.95,.7),v3(-.20+Math.sin(i*2.4)*.63,-1.36-Math.cos(i)*.17,.5+Math.sin(i)*.23));
   });
   const set=(mesh,index,p,size)=>{transform.position.copy(p);transform.scale.setScalar(Math.max(.00001,size));transform.updateMatrix();mesh.setMatrixAt(index,transform.matrix);};
@@ -45,7 +46,7 @@ export function createParticles(root, channels, receptors) {
     }
     for(let i=0;i<18;i++){
       const phase=t*.50+i*2.39996;
-      position.set(.31+Math.sin(phase)*(.70+(i%3)*.10),-1.14+Math.cos(phase*.9+i)*.45,.47+Math.sin(i*1.7+phase)*.28);
+      position.set((rosOrigin?.x ?? .31)+Math.sin(phase)*(proximal?.92:.70+(i%3)*.10),(rosOrigin?.y ?? -1.14)+Math.cos(phase*.9+i)*(proximal?.24:.45),(rosOrigin?.z ?? .47)+Math.sin(i*1.7+phase)*.28);
       const weight=THREE.MathUtils.clamp(stress*19-i,0,1);
       set(ros,i,position,(.015+.014*(.5+.5*Math.sin(t*1.6+i)))*weight);
     }

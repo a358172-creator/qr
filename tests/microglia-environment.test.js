@@ -67,6 +67,32 @@ test('functional baseline has no damage signals even when a stale incoming state
   assert.deepEqual(stage(5).markers, { c1q: false, c3: false, caspase3: false });
 });
 
+test('both spine lumens open into the dendrite and their basal rings stay fixed during remodelling', () => {
+  stage(0);
+  const shaft = named('Continuous dendritic shaft');
+  const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+  const proxy = new THREE.Mesh(shaft.geometry, material);
+  const ray = new THREE.Raycaster();
+  const uv = damaged.geometry.attributes.uv;
+  const ring = Array.from({ length: uv.count }, (_, index) => index).filter(index => uv.getY(index) === 0);
+  const basal = ring.map(index => new THREE.Vector3().fromBufferAttribute(damaged.geometry.attributes.position, index).toArray());
+  for (const index of [0, 4, 5]) {
+    stage(index);
+    for (const x of [-2.2, 1.2]) {
+      const z = -.03 - .0075 * x * x - .004 * x;
+      for (const offset of [-.08, 0, .08]) {
+        ray.set(new THREE.Vector3(x + offset, -1.5, z), new THREE.Vector3(0, -1, 0));
+        const hits = ray.intersectObject(proxy);
+        assert.ok(hits.length > 0, 'the floor of the shaft must remain present');
+        assert.ok(hits[0].point.y < -2.4, 'no shaft roof can seal the neck lumen');
+      }
+    }
+    assert.deepEqual(ring.map(vertex => new THREE.Vector3().fromBufferAttribute(damaged.geometry.attributes.position, vertex).toArray()), basal,
+      'local retraction must preserve the neck/shaft attachment');
+  }
+  material.dispose();
+});
+
 test('only the affected spine remodels, and microglial contact follows its retracting surface', () => {
   stage(0);
   const controlPositions = healthy.geometry.attributes.position.array.slice();
@@ -87,17 +113,76 @@ test('only the affected spine remodels, and microglial contact follows its retra
     assert.deepEqual(healthy.material.color.toArray(), controlColour);
     assert.equal(healthy.material.opacity, controlOpacity);
     if (index >= 4) {
-      const tip = new THREE.Vector3(...state.cell.contactTip).add(new THREE.Vector3(3.5, 3.3, -1));
+      const tip = new THREE.Vector3(...state.cell.contactTip).add(new THREE.Vector3(...state.cellPosition));
       assert.ok(tip.distanceTo(new THREE.Vector3(...state.contactTarget)) < 1e-12, 'the contacting tip cannot float above the retracting head');
       assert.ok(tip.x > .9, 'contact remains at the affected spine, never the conserved spine at x−2.2');
     }
   }
   const lastTop = Math.max(...Array.from(damaged.geometry.attributes.position.array).filter((_, index) => index % 3 === 1));
-  assert.ok(lastTop < originalTop - 1.5, 'the head retracts visibly toward the dendritic shaft');
-  assert.ok(previousScale < .3 && previousScale > .1, 'remodelling leaves a small, finite remnant');
+  assert.ok(lastTop < originalTop - .9, 'the head retracts visibly toward the dendritic shaft');
+  assert.ok(previousScale < .55 && previousScale > .4, 'localized remodelling retains a recognizable head, without implying complete engulfment');
   stage(0);
   assert.equal(specimen.diagnostics().headScale, 1);
   assert.ok(Math.abs(Math.max(...Array.from(damaged.geometry.attributes.position.array).filter((_, index) => index % 3 === 1)) - originalTop) < 1e-6);
+});
+
+test('contact reaches actual spine membrane in three dimensions throughout local retraction', () => {
+  const point = new THREE.Vector3(), tip = new THREE.Vector3();
+  const process = named('Extending microglial process');
+  for (const pruning of [0, .25, .5, .75, .93]) {
+    specimen.update({ time: 48, stepIndex: 4, state: { ...microgliaMechanism.steps[4].state, approach: 1, contact: 1, pruning } });
+    const data = specimen.diagnostics();
+    tip.fromArray(data.cell.contactTip).add(new THREE.Vector3(...data.cellPosition));
+    let distanceToSpine = Infinity, distanceToProcess = Infinity;
+    for (let index = 0; index < damaged.geometry.attributes.position.count; index++) {
+      point.fromBufferAttribute(damaged.geometry.attributes.position, index).add(damaged.position);
+      distanceToSpine = Math.min(distanceToSpine, point.distanceTo(tip));
+    }
+    for (const index of process.geometry.index.array) {
+      point.fromBufferAttribute(process.geometry.attributes.position, index).add(process.parent.position);
+      distanceToProcess = Math.min(distanceToProcess, point.distanceTo(tip));
+    }
+    assert.ok(distanceToSpine < 1e-6, 'contact must be on the visible spine, rather than at a nearby arbitrary point');
+    assert.ok(distanceToProcess < .04, 'the process membrane must physically reach the spine in 3D');
+  }
+});
+
+test('complement glyphs remain extracellular while caspase-3 remains intracellular', () => {
+  const matrix = new THREE.Matrix4(), centre = new THREE.Vector3(), point = new THREE.Vector3(), normal = new THREE.Vector3();
+  // Sign of the nearest membrane's outward normal distinguishes compartments;
+  // check the full glyph envelope, not only the position of its annotation.
+  const compartment = centre => {
+    let nearest = Infinity, signed = 0;
+    const positions = damaged.geometry.attributes.position, normals = damaged.geometry.attributes.normal;
+    for (let index = 0; index < positions.count; index++) {
+      point.fromBufferAttribute(positions, index).add(damaged.position);
+      const distance = point.distanceToSquared(centre);
+      if (distance < nearest) {
+        nearest = distance;
+        normal.fromBufferAttribute(normals, index);
+        signed = point.sub(centre).negate().dot(normal);
+      }
+    }
+    return signed;
+  };
+  for (const index of [2, 3, 4]) {
+    stage(index, 42);
+    for (const name of ['C1Q conceptual recognition complexes', 'C3 conceptual recognition complexes']) {
+      const marker = named(name), positions = marker.geometry.attributes.position;
+      for (let instance = 0; instance < marker.count; instance++) {
+        marker.getMatrixAt(instance, matrix);
+        centre.setFromMatrixPosition(matrix);
+        assert.ok(compartment(centre) > .06, `${name} centre must be extracellular`);
+        // Extremal vertices include the furthest lobe and the bouquet stalk.
+        for (let vertex = 0; vertex < positions.count; vertex += 83) {
+          centre.fromBufferAttribute(positions, vertex).applyMatrix4(matrix);
+          assert.ok(compartment(centre) > .004, `${name} cannot intersect the postsynaptic membrane`);
+        }
+      }
+    }
+    const caspase = named('Intracellular conceptual caspase-3 signal');
+    assert.ok(compartment(caspase.position) < -.1, 'CASP3 must remain inside the head');
+  }
 });
 
 test('pause or explore repeats preserve geometry, process positions and molecular matrices exactly', () => {

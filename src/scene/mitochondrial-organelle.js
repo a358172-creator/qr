@@ -27,21 +27,54 @@ export function createMitochondrialOrganelle(texture) {
     return c.add(v3(.027 * Math.sin(a * 3) * r, Math.sin(a) * r * relief, Math.cos(a) * r * .91 * relief));
   };
   const outerMat = physical(0xb57f83, {
-    side: THREE.DoubleSide, roughness: .61, bumpMap: texture, bumpScale: .027,
+    side: THREE.DoubleSide, roughness: .61, bumpMap: texture, bumpScale: .010,
     sheen: .24, sheenColor: new THREE.Color(0xedb9b2), sheenRoughness: .7,
     emissive: 0x5f2635, emissiveIntensity: .025,
   });
-  const innerMat = physical(0x7a536a, { side: THREE.DoubleSide, roughness: .77, bumpMap: texture, bumpScale: .016 });
+  const innerMat = physical(0x7a536a, { side: THREE.DoubleSide, roughness: .77, bumpMap: texture, bumpScale: .006 });
   const outer = new THREE.Mesh(gridGeometry(104, 66, (u, v) => surface(u, v)), outerMat);
-  const inner = new THREE.Mesh(gridGeometry(104, 66, (u, v) => surface(u, v, .075)), innerMat);
-  outer.name = 'Outer mitochondrial membrane';
-  inner.name = 'Inner mitochondrial membrane';
-  group.add(outer, inner);
+  // One continuous inner-membrane manifold, locally invaginated. The fold
+  // material partitions this same indexed surface; no floating sheets, rods,
+  // or decorative bridges are used to imply crista junctions.
+  const foldSites=Array.from({length:13},(_,i)=>({
+    u:.09+i*.067+.009*Math.sin(i*2.4),width:.014+.003*Math.sin(i*1.8)**2,
+    depth:.57+.14*Math.sin(i*1.7+.4)**2,
+  }));
+  const indentation=(u,v)=>{
+    let depth=0;
+    for(const fold of foldSites){
+      const centreU=fold.u+.006*Math.sin(v*Math.PI*2+iPhase(fold.u));
+      const d=(u-centreU)/fold.width;
+      depth=Math.max(depth,fold.depth*Math.exp(-d*d));
+    }
+    return depth*Math.pow(Math.sin(v*Math.PI),1.35);
+  };
+  const iPhase=u=>u*27;
+  const innerSurface=(u,v)=>surface(u,v,.075).lerp(centre(u),indentation(u,v));
+  const continuousInner=gridGeometry(312,64,innerSurface),innerIndices=[],foldIndices=[];
+  const uv=continuousInner.attributes.uv;
+  for(let i=0;i<continuousInner.index.count;i+=3){
+    const face=[0,1,2].map(j=>continuousInner.index.getX(i+j));
+    const u=face.reduce((sum,j)=>sum+uv.getY(j),0)/3,v=face.reduce((sum,j)=>sum+uv.getX(j),0)/3;
+    (indentation(u,v)>.045?foldIndices:innerIndices).push(...face);
+  }
+  const partition=indices=>{
+    const geometry=new THREE.BufferGeometry();
+    for(const [name,attribute] of Object.entries(continuousInner.attributes))geometry.setAttribute(name,attribute);
+    geometry.setIndex(indices);return geometry;
+  };
+  const inner=new THREE.Mesh(partition(innerIndices),innerMat);
+  const foldMat=physical(0xc59194,{side:THREE.DoubleSide,roughness:.74,clearcoat:.025,bumpMap:texture,bumpScale:.006,emissive:0x6a3040,emissiveIntensity:.035});
+  const folds=new THREE.Mesh(partition(foldIndices),foldMat);
+  outer.name='Outer mitochondrial membrane';inner.name='Inner mitochondrial membrane';folds.name='Invaginated cristae membranes';
+  group.add(outer,inner,folds);
 
   const cutMat = physical(0xdbb1a7, { roughness: .62, bumpMap: texture, bumpScale: .012 });
   const outerEdges = [], innerEdges = [];
   for (const side of [0, 1]) {
-    group.add(new THREE.Mesh(gridGeometry(100, 4, (u, v) => surface(u, side, v * .075)), cutMat));
+    // The intermembrane space stays open at the cut. Each membrane has its
+    // own thin section lip instead of a solid bridge joining both membranes.
+    for(const inset of [0,.075]) group.add(new THREE.Mesh(gridGeometry(100,2,(u,v)=>surface(u,side,inset+v*.012)),cutMat));
     const outerPoints = [], innerPoints = [];
     for (let i = 0; i <= 100; i++) {
       outerPoints.push(surface(i / 100, side));
@@ -53,53 +86,19 @@ export function createMitochondrialOrganelle(texture) {
   group.add(new THREE.Mesh(merged(outerEdges), cutMat));
   group.add(new THREE.Mesh(merged(innerEdges), physical(0x80516a, { roughness: .7 })));
 
-  const foldMat = physical(0xc99192, {
-    side: THREE.DoubleSide, roughness: .64, bumpMap: texture, bumpScale: .015,
-    sheen: .19, sheenColor: new THREE.Color(0xf0c8b9),
-    emissive: 0x6a3040, emissiveIntensity: .035,
-  });
-  const ridgeMat = physical(0xe1b5a7, { roughness: .57, bumpMap: texture, bumpScale: .009 });
-  const foldParts = [], crestParts = [], junctionParts = [];
-  for (let index = 0; index < 15; index++) {
-    const u = .075 + index * .0602, c = centre(u), r = radius(u) - .095;
-    const flip = index % 2 ? -1 : 1;
-    const sway = .04 * Math.sin(index * 2.7);
-    const curve = new THREE.CatmullRomCurve3([
-      v3(c.x - .07, c.y + flip * r * .84, -.09),
-      v3(c.x + .045 + sway, c.y + flip * r * .61, .26 * r + .08),
-      v3(c.x - .075, c.y + flip * r * .07, .49 * r + .085),
-      v3(c.x + .035 + sway, c.y - flip * r * .51, .40 * r + .065),
-      v3(c.x + .155, c.y - flip * r * .57, .04),
-    ]);
-    // Each fold is a membrane sheet with a rounded exposed crest. Its recessed
-    // edge reaches the back of the inner membrane, rather than floating free.
-    foldParts.push(gridGeometry(36, 11, (s, t) => {
-      const p = curve.getPoint(s);
-      const recessedZ = -.45 * r * Math.sin(s * Math.PI) - .05;
-      return v3(p.x + .024 * Math.sin(t * Math.PI) * Math.sin(s * 15 + index), p.y + .027 * Math.sin(t * Math.PI) * Math.sin(s * 8 + index), THREE.MathUtils.lerp(p.z, recessedZ, t));
-    }));
-    crestParts.push(new THREE.TubeGeometry(curve, 42, .020, 7, false));
-    const junction = new THREE.CatmullRomCurve3([
-      v3(c.x - .07, c.y + flip * r * .84, -.09),
-      v3(c.x - .04, c.y + flip * r * .89, -.23 * r),
-      v3(c.x + .015, c.y + flip * r * .67, -.52 * r),
-    ]);
-    junctionParts.push(new THREE.TubeGeometry(junction, 14, .024, 7, false));
-  }
-  const folds = new THREE.Mesh(merged(foldParts), foldMat);
-  folds.name = 'Invaginated cristae membranes';
-  group.add(folds, new THREE.Mesh(merged(crestParts), ridgeMat), new THREE.Mesh(merged(junctionParts), foldMat));
-
   const granules = new THREE.InstancedMesh(new THREE.SphereGeometry(.026, 7, 5), physical(0xb79a9f, { roughness: .92 }), 76);
   const rng = random(847), transform = new THREE.Object3D();
   for (let index = 0; index < granules.count; index++) {
-    const u = .07 + rng() * .86, c = centre(u), r = radius(u) - .16;
+    let u=.07+rng()*.86;
+    // Matrix granules occupy spaces between invaginations.
+    for(let retry=0;retry<40&&indentation(u,.5)>.10;retry++)u=.07+rng()*.86;
+    const c=centre(u),r=radius(u)-.16;
     transform.position.set(c.x, c.y + (rng() - .5) * r * 1.05, -.20 - rng() * r * .33);
     transform.scale.setScalar(.48 + rng() * .62);
     transform.updateMatrix();
     granules.setMatrixAt(index, transform.matrix);
   }
-  group.add(granules);
+  granules.name='Matrix granules';group.add(granules);
 
   // Fine, discontinuous surface relief remains attached to the back membrane.
   // It is structural texture, never a luminous outline or oxidative lightning.
@@ -117,7 +116,8 @@ export function createMitochondrialOrganelle(texture) {
   const healthy = new THREE.Color(0xb57f83), stressed = new THREE.Color(0x9e6b80);
   const healthyFold = new THREE.Color(0xc99192), stressedFold = new THREE.Color(0xb48194);
   return {
-    group, outer, inner, folds, surface,
+    group, outer, inner, folds, surface, innerSurface, outerMat, foldMat,
+    diagnostics:()=>({cristae:foldSites.length,sharedInnerVertices:continuousInner.attributes.position.count,innerTriangles:innerIndices.length/3,foldTriangles:foldIndices.length/3}),
     update(stress, selected) {
       outerMat.color.copy(healthy).lerp(stressed, stress * .68);
       foldMat.color.copy(healthyFold).lerp(stressedFold, stress * .55);

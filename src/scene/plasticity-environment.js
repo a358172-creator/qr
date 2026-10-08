@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { v3, random, gridGeometry, membraneSurface, organicLobe, tissueMaterial, physical } from './geometry.js';
+import { v3, random, gridGeometry, membraneSurface, createSpineShaftJunction, organicLobe, tissueMaterial, physical } from './geometry.js';
 import { createMolecularPool, molecularGlyph } from './molecular-particles.js';
 import { createActinNetwork } from './actin-network.js';
 
@@ -11,9 +11,15 @@ const BASE = { glut:.08, activation:.03, ca:0, scaffold:.25, disc1:.18, kalirin:
 const clamp = value => THREE.MathUtils.clamp(Number.isFinite(value) ? value : 0, 0, 1);
 const morph = (point, amount) => {
   const weight = THREE.MathUtils.smoothstep(point.y,-2.1,-1.2);
-  return point.set(point.x*(1+.10*amount*weight),point.y+.04*amount*weight,point.z*(1+.10*amount*weight));
+  return point.set(point.x*(1+.17*amount*weight),point.y+.065*amount*weight,point.z*(1+.11*amount*weight));
 };
 const merge = parts => { const geometry = mergeGeometries(parts); parts.forEach(part=>part.dispose()); return geometry; };
+// The neck and shaft share an actual oval aperture. Its ring follows the
+// shaft's surface, instead of ending as a truncated tube inside another mesh.
+const SHAFT_RADIUS=.40, ROOT_X=.20, ROOT_WIDTH=.43, ROOT_DEPTH=.31;
+const shaftY=x=>-3.65-.014*x*x-.035*Math.sin(x*.65);
+const shaftZ=x=>-.014*x*x;
+const junction=createSpineShaftJunction({centerX:ROOT_X,halfWidth:ROOT_WIDTH,halfDepth:ROOT_DEPTH,shaftRadius:SHAFT_RADIUS,shaftY,shaftZ});
 
 /** A sectioned, physiological postsynaptic microdomain. Protein proximity and
  * illumination represent functional context, not a compulsory molecular chain. */
@@ -28,9 +34,10 @@ export function createPlasticityEnvironment({ texture } = {}) {
   // thickness are geometry, so orbiting preserves a readable organic silhouette.
   for (const kind of ['post','pre']) {
     const surface = membraneSurface(kind==='post'?POST:PRE,kind);
+    if(kind==='post') junction.fitSurface(surface);
     let geometry = surface.geometry;
     if (kind==='pre') {
-      geometry = gridGeometry(48,52,surface.sample); surface.geometry.dispose();
+      geometry = gridGeometry(40,42,surface.sample); surface.geometry.dispose();
     }
     const material = tissueMaterial(texture, {color:kind==='post'?0xf2ddea:0xbeb0ca,
       vertexColors:kind==='post',side:THREE.FrontSide,opacity:kind==='post'?.80:.46,
@@ -46,7 +53,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
       vertexColors:kind==='post',side:THREE.BackSide,opacity:kind==='post'?.72:.58,
       roughness:.78,bumpScale:.007,relief:.002,emissive:kind==='post'?0x513f50:0x3f364c,emissiveIntensity:.08});
     const inner=new THREE.Mesh(geometry,innerMaterial);
-    inner.scale.set(.99,1,.99);
+    if(kind==='pre') inner.scale.set(.99,1,.99);
     register(inner,kind==='post'?'spine':'terminal',kind==='post'?'Inner mushroom membrane':'Inner presynaptic membrane');
     (kind==='post'?membraneMaterials:terminalMaterials).push({material:innerMaterial,opacity:innerMaterial.opacity});
     const edgeMat = physical(kind==='post'?0xd2a9c2:0xb8a5c7,{roughness:.65,transparent:true,opacity:kind==='post'?.84:.46,depthWrite:false,bumpMap:texture,bumpScale:.008});
@@ -61,20 +68,19 @@ export function createPlasticityEnvironment({ texture } = {}) {
     if(kind==='post') rememberMorph(edgeGeometry);
   }
 
-  const shaftCurve = new THREE.CatmullRomCurve3([v3(-5,-3.85,-.35),v3(-2.8,-3.67,-.1),v3(0,-3.65,0),v3(2.8,-3.75,-.12),v3(5,-4.03,-.4)]);
-  const frames=shaftCurve.computeFrenetFrames(96,false);
-  const shaftGeometry=gridGeometry(96,32,(u,v)=>{
-    const a=v*Math.PI*2,t=u*96,i=Math.min(95,Math.floor(t)),fraction=t-i,r=.39*(1+.032*Math.sin(u*17+a*3));
-    const normal=frames.normals[i].clone().lerp(frames.normals[i+1],fraction).normalize();
-    const binormal=frames.binormals[i].clone().lerp(frames.binormals[i+1],fraction).normalize();
-    return shaftCurve.getPointAt(u).addScaledVector(normal,Math.cos(a)*r).addScaledVector(binormal,Math.sin(a)*r);
-  });
+  const shaftParts=[[-5,ROOT_X-ROOT_WIDTH,30],[ROOT_X-ROOT_WIDTH,ROOT_X+ROOT_WIDTH,32],[ROOT_X+ROOT_WIDTH,5,30]].map(([start,end,rows])=>gridGeometry(rows,32,(u,v)=>{
+    const x=THREE.MathUtils.lerp(start,end,u),half=junction.roofHalf(x);
+    const a=half+v*(Math.PI*2-2*half),relief=THREE.MathUtils.smoothstep(Math.abs(x-ROOT_X),.65,1.3);
+    const r=SHAFT_RADIUS*(1+.018*relief*Math.sin(x*2+a*3));
+    return v3(x,shaftY(x)+Math.cos(a)*r,shaftZ(x)+Math.sin(a)*r);
+  }));
+  const shaftGeometry=merge(shaftParts);
   // Frenet circles run clockwise when viewed along this shaft's outward
   // normal. Reverse this local surface's indices before using FrontSide.
   const shaftIndices=shaftGeometry.index.array;
   for(let i=0;i<shaftIndices.length;i+=3) [shaftIndices[i+1],shaftIndices[i+2]]=[shaftIndices[i+2],shaftIndices[i+1]];
   shaftGeometry.index.needsUpdate=true;shaftGeometry.computeVertexNormals();
-  register(new THREE.Mesh(shaftGeometry,tissueMaterial(texture,{vertexColors:false,color:0xb599b4,side:THREE.FrontSide,opacity:.88,bumpScale:.007,relief:.002})),'dendrite','Supporting dendritic shaft');
+  register(new THREE.Mesh(shaftGeometry,tissueMaterial(texture,{vertexColors:false,color:0xbda0b6,side:THREE.FrontSide,opacity:.84,bumpScale:.007,relief:.002})),'dendrite','Supporting dendritic shaft');
 
   // Modest presynaptic context: eleven membrane-bound vesicles, no unrelated
   // organelles or damage machinery are constructed for this mechanism.
@@ -107,9 +113,9 @@ export function createPlasticityEnvironment({ texture } = {}) {
   // A porous, irregular three-dimensional protein mesh under the membrane,
   // deliberately avoiding a plate, disk, or solid slab.
   const latticeParts=[],scaffoldRng=random(694),scaffoldCurves=[];
-  for(let i=0;i<18;i++) {
+  for(let i=0;i<24;i++) {
     const angle=scaffoldRng()*Math.PI*2,turn=.8+scaffoldRng()*1.2;
-    const depth=-.45-(i%3)*.095;
+    const depth=-.405-scaffoldRng()*.26;
     const origin=v3(Math.cos(angle)*(.68+scaffoldRng()*.32),depth+(scaffoldRng()-.5)*.04,Math.sin(angle)*.51);
     const destination=v3(Math.cos(angle+Math.PI+turn*.2)*(.63+scaffoldRng()*.37),depth+(scaffoldRng()-.5)*.05,Math.sin(angle+Math.PI+turn*.2)*.50);
     const middle=origin.clone().lerp(destination,.49).add(v3((scaffoldRng()-.5)*.38,(scaffoldRng()-.5)*.09,(scaffoldRng()-.5)*.29));
@@ -119,18 +125,18 @@ export function createPlasticityEnvironment({ texture } = {}) {
   }
   // Short unequal forks attach to the long paths at varying depths. Their
   // irregular spacing avoids reading the PSD as a rectangular fabric or grid.
-  for(let i=0;i<24;i++) {
+  for(let i=0;i<30;i++) {
     const parent=scaffoldCurves[i%scaffoldCurves.length],u=.16+scaffoldRng()*.68,start=parent.getPoint(u);
     const tangent=parent.getTangent(u),side=v3(-tangent.z,(scaffoldRng()-.5)*.8,tangent.x).normalize().multiplyScalar(i%2?1:-1);
     const tip=start.clone().addScaledVector(side,.13+scaffoldRng()*.26).addScaledVector(tangent,.08+scaffoldRng()*.12);
-    tip.x=THREE.MathUtils.clamp(tip.x,-1.04,1.04);tip.z=THREE.MathUtils.clamp(tip.z,-.58,.58);tip.y=THREE.MathUtils.clamp(tip.y,-.78,-.43);
+    tip.x=THREE.MathUtils.clamp(tip.x,-1.04,1.04);tip.z=THREE.MathUtils.clamp(tip.z,-.58,.58);tip.y=THREE.MathUtils.clamp(tip.y,-.78,-.35);
     const middle=start.clone().lerp(tip,.52).add(v3(.025*Math.sin(i),-.025,.015*Math.cos(i)));
     latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start,middle,tip]),10,.012+scaffoldRng()*.004,5,false));
   }
   // Cross-links join adjacent depths rather than stacking disconnected sheets.
   // Small elongated domains sit on the scaffold itself, giving the density a
   // granular protein volume distinct from the finer, pink actin filaments.
-  for(let i=0;i<12;i++) {
+  for(let i=0;i<20;i++) {
     const from=scaffoldCurves[i].getPoint(.27+(i%3)*.21),neighbor=scaffoldCurves[i+1];
     let nearest=neighbor.getPoint(0),distance=Infinity;
     for(let j=0;j<=20;j++) {
@@ -140,7 +146,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
     const middle=from.clone().lerp(nearest,.53).add(v3(.025,-.013,.015));
     latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([from,middle,nearest]),8,.014,5,false));
   }
-  for(let i=0;i<24;i++) {
+  for(let i=0;i<34;i++) {
     const curve=scaffoldCurves[i%scaffoldCurves.length],u=.19+scaffoldRng()*.62;
     const center=curve.getPoint(u),tangent=curve.getTangent(u);
     const domain=new THREE.SphereGeometry(1,10,6),position=domain.attributes.position;
@@ -153,17 +159,33 @@ export function createPlasticityEnvironment({ texture } = {}) {
     domain.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(v3(1,0,0),tangent));
     domain.translate(center.x,center.y,center.z);domain.computeVertexNormals();latticeParts.push(domain);
   }
+  // Irregular short elements approach the cytoplasmic membrane face; there is
+  // no detached sheet or single protein masquerading as the entire density.
+  for(let i=0;i<9;i++) {
+    const start=scaffoldCurves[i*2].getPoint(.34+(i%3)*.14);
+    const tip=v3(start.x*.96,-.31-.035*Math.abs(start.x),start.z*.97);
+    latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start,start.clone().lerp(tip,.5).add(v3(.02,0,-.015)),tip]),8,.012+(i%3)*.002,5,false));
+  }
   const psdMat=physical(0x6f958c,{roughness:.81,clearcoat:.02,transparent:true,opacity:.72,depthWrite:false,emissive:0x24433a,emissiveIntensity:.025});
   const psd=register(new THREE.Mesh(merge(latticeParts),psdMat),'psd','Porous postsynaptic protein scaffold');rememberMorph(psd.geometry);
 
   const proteinSpecs=[
-    {key:'psd95',name:'PSD-95 scaffold complex',position:v3(.65,-.43,.37),color:0x8ea99f,emissive:0x344c43,scales:[[.125,.057,.065],[.082,.115,.067],[.105,.055,.080],[.065,.090,.06],[.07,.06,.06]],offsets:[[-.12,.01,0],[0,0,.015],[.11,-.018,-.015],[.034,.025,.10],[-.035,-.03,-.085]]},
-    {key:'disc1',name:'DISC1 structural complex',position:v3(-.64,-.89,.35),color:0x91a3b5,emissive:0x334453,scales:[[.088,.14,.07],[.13,.058,.065],[.062,.12,.082],[.10,.057,.065],[.055,.082,.06]],offsets:[[-.09,.04,0],[.065,.08,-.01],[.045,-.05,.05],[-.035,-.12,-.02],[.14,-.02,-.02]]},
-    {key:'kalirin7',name:'Kalirin-7 actin-adjacent complex',position:v3(.62,-1.23,.30),color:0x99b6a4,emissive:0x3d5347,scales:[[.12,.063,.072],[.125,.053,.066],[.068,.125,.061],[.078,.055,.083],[.066,.10,.062],[.074,.052,.06]],offsets:[[-.12,.025,0],[.025,.035,.01],[.15,.015,-.02],[-.07,-.075,.02],[.07,-.08,.045],[.18,.10,0]]},
+    {key:'psd95',name:'PSD-95 scaffold complex',position:v3(.60,-.43,.37),color:0x8ea99f,emissive:0x344c43,
+      scales:[[.075,.048,.065],[.079,.052,.059],[.081,.050,.065],[.072,.069,.058],[.105,.074,.075]],
+      offsets:[[-.25,.025,-.025],[-.11,.012,.035],[.035,-.018,.03],[.13,-.085,-.008],[.25,-.13,-.015]]},
+    {key:'disc1',name:'DISC1 structural complex',position:v3(-.69,-.98,.35),color:0x91a3b5,emissive:0x334453,
+      scales:[[.086,.112,.072],[.049,.145,.052],[.057,.128,.048],[.089,.090,.063]],
+      offsets:[[-.054,.19,-.025],[.007,.055,.012],[.02,-.115,.005],[.075,-.265,-.01]]},
+    {key:'kalirin7',name:'Kalirin-7 actin-adjacent complex',position:v3(.63,-1.22,.32),color:0x99b6a4,emissive:0x3d5347,
+      scales:[[.091,.064,.058],[.082,.041,.047],[.091,.044,.050],[.102,.045,.056],[.13,.085,.073],[.080,.059,.067]],
+      offsets:[[-.35,.045,-.018],[-.22,-.025,.012],[-.075,-.073,.04],[.09,-.073,.027],[.27,-.02,0],[.31,.105,-.018]]},
   ];
   const proteins=proteinSpecs.map((spec,i)=>{
-    const parts=spec.scales.map((scale,j)=>{const g=organicLobe(31+i*9+j);g.scale(...scale);g.rotateZ((j-2)*.31);g.rotateY(j*.41);g.rotateX((j-1)*.23);g.translate(...spec.offsets[j]);return g;});
-    const material=physical(spec.color,{roughness:.59,bumpMap:texture,bumpScale:.011,transparent:true,opacity:.8,emissive:spec.emissive,emissiveIntensity:.05});
+    const parts=spec.scales.map((scale,j)=>{const g=organicLobe(31+i*9+j);g.scale(...scale);g.rotateZ(Math.sin(j*1.7+i)*.22);g.rotateY(j*.27);g.translate(...spec.offsets[j]);return g;});
+    // These connectors belong to each stylized multidomain silhouette. They
+    // never connect different proteins or claim resolved atomic structures.
+    parts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(spec.offsets.map(p=>v3(...p))),36,i===1?.038:.023,7,false));
+    const material=physical(spec.color,{roughness:.73,clearcoat:.025,bumpMap:texture,bumpScale:.006,transparent:true,opacity:.8,emissive:spec.emissive,emissiveIntensity:.05});
     const mesh=register(new THREE.Mesh(merge(parts),material),spec.key,spec.name);mesh.position.copy(spec.position);
     return {...spec,mesh,material};
   });
@@ -181,9 +203,9 @@ export function createPlasticityEnvironment({ texture } = {}) {
   anchor('glutamate','Glutamato',[-.14,.55,.37],'left');
   anchor('calcium','Ca²⁺',[.17,-.66,.55],'left',3);
   anchor('psd','Densidad postsináptica',[-.91,-.45,.39],'left');
-  anchor('psd95','PSD-95',[.81,-.45,.4],'right',3);
-  anchor('disc1','DISC1',[-.72,-.91,.46],'left',3);
-  anchor('kalirin7','Kalirin-7',[.80,-1.22,.42],'right',3);
+  anchor('psd95','PSD-95',[.79,-.52,.4],'right',3);
+  anchor('disc1','DISC1',[-.68,-.98,.40],'left',3);
+  anchor('kalirin7','Kalirin-7',[.88,-1.22,.37],'right',3);
   const anchorBases=new Map(labelAnchors.map(item=>[item.key,item.position.clone()]));
   const stageKeys=[
     ['spine','terminal','dendrite','actin','psd','nmda'],
@@ -194,7 +216,10 @@ export function createPlasticityEnvironment({ texture } = {}) {
     ['spine','terminal','dendrite','actin','psd','nmda','psd95','disc1','kalirin7'],
   ];
   let lastMorph=NaN,currentStage=0,currentState={...BASE},viewOpacity=.8;
-  const ionTargets=proteins.map(protein=>protein.position.clone());
+  // Independent cytosolic samples describe dispersion after pore entry. They
+  // deliberately do not use protein coordinates as delivery destinations.
+  const ionTargets=[v3(-.28,-.90,-.20),v3(.39,-1.10,-.31),v3(-.54,-1.30,-.02),v3(.08,-1.58,.14),
+    v3(.81,-.96,-.13),v3(-.81,-1.02,-.28),v3(.24,-1.45,.10),v3(-.15,-.73,.41)];
   function update({time=0,state=BASE,stepIndex=0,elapsed=0,selected=null,viewDistance=17}={}) {
     currentStage=THREE.MathUtils.clamp(stepIndex|0,0,5);
     const values=Object.fromEntries(Object.keys(BASE).map(key=>[key,clamp(state[key])]));
@@ -234,7 +259,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
       if(t<.55) object.position.set(channel.x,channel.y+.72-t/.55*1.02,channel.z);
       else {
         const q=(t-.55)/.45,target=morph(ionTargets[index%ionTargets.length].clone(),amount);
-        object.position.set(channel.x+(target.x-channel.x)*q*q,channel.y-.30+(target.y-channel.y+.18)*q,channel.z+(target.z-channel.z)*q*q);
+        object.position.set(channel.x+(target.x-channel.x)*q*q,THREE.MathUtils.lerp(channel.y-.30,target.y,q),channel.z+(target.z-channel.z)*q*q);
       }
       object.scale.setScalar(.83+.15*Math.sin(index*1.7));
     });
@@ -246,7 +271,8 @@ export function createPlasticityEnvironment({ texture } = {}) {
     root.updateMatrixWorld(true);
   }
   function diagnostics() {
-    return {stage:currentStage,remodeling:currentState.remodeling,headRadialScale:1+.10*currentState.remodeling,
+    return {stage:currentStage,remodeling:currentState.remodeling,headRadialScale:1+.17*currentState.remodeling,
+      junction:{center:ROOT_X,width:ROOT_WIDTH,depth:ROOT_DEPTH,shaftRadius:SHAFT_RADIUS},
       channel:receptor.position.toArray(),proteins:Object.fromEntries(proteins.map(protein=>[protein.key,protein.mesh.position.toArray()])),
       particles:{calcium:calcium.mesh.count,glutamate:glutamate.mesh.count},appearance:{membraneOpacity:viewOpacity},
       actin:actin.diagnostics()};

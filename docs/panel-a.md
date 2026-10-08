@@ -1,6 +1,6 @@
 # Panel A · plasticidad estructural de la espina
 
-La referencia principal de este módulo es **el panel A de la Figura 1 proporcionada por el usuario en la conversación**. Muestra glutamato, NMDAR, Ca²⁺, DISC1, PSD-95, Kalirin-7, actina y una espina dendrítica. No se atribuye la figura a un artículo porque no se dispone de su procedencia bibliográfica original.
+La documentación previa identifica como referencia **el panel A de la Figura 1**: glutamato, NMDAR, Ca²⁺, DISC1, PSD-95, Kalirin-7, actina y una espina dendrítica. En esta fase no se ha podido cotejar su imagen original: `assets/poster-reference.png` y `assets/reference-synapse.png` están vacíos, y `assets/image.png` es un mockup general de la aplicación. El refinamiento se apoya en el alcance documentado y en los estudios primarios enlazados abajo. No se atribuye la figura a un artículo sin conocer su procedencia.
 
 El recorrido interpreta su relación conceptual con la organización y el mantenimiento de la espina. La cámara y la iluminación reparten la atención entre estructuras coexistentes. El orden de las seis etapas no establece una cadena molecular obligatoria ni indica que las proteínas aparezcan desde cero, se activen todas del mismo modo o se desplacen de una a otra. La escena conserva una conexión fisiológica, con entrada moderada de calcio y remodelado sutil.
 
@@ -12,8 +12,8 @@ El recorrido interpreta su relación conceptual con la organización y el manten
 | 2. Activación de NMDAR | Glutamato, apertura conceptual del canal y pocas partículas de Ca²⁺ entrando al microdominio. | No se representa la totalidad de las condiciones de apertura ni se cuantifican concentraciones. |
 | 3. Organización postsináptica | Énfasis en PSD-95 próxima a la membrana; DISC1 ligeramente más profunda. | La proximidad y el foco indican contexto funcional, no una reacción directa ni un ensamblaje atomístico. |
 | 4. Kalirin-7 | Complejo próximo al entramado de actina, destacado por un cambio de foco. | Su relación con el remodelado se ilustra sin incorporar intermediarios ausentes en la figura. |
-| 5. Remodelado de actina | Reorientación gradual, ramificación localizada y ajuste leve de la cabeza de la misma espina. | El morph es una posibilidad ilustrativa; no mide fuerza sináptica, aprendizaje o una respuesta universal. |
-| 6. Plasticidad estructural | Vista conjunta del receptor, la región postsináptica, los complejos y la arquitectura de actina. | La organización interna contribuye al mantenimiento y remodelado; el recorrido no demuestra una secuencia causal completa. |
+| 5. Remodelado de actina | Reorientación gradual, elongación de ramas locales y expansión moderada de la cabeza de la misma espina. | El morph es una posibilidad ilustrativa; no mide fuerza sináptica, aprendizaje o una respuesta universal. |
+| 6. Plasticidad estructural | Vista conjunta con exactamente la misma cámara que la primera etapa, para comparar cabeza y actina. | La activación de NMDAR no implica siempre crecimiento o potenciación. La selección de etapas permite contrastar estados sin añadir controles. |
 
 ## Evidencia primaria y alcance
 
@@ -24,9 +24,11 @@ El recorrido interpreta su relación conceptual con la organización y el manten
 
 ## Convenciones visuales
 
-- PSD-95, DISC1 y Kalirin-7 son complejos orgánicos estilizados. Su tamaño, separación y profundidad favorecen la lectura; no representan una arquitectura molecular resuelta.
-- La densidad postsináptica es una región de entramado proteico bajo la membrana. Se distingue de PSD-95, una proteína de esa organización, tanto en la selección como en los textos.
-- La red de actina es tridimensional y más densa en la cabeza, con continuidad hacia el cuello. Las ramificaciones adicionales y el morph facilitan ver plasticidad; no simulan cinética de polimerización ni identifican proteínas ramificadoras adicionales.
+- La espina termina en una abertura oval real de la superficie dendrítica. Cuello y eje comparten su contorno; no hay una tapa de la dendrita que atraviese el lumen del cuello. El corte anterior expone el interior con un borde fino y no representa una lesión.
+- PSD-95 tiene una silueta multidominio baja y curvada, integrada en la región próxima a NMDAR; DISC1 es más alargada, intracelular y profunda; Kalirin-7 forma un arco extendido junto al citoesqueleto. Los conectores pertenecen a cada silueta: no hay puentes entre las tres proteínas que insinúen un ensamblaje obligatorio. La forma, el número de lóbulos y sus proporciones no representan estructuras atómicas, dominios resueltos o estequiometrías experimentales.
+- La densidad postsináptica reúne trayectos irregulares, enlaces entre profundidades, pequeños volúmenes proteicos y elementos cortos que se aproximan a la cara citoplasmática de la membrana. Es una región tridimensional heterogénea, diferenciada de la proteína PSD-95 seleccionable.
+- La red de actina es tridimensional y más densa en la cabeza. Los arcos principales se ramifican desde tres trayectos que continúan al cuello, y sus ramas secundarias permanecen unidas durante la deformación. El número de raíces es una decisión gráfica. Las ramificaciones adicionales y el morph facilitan ver plasticidad; no simulan cinética de polimerización ni identifican proteínas ramificadoras adicionales.
+- La cabeza se ensancha de forma moderada y anisótropa; cuello y unión dendrítica quedan fijos. Los factores de deformación son parámetros gráficos sin valor experimental. Primera y última etapa usan la misma posición y punto de mira para evitar que un cambio de zoom aparente crecimiento.
 - Los recorridos del calcio quedan ligados al canal y su dispersión intracelular es conceptual. No describen transporte dirigido de iones hacia una proteína específica.
 - La transparencia temporal ayuda a observar el interior conservando la membrana como referencia espacial. Seleccionar actina debe destacar los filamentos y reducir discretamente el protagonismo del contexto.
 - No forman parte de esta escena ROS, caspasas, microglía, lesiones de membrana ni alteración mitocondrial. Los otros tres módulos conservan sus propias narrativas; el hotspot independiente de apoptosis sigue fuera de alcance.
@@ -37,6 +39,8 @@ El recorrido interpreta su relación conceptual con la organización y el manten
 `src/mechanisms/synaptic-plasticity.js` define el identificador `signaling`, seis etapas de 8, 9, 10, 10, 13 y 10 segundos, siete poses de cámara, once contenidos seleccionables y la fábrica diferida `createPlasticityEnvironment` de `src/scene/plasticity-environment.js`.
 
 La definición utiliza la sesión, timeline, cámara, controles y anotaciones compartidos del atlas. `resetOnExit: true` devuelve la experiencia a su estado basal al salir. La reversibilidad del morph, el congelado al explorar, la selección y las transiciones se comprueban junto con el entorno 3D y la integración; este documento describe su alcance y no sustituye el registro de validación.
+
+Las pruebas de fase 1 comprueban que el eje carece de techo bajo el cuello, que su borde coincide con la base de la membrana, que todos los filamentos de cabeza conectan con raíces del cuello, que las siluetas proteicas difieren y que la cámara basal coincide con la final. Se conserva el límite de 120 000 triángulos con las reservas de partículas completamente ocupadas.
 
 ## Referencias
 

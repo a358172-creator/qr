@@ -126,7 +126,9 @@ test('the first mechanism completes without entering additional mechanisms', () 
   timeline.play();
   timeline.update(1000);
   const state = timeline.getState();
-  assert.equal(state.step.key, 'ros');
+  assert.equal(state.step.key, 'intrinsic-possibility');
   assert.equal(state.complete, true);
-  assert.ok(glutamateMechanism.steps.every(step => step.state.damage === 0));
+  assert.ok(glutamateMechanism.steps.slice(0,6).every(step => step.state.damage === 0));
+  assert.equal(glutamateMechanism.steps[6].state.intrinsic,0);
+  assert.equal(glutamateMechanism.steps[7].state.local,0);
 });

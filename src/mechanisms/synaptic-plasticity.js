@@ -30,7 +30,7 @@ export const plasticityMechanism = {
     organizationFocus: { position: [2, .4, 10.8], target: [0, -.6, .1] },
     kalirinFocus: { position: [2.3, .2, 11.2], target: [.1, -.95, .1] },
     actinFocus: { position: [2, -.45, 11.4], target: [0, -1.55, .1] },
-    remodeledOverview: { position: [3, .85, 17.6], target: [0, -1.4, 0] },
+    remodeledOverview: { position: [3, 1.25, 18.5], target: [0, -1.4, 0] },
   },
   steps: [
     {
@@ -54,7 +54,7 @@ export const plasticityMechanism = {
     {
       key: 'postsynaptic-organization',
       title: 'Organización postsináptica',
-      caption: 'PSD-95 contribuye a organizar receptores y complejos bajo la membrana. El foco pasa después a DISC1, otra proteína relacionada con el mantenimiento de la estructura de la espina.',
+      caption: 'PSD-95 se integra en el entramado bajo NMDAR. DISC1, de silueta más alargada y posición intracelular, participa en la regulación de la espina; no se representa un ensamblaje obligatorio entre ambas.',
       duration: 10,
       state: state(.32, .45, .18, .92, .72, .16, .02),
       camera: 'organizationFocus',
@@ -67,7 +67,7 @@ export const plasticityMechanism = {
     {
       key: 'kalirin-structural-context',
       title: 'Kalirin-7 y el entorno de actina',
-      caption: 'Kalirin-7 participa en mecanismos que relacionan la actividad sináptica con cambios de forma de la espina. Su proximidad a la actina permite seguir esa relación estructural.',
+      caption: 'Kalirin-7, el complejo curvado junto a la red, regula vías que modifican la actina. La proximidad ilustra ese contexto funcional; no demuestra una unión molecular directa.',
       duration: 10,
       state: state(.24, .32, .13, .82, .68, .95, .12),
       camera: 'kalirinFocus',
@@ -76,7 +76,7 @@ export const plasticityMechanism = {
     {
       key: 'actin-remodeling',
       title: 'Remodelado de actina',
-      caption: 'Los filamentos cambian lentamente de orientación y ramificación. La cabeza ajusta de forma sutil su volumen, conservando la continuidad con el cuello y la dendrita.',
+      caption: 'Algunas ramas de actina se alargan y reorientan mientras la cabeza se ensancha moderadamente. El cuello y su unión con la dendrita permanecen estables: es una posibilidad de remodelado dependiente de actividad.',
       duration: 13,
       state: state(.18, .22, .09, .75, .65, .86, 1),
       camera: 'actinFocus',
@@ -85,7 +85,7 @@ export const plasticityMechanism = {
     {
       key: 'structural-plasticity',
       title: 'Plasticidad estructural de la espina dendrítica',
-      caption: 'La organización postsináptica y el citoesqueleto contribuyen a mantener y remodelar la conexión. La plasticidad conserva una arquitectura capaz de cambiar con la actividad.',
+      caption: 'Compara con la primera etapa desde la misma perspectiva: cambian la cabeza y ramas locales de actina. La entrada de Ca²⁺ por NMDAR no implica siempre crecimiento ni potenciación sináptica.',
       duration: 10,
       state: state(.12, .12, .04, .65, .55, .60, 1),
       camera: 'remodeledOverview',
@@ -113,23 +113,23 @@ export const plasticityMechanism = {
       title: 'PSD-95',
       text: 'PSD-95 es una proteína de andamiaje: ayuda a organizar receptores y complejos de señalización bajo la membrana. Forma parte de la densidad postsináptica, una región que reúne muchas proteínas.',
       detail: 'El término andamiaje describe su capacidad de participar en la organización de otros componentes de la sinapsis. Se han identificado interacciones entre subunidades de NMDAR y proteínas de la familia PSD-95. Aquí, el complejo cercano al receptor permite distinguir una proteína particular del entramado postsináptico que la contiene, manteniendo visible su relación espacial con la membrana.',
-      observe: 'Localiza el complejo verde azulado junto a NMDAR y distingue su contorno del entramado postsináptico que lo rodea.',
-      note: 'Su proximidad al receptor facilita la lectura de su localización; la forma del complejo es conceptual.',
+      observe: 'Localiza la silueta verde azulada de varios dominios bajo NMDAR, integrada en el entramado postsináptico más amplio.',
+      note: 'La silueta multidominio es estilizada; no reproduce una conformación atómica ni una estequiometría determinada.',
     },
     disc1: {
       category: 'ORGANIZACIÓN ESTRUCTURAL',
       title: 'DISC1',
       text: 'DISC1 participa en la regulación de la morfología y función de las espinas. Su relación con Kalirin-7 aporta contexto para comprender cómo se organiza la respuesta estructural a la actividad.',
       detail: 'Estudios en modelos neuronales relacionan DISC1 con la regulación de complejos que incluyen Kalirin-7 y con el mantenimiento de la forma de la espina. Esta regulación depende del contexto de actividad. La escena muestra a DISC1 como un componente ya presente en la organización postsináptica; el cambio de iluminación dirige la atención hacia su papel dentro de ese conjunto.',
-      observe: 'Busca el complejo azul grisáceo algo más profundo que PSD-95; permanece en la espina mientras cambia el foco.',
-      note: 'La posición y el foco sugieren relación funcional sin representar una reacción molecular específica.',
+      observe: 'Busca la silueta alargada azul grisácea, más profunda que PSD-95; permanece intracelular mientras cambia el foco.',
+      note: 'DISC1 no se presenta como componente obligatorio de un único ensamblaje. Su posición no demuestra una interacción específica.',
     },
     kalirin7: {
       category: 'REMODELADO ESTRUCTURAL',
       title: 'Kalirin-7',
       text: 'Kalirin-7 participa en mecanismos que relacionan la actividad sináptica con el remodelado de la espina. Se representa cerca de la actina para vincular visualmente señalización y arquitectura celular.',
       detail: 'En modelos experimentales, Kalirin-7 se ha relacionado con cambios estructurales y funcionales de las espinas dependientes de actividad. Su inclusión permite conectar los complejos postsinápticos con la capacidad de reorganizar el citoesqueleto. El recorrido concentra la lectura en esa relación funcional y conserva simultáneamente a PSD-95, DISC1 y la red de actina como partes del mismo microambiente.',
-      observe: 'Identifica el complejo verde menta junto a los filamentos y sigue después el remodelado gradual de la red.',
+      observe: 'Identifica la silueta curva y extendida verde menta junto a los filamentos y sigue después el remodelado localizado de la red.',
       note: 'Su cercanía a la actina es una convención espacial; el recorrido no desarrolla una ruta bioquímica completa.',
     },
     actin: {
@@ -146,7 +146,7 @@ export const plasticityMechanism = {
       text: 'Una prolongación de la dendrita con cabeza y cuello diferenciados. Su forma puede cambiar junto con la organización interna del citoesqueleto.',
       detail: 'La cabeza recibe el contacto de la terminal presináptica, mientras el cuello mantiene la continuidad con la dendrita. Esta morfología de cabeza amplia es una de varias formas de espina. El recorrido conserva la misma conexión y muestra un ensanchamiento discreto, coordinado con la red interna; el cambio visible ilustra plasticidad estructural sin medir por sí solo la eficacia de la sinapsis.',
       observe: 'Compara la silueta inicial y final: la cabeza se ensancha ligeramente y el cuello sigue conectado a la dendrita.',
-      note: 'El cambio de volumen es sutil e ilustrativo: no cuantifica fuerza sináptica ni representa una respuesta universal.',
+      note: 'El corte permite observar el interior y no representa una lesión. La expansión es ilustrativa: no cuantifica fuerza sináptica ni constituye una respuesta universal.',
     },
     psd: {
       category: 'ORGANIZACIÓN SUBMEMBRANAL',

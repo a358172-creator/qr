@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { branch, fusedNeuronGeometry, organicMaterial, point, seededRandom } from '../atlas/organic.js';
+import { branch, fusedNeuronGeometry, point, seededRandom } from '../atlas/organic.js';
+import { tissueMaterial } from './geometry.js';
 
 const LOCAL_SCALE = .17;
 const DEFAULT_TARGET = point(-1.7, -3.1, 1.35);
@@ -27,7 +28,7 @@ function skeleton() {
     // Small varicosities remain part of the membrane surface, rather than
     // separate beads glued to cylindrical processes.
     const phase = rng() * Math.PI * 2;
-    item.radius = t => baseRadius(t) * (1 + .09 * Math.sin(t * 22 + phase) * Math.sin(Math.PI * t));
+    item.radius = t => baseRadius(t) * (1 + .055 * Math.sin(t * 18 + phase) * Math.sin(Math.PI * t));
     branches.push(item);
     return item;
   };
@@ -60,9 +61,9 @@ function skeleton() {
   // A restrained terminal fan lies above the altered spine initially. During
   // extension it travels with the leading process, not with the cell soma.
   const lead = stems[5];
-  add([lead.curve.getPoint(.51).toArray(),[-.91,-.91,.77],[-1.42,-1.12,1.05]], [.065,.038,.013], 'leading-fork-a');
-  add([lead.curve.getPoint(.69).toArray(),[-.69,-1.40,.79],[-.63,-1.73,1.08]], [.049,.033,.012], 'leading-fork-b');
-  add([lead.curve.getPoint(.85).toArray(),[-1.45,-1.42,.86],[-1.83,-1.58,1.02]], [.038,.025,.009], 'leading-fork-c');
+  add([lead.curve.getPoint(.51).toArray(),[-.92,-1.03,.70],[-.98,-1.20,1.05]], [.057,.031,.012], 'leading-fork-a');
+  add([lead.curve.getPoint(.69).toArray(),[-.80,-1.55,.80],[-.72,-1.83,1.12]], [.043,.027,.011], 'leading-fork-b');
+  add([lead.curve.getPoint(.85).toArray(),[-1.45,-1.72,1.02],[-1.43,-1.98,1.19]], [.032,.021,.009], 'leading-fork-c');
   return { branches, leading: lead };
 }
 
@@ -95,6 +96,15 @@ export function createMicrogliaCell({ texture, target = DEFAULT_TARGET } = {}) {
   }));
   const completeGeometry = fusedNeuronGeometry(canonical, point(0, 0, 0), .024 / LOCAL_SCALE);
   completeGeometry.scale(LOCAL_SCALE, LOCAL_SCALE, LOCAL_SCALE);
+  // A broad, low-frequency soma asymmetry preserves the fused roots while
+  // avoiding a perfectly spherical centre or fine crystalline relief.
+  const surface = completeGeometry.attributes.position;
+  for (let index = 0; index < surface.count; index++) {
+    const x = surface.getX(index), y = surface.getY(index), z = surface.getZ(index);
+    const soma = 1 - THREE.MathUtils.smoothstep(Math.hypot(x, y, z), .26, .74);
+    surface.setXYZ(index, x + soma * (.025 * Math.sin(y * 7) + .018), y + soma * .023 * Math.cos(z * 8 + x * 3), z * (1 + soma * .07));
+  }
+  completeGeometry.computeVertexNormals();
   pigment(completeGeometry);
   const positions = completeGeometry.attributes.position;
   positions.setUsage(THREE.DynamicDrawUsage);
@@ -137,10 +147,11 @@ export function createMicrogliaCell({ texture, target = DEFAULT_TARGET } = {}) {
     return mesh;
   };
   const materialOptions = {
-    roughness: .64, clearcoat: .025, sheen: .22, sheenColor: new THREE.Color(0xa5b7d2),
-    bumpMap: texture ?? null, bumpScale: .007, emissive: 0x35445f, emissiveIntensity: .03,
+    color: 0xffffff, roughness: .71, clearcoat: .015, sheen: .17, sheenColor: new THREE.Color(0xa5b7d2),
+    transparent: false, opacity: 1, depthWrite: true, side: THREE.FrontSide,
+    relief: .0016, bumpScale: .002, emissive: 0x35445f, emissiveIntensity: .025,
   };
-  const bodyMaterial = organicMaterial(materialOptions), processMaterial = organicMaterial(materialOptions);
+  const bodyMaterial = tissueMaterial(texture ?? null, materialOptions), processMaterial = tissueMaterial(texture ?? null, materialOptions);
   const body = makePartition(bodyIndices, 'microglia', bodyMaterial), process = makePartition(processIndices, 'process', processMaterial);
   const defaultTarget = target.clone ? target.clone() : point(...target);
   const contactTip = LEADING_TIP.clone(), processAnchor = LEADING_TIP.clone();
@@ -161,16 +172,20 @@ export function createMicrogliaCell({ texture, target = DEFAULT_TARGET } = {}) {
     const surfaceChanged = !lastSurfaceFrame || frame.some((value, index) => value !== lastSurfaceFrame[index]);
     if (surfaceChanged) {
       delta.copy(destination).sub(LEADING_TIP).multiplyScalar(a);
+      const bowAmplitude = a * (.18 + Math.min(3, delta.length()) * .12);
       tipNoise.set(Math.sin(t * .17 + .4) * .008, Math.sin(t * .12 + 1.3) * .011, Math.cos(t * .14 + .7) * .008).multiplyScalar((1 - a) ** 2);
       for (let index = 0; index < positions.count; index++) {
         const offset = index * 3, x = baseline[offset], y = baseline[offset + 1], z = baseline[offset + 2];
         const w = leadWeights[index], basal = basalWeights[index];
         if (w > 0) {
           const cup = Math.sin(Math.PI * w) * w * c;
+          // Distribute the extension over a three-dimensional arc. Both ends
+          // remain anchored; short side branches travel with the membrane.
+          const bow = Math.sin(Math.PI * w) * bowAmplitude;
           positions.setXYZ(index,
-            x + delta.x * w + tipNoise.x * w - cup * .045,
-            y + delta.y * w + tipNoise.y * w + cup * .035,
-            z + delta.z * w + tipNoise.z * w + cup * .075,
+            x + delta.x * w + tipNoise.x * w + bow * .84 - cup * .035,
+            y + delta.y * w + tipNoise.y * w + bow * .13 + cup * .025,
+            z + delta.z * w + tipNoise.z * w + bow * .48 + cup * .05,
           );
         } else {
           // Soma and proximal roots have zero basal weight. Distal excursions are

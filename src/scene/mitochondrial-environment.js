@@ -8,6 +8,8 @@ const TAU = Math.PI * 2;
 const fract = value => value - Math.floor(value);
 const bounded = value => THREE.MathUtils.clamp(value || 0, 0, 1);
 const CHANNEL = v3(-.65, 2.2, .10);
+const NOX_SITE=v3(2.39,membraneHeight(2.39,-.06),-.06);
+const REACTION=v3(.52,2.98,.28);
 const NUCLEAR = v3(2.65, -2.30, -.12);
 
 function merge(parts) {
@@ -43,7 +45,7 @@ function createBilayer(texture) {
     const position = geometry.attributes.position, indices = [];
     for (let index = 0; index < geometry.index.count; index += 3) {
       const face = [0, 1, 2].map(n => geometry.index.getX(index + n));
-      if (face.some(vertex => Math.hypot(position.getX(vertex) - CHANNEL.x, position.getZ(vertex) - CHANNEL.z) < .25)) continue;
+      if (face.some(vertex => [CHANNEL,NOX_SITE].some(site=>Math.hypot(position.getX(vertex)-site.x,position.getZ(vertex)-site.z)<.25))) continue;
       indices.push(...face);
     }
     geometry.setIndex(indices);
@@ -57,7 +59,7 @@ function createBilayer(texture) {
     for (let column = 0; column < 51; column++) {
       const x = -3.50 + column * .14 + (row % 2) * .052;
       const z = -.85 + row * .17;
-      if (Math.hypot(x - CHANNEL.x, z - CHANNEL.z) < .285) continue;
+      if ([CHANNEL,NOX_SITE].some(site=>Math.hypot(x-site.x,z-site.z)<.285)) continue;
       const susceptibility = Math.exp(-((x + 2.48) ** 2 / .36 + (z - .29) ** 2 / .30));
       for (const side of [-1, 1]) seeds.push({ x, z, side, phase: rng() * TAU, susceptibility });
     }
@@ -185,10 +187,10 @@ function createNuclearContext() {
 const STAGE_KEYS = [
   ['nmda', 'calcium', 'membrane', 'mitochondria'],
   ['nmda', 'calcium', 'nnos', 'no', 'sgc', 'pkc', 'nox2', 'superoxide', 'peroxynitrite', 'membrane', 'mitochondria'],
-  ['nmda', 'calcium', 'cpla2', 'aa', 'eicosanoids', 'peroxynitrite', 'membrane', 'mitochondria'],
+  ['nmda','calcium','cpla2','aa','eicosanoids','nnos','no','nox2','superoxide','peroxynitrite','membrane','mitochondria'],
   ['nmda', 'calcium', 'membrane', 'mitochondria', 'ptp', 'ros'],
   ['nmda', 'calcium', 'membrane', 'mitochondria', 'ptp', 'aif', 'ros', 'dna'],
-  ['nmda', 'calcium', 'no', 'superoxide', 'peroxynitrite', 'membrane', 'mitochondria', 'ptp', 'aif', 'ros', 'dna'],
+  ['nmda','calcium','nnos','no','nox2','superoxide','peroxynitrite','membrane','mitochondria','ptp','aif','ros','dna'],
 ];
 
 export function createMitochondrialEnvironment({ texture = surfaceTexture() } = {}) {
@@ -230,10 +232,14 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
   addProtein('nnos', [-2.02, .83, .20], 1.05, 0x86a6b0, pairedDomains, 23);
   addProtein('sgc', [-2.94, -.02, .34], .72, 0x9bb2b8, [[-.20, 0, 0, .20, .24, .18], [.18, 0, 0, .21, .24, .19], [0, -.20, 0, .18, .12, .14]], 49);
   addProtein('pkc', [1.44, 1.13, .27], 1.02, 0xc9ad97, [[-.15, .08, 0, .22, .21, .18], [.18, -.10, .04, .26, .17, .19], [.18, .20, -.025, .125, .17, .14]], 55);
-  addProtein('nox2', [2.39, 2.28, -.06], .96, 0x8299b2, [[-.13, .03, 0, .16, .33, .19], [.16, -.03, 0, .17, .28, .18], [0, -.34, .05, .27, .18, .21], [.23, -.35, .035, .15, .15, .15]], 67);
+  addProtein('nox2', NOX_SITE.toArray(), .96, 0x8299b2, [[-.13, .03, 0, .16, .33, .19], [.16, -.03, 0, .17, .28, .18], [0, -.34, .05, .27, .18, .21], [.23, -.35, .035, .15, .15, .15]], 67);
   addProtein('cpla2', [-2.87, 1.96, .57], .90, 0xa0b5a4, [[-.18, .06, 0, .23, .16, .20], [.15, .0, .05, .26, .20, .19], [.03, -.22, .01, .16, .14, .14]], 89);
 
-  const porePoint = mito.surface(.81, .006, .075);
+  const sgc=proteins.get('sgc');
+  const pkg=protein('sgc',v3(.13,-.86,.02),.70,0x93aaab,[[0,0,0,.19,.25,.14],[.18,-.13,.03,.17,.12,.13],[-.14,.16,0,.10,.12,.09]],167,texture);
+  pkg.group.name='PKG within the NO signalling route';sgc.group.add(pkg.group);
+
+  const porePoint = mito.innerSurface(.24,.006);
   mito.group.updateMatrix();
   porePoint.applyMatrix4(mito.group.matrix);
   const ptpDomains = Array.from({ length: 5 }, (_, index) => {
@@ -254,6 +260,7 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
   const ros = pool('ros', 16, 0xd6a0b4, 'cluster', .039);
   const aa = pool('aa', 6, 0xc5c7a5, 'filament', .043);
   const eicosanoids = pool('eicosanoids', 5, 0xb3bda2, 'cluster', .044);
+  const cgmp=pool('sgc',4,0x91b9b0,'single',.028);
   const oxidants = createMolecularPool(root, { key: 'membrane', capacity: 6, geometry: molecularGlyph('double', .029), material: physical(0xcc97ac, { roughness: .7, emissive: 0x6b354e, emissiveIntensity: .12 }) });
   selectable.push(oxidants.mesh);
 
@@ -264,8 +271,8 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
   anchor('sgc', 'sGC · cGMP · PKG', [-3.0, -.04, .48], 'left', 2);
   anchor('pkc', 'PKC', [1.55, 1.03, .46], 'right', 4);
   anchor('nox2', 'NOX2', [2.50, 2.40, .35], 'right', 3);
-  anchor('superoxide', 'O₂•⁻', [1.63, .55, .56], 'right', 3);
-  anchor('peroxynitrite', 'ONOO⁻', [-.41, .01, .70], 'right', 2);
+  anchor('superoxide', 'O₂•⁻ · extracelular', [1.58,2.89,.34], 'right', 3);
+  anchor('peroxynitrite', 'NO + O₂•⁻ → ONOO⁻', REACTION.toArray(), 'right', 2);
   anchor('cpla2', 'cPLA₂', [-2.92, 1.93, .77], 'left', 4);
   anchor('aa', 'Ácido araquidónico', [-3.14, 1.00, .63], 'left', 2);
   anchor('eicosanoids', 'Eicosanoides', [-3.28, .18, .59], 'left', 2);
@@ -276,9 +283,13 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
   anchor('ros', 'ERO mitocondriales', [.0, -2.03, .47], 'left', 3);
   anchor('dna', 'Contexto nuclear · ADN', [2.75, -2.35, .17], 'right', 3);
 
-  const controls = [v3(1.58, -.38, .63), v3(2.28, -.64, .73), v3(2.64, -1.35, .55), v3(2.59, -2.12, .15)];
+  const aifOrigin=mito.surface(.83,.035,.037).applyMatrix4(mito.group.matrix);
+  const controls = [aifOrigin, v3(2.28, -.64, .73), v3(2.64, -1.35, .55), v3(2.59, -2.12, .15)];
   const aifPath = new THREE.CatmullRomCurve3(controls);
   const particleCounts = {};
+  const secondary=new THREE.Color(0x88949e);
+  for(const item of proteins.values())item.baseColor=item.material.color.clone();
+  const emphasis=[['nmda','calcium'],['nnos','no','sgc','pkc','nox2','superoxide','peroxynitrite'],['cpla2','aa','eicosanoids','membrane'],['mitochondria','ptp','ros'],['aif','dna'],['mitochondria','ros','membrane','dna']];
   let currentAifProgress = 0;
 
   function update({ time = 0, state = {}, stepIndex = 0, elapsed = 0, selected = null } = {}) {
@@ -286,11 +297,15 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
     const keys = new Set(STAGE_KEYS[lastStage]);
     const ca = bounded(state.ca), redox = bounded(state.redox), lipid = bounded(state.lipid), stress = bounded(state.stress);
     membrane.update(lipid, selected === 'membrane');
-    mito.update(stress, selected === 'mitochondria');
+    mito.update(stress,selected==='mitochondria');
+    mito.outerMat.color.lerp(secondary,lastStage<3?.20:0);
+    mito.foldMat.color.lerp(secondary,lastStage<3?.16:0);
     nmda.material.emissiveIntensity = .045 + bounded(state.activation) * .08 + (selected === 'nmda' ? .16 : 0);
     for (const [key, item] of proteins) {
       item.group.visible = keys.has(key);
-      item.material.emissiveIntensity = .015 + (selected === key ? .18 : .035 * (key === 'ptp' ? stress : redox));
+      const primary=emphasis[lastStage].includes(key)||selected===key;
+      item.material.color.copy(item.baseColor).lerp(secondary,primary?0:.30);
+      item.material.emissiveIntensity=.012+(selected===key?.16:primary?.075:.005);
     }
     nuclear.group.visible = keys.has('dna');
     // AIF is shown leaving a neighbouring mitochondrial region. The image does
@@ -315,23 +330,37 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
       transform.scale.setScalar(.72 + .18 * Math.sin(index * 2.3) ** 2);
     });
 
-    no.update(keys.has('no') ? 3 + redox * (lastStage === 5 ? 4 : 10) : 0, (index, transform) => {
-      const t = fract(time * .14 + index * .618034), toSgc = index % 3 === 0;
-      transform.position.set(THREE.MathUtils.lerp(-2.0, toSgc ? -2.97 : -.51, t), THREE.MathUtils.lerp(.77, toSgc ? -.01 : .20, t) + Math.sin(t * Math.PI) * .10, .40 + Math.sin(index * 2.3 + t * 2) * .10);
-      transform.scale.setScalar(.8 + .22 * Math.sin(index) ** 2);
+    // Paired reactants converge on the extracellular side of this plasma-
+    // membrane NOX2. Products appear only after the shared encounter phase.
+    // NO diffusion across the bilayer is possible; superoxide is never drawn
+    // traversing intact lipid as if it were freely membrane-permeant.
+    const pairs=keys.has('no')&&keys.has('superoxide')?Math.round(2+redox*3):0;
+    const reactionPhase=i=>fract(time*.12+i*.193);
+    no.update(keys.has('no')?pairs+(keys.has('sgc')?3:0):0,(i,object)=>{
+      const toSgc=keys.has('sgc')&&i>=pairs;
+      if(toSgc){const t=fract(time*.14+i*.193);object.position.set(THREE.MathUtils.lerp(-2,-2.94,t),THREE.MathUtils.lerp(.77,-.01,t),.40);object.scale.setScalar(.8);return;}
+      const phase=reactionPhase(i),t=Math.min(1,phase/.55);
+      object.position.copy(v3(-2,.83,.3)).lerp(REACTION,t);
+      object.position.z+=Math.sin(t*Math.PI)*.12;
+      object.scale.setScalar(phase<.55?.85*Math.min(1,phase*15):.00001);
     });
-    superoxide.update(keys.has('superoxide') ? 2 + redox * (lastStage === 5 ? 3 : 9) : 0, (index, transform) => {
-      const t = fract(time * .115 + index * .618034);
-      transform.position.set(THREE.MathUtils.lerp(2.38, -.41, t), 1.89 - t * 1.74 + Math.sin(t * Math.PI) * .10, .14 + Math.sin(t * Math.PI) * .41 + Math.sin(index * 1.9) * .08);
-      transform.rotation.set(t * 2, index + time * .3, t * 3);
+    superoxide.update(pairs,(i,object)=>{
+      const phase=reactionPhase(i),t=Math.min(1,phase/.55);
+      object.position.copy(NOX_SITE).add(v3(0,.34,.10)).lerp(REACTION,t);
+      object.position.y+=Math.sin(t*Math.PI)*.12;
+      object.rotation.set(t*2,i+time*.3,t*3);
+      object.scale.setScalar(phase<.55?Math.min(1,phase*15):.00001);
     });
-    peroxynitrite.update(keys.has('peroxynitrite') ? 2 + redox * (lastStage === 5 ? 2 : 6) : 0, (index, transform) => {
-      const t = fract(time * .10 + index * .618034), towardMembrane = lastStage === 2 || index % 3 === 0;
-      const destination = towardMembrane ? v3(-2.40, 2.30, .35) : v3(.40, -.55, .50);
-      transform.position.copy(v3(-.43, .22, .62)).lerp(destination, t);
-      transform.position.z += Math.sin(t * Math.PI) * .11;
-      transform.rotation.set(time * .17, index + t, t * 2.4);
-      transform.scale.setScalar(.75 + Math.sin(t * Math.PI) * .25);
+    peroxynitrite.update(keys.has('peroxynitrite')?pairs:0,(i,object)=>{
+      const phase=reactionPhase(i),t=Math.max(0,(phase-.55)/.45);
+      const destination=lastStage===2||i%2===0?v3(-2.40,membraneHeight(-2.4,.35)+.19,.35):v3(-.1,3.28,.42);
+      object.position.copy(REACTION).lerp(destination,t);
+      object.position.z+=Math.sin(t*Math.PI)*.10;
+      object.rotation.set(time*.17,i+t,t*2.4);
+      object.scale.setScalar(phase>=.55?Math.min(1,t*7,(1-t)*7):.00001);
+    });
+    cgmp.update(keys.has('sgc')?4:0,(i,object)=>{
+      const t=fract(time*.16+i*.25);object.position.set(-2.94+.095*t,-.15-.38*t,.36);object.scale.setScalar(.7+Math.sin(t*Math.PI)*.2);
     });
     ros.update(keys.has('ros') ? 3 + stress * 13 : 0, (index, transform) => {
       const t = fract(time * .09 + index * .618034), a = index * 2.399963;
@@ -367,6 +396,6 @@ export function createMitochondrialEnvironment({ texture = surfaceTexture() } = 
   return {
     root, selectable, labelAnchors, update,
     visibleKeys: (stepIndex = lastStage) => [...STAGE_KEYS[THREE.MathUtils.clamp(stepIndex, 0, 5)]],
-    diagnostics: () => ({ particles: { ...particleCounts }, membrane: membrane.diagnostics(), aifProgress: currentAifProgress, aifPosition: aif.group.position.toArray(), channel: CHANNEL.toArray(), stage: lastStage }),
+    diagnostics: () => ({ organelle:mito.diagnostics(),reactionSite:REACTION.toArray(),nox2:NOX_SITE.toArray(),aifOrigin:aifOrigin.toArray(),ptp:porePoint.toArray(),particles: { ...particleCounts }, membrane: membrane.diagnostics(), aifProgress: currentAifProgress, aifPosition: aif.group.position.toArray(), channel: CHANNEL.toArray(), stage: lastStage }),
   };
 }

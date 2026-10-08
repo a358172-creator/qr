@@ -1,0 +1,1127 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "deviceScaleFactor": 1,
+  "motion": "reduce",
+  "quick": true,
+  "modules": {
+    "B": {
+      "id": "glutamate",
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-b-stage-1.png",
+          "view": "synapse",
+          "mechanism": "glutamate",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 0,
+          "availableKeys": [
+            "terminal",
+            "vesicles",
+            "glutamate",
+            "ampa",
+            "nmda",
+            "spine",
+            "dendrite",
+            "mitochondria"
+          ],
+          "timeline": {
+            "index": 0,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0,
+            "step": "glutamate"
+          },
+          "particles": {
+            "glut": 0.6,
+            "activation": 0.04,
+            "ca": 0,
+            "stress": 0,
+            "damage": 0,
+            "local": 0,
+            "intrinsic": 0
+          },
+          "camera": [
+            2.365362384615384,
+            1.926343619658119,
+            12.111428794871797
+          ],
+          "target": [
+            1.0539,
+            0.8959088888888886,
+            1.120125
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 44,
+          "triangles": 266244,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 85,
+            "textures": 2,
+            "sessions": 1
+          },
+          "model": {
+            "stage": 0,
+            "local": 0,
+            "intrinsic": 0,
+            "headRadialScale": 1,
+            "mitochondria": [
+              1.65,
+              -3.72,
+              0
+            ],
+            "mitochondrialScale": 0.4,
+            "cytochromeOrigin": [
+              2.0102158198800497,
+              -3.574496737879499,
+              0.16219028698262355
+            ],
+            "caspasesVisible": false,
+            "cytochromeCount": 0,
+            "intrinsicVisible": false,
+            "channel": [
+              0.2,
+              -0.2154856,
+              0.63
+            ]
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-b-stage-8.png",
+          "view": "synapse",
+          "mechanism": "glutamate",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 59,
+          "availableKeys": [
+            "terminal",
+            "vesicles",
+            "glutamate",
+            "ampa",
+            "nmda",
+            "spine",
+            "dendrite",
+            "mitochondria",
+            "calcium",
+            "ros",
+            "cytochrome",
+            "apaf1",
+            "caspase9",
+            "executioners"
+          ],
+          "timeline": {
+            "index": 7,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.8082191780821918,
+            "step": "intrinsic-possibility"
+          },
+          "particles": {
+            "glut": 0.35,
+            "activation": 0.4,
+            "ca": 0.55,
+            "stress": 0.75,
+            "damage": 0,
+            "local": 0,
+            "intrinsic": 1
+          },
+          "camera": [
+            2.7020230769230773,
+            1.4835816239316248,
+            10.564161538461539
+          ],
+          "target": [
+            1.35,
+            0.42127777777777786,
+            1.1
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 48,
+          "triangles": 271128,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 89,
+            "textures": 2,
+            "sessions": 1
+          },
+          "model": {
+            "stage": 7,
+            "local": 0,
+            "intrinsic": 1,
+            "headRadialScale": 1,
+            "mitochondria": [
+              1.65,
+              -3.72,
+              0
+            ],
+            "mitochondrialScale": 0.4,
+            "cytochromeOrigin": [
+              2.0102158198800497,
+              -3.574496737879499,
+              0.16219028698262355
+            ],
+            "caspasesVisible": false,
+            "cytochromeCount": 6,
+            "intrinsicVisible": true,
+            "channel": [
+              0.2,
+              -0.2154856,
+              0.63
+            ]
+          }
+        }
+      ],
+      "selections": [],
+      "navigation": []
+    },
+    "A": {
+      "id": "signaling",
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-a-stage-1.png",
+          "view": "synapse",
+          "mechanism": "signaling",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 0,
+          "availableKeys": [
+            "spine",
+            "terminal",
+            "dendrite",
+            "actin",
+            "psd",
+            "nmda"
+          ],
+          "timeline": {
+            "index": 0,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0,
+            "step": "postsynaptic-architecture"
+          },
+          "particles": {
+            "glut": 0.08,
+            "activation": 0.03,
+            "ca": 0,
+            "scaffold": 0.25,
+            "disc1": 0.18,
+            "kalirin": 0.16,
+            "remodeling": 0
+          },
+          "camera": [
+            -1.0593846153846158,
+            3.1388213675213663,
+            10.25879487179487
+          ],
+          "target": [
+            -2.65,
+            1.7337777777777776,
+            0.45
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 18,
+          "triangles": 116424,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 105,
+            "textures": 2,
+            "sessions": 2
+          },
+          "model": {
+            "stage": 0,
+            "remodeling": 0,
+            "headRadialScale": 1,
+            "junction": {
+              "center": 0.2,
+              "width": 0.43,
+              "depth": 0.31,
+              "shaftRadius": 0.4
+            },
+            "channel": [
+              0.24,
+              -0.215,
+              0.26
+            ],
+            "proteins": {
+              "psd95": [
+                0.6,
+                -0.43,
+                0.37
+              ],
+              "disc1": [
+                -0.69,
+                -0.98,
+                0.35
+              ],
+              "kalirin7": [
+                0.63,
+                -1.22,
+                0.32
+              ]
+            },
+            "particles": {
+              "calcium": 0,
+              "glutamate": 0
+            },
+            "appearance": {
+              "membraneOpacity": 0.8
+            },
+            "actin": {
+              "time": 0,
+              "remodeling": 0,
+              "filamentCount": 50,
+              "primaryCount": 12,
+              "growingBranches": 27,
+              "triangles": 17856,
+              "totalLength": 31.24633333846695,
+              "headFraction": 0.8682675373571717,
+              "branchRecords": 47,
+              "vertexRanges": 50
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-a-stage-6.png",
+          "view": "synapse",
+          "mechanism": "signaling",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 50,
+          "availableKeys": [
+            "spine",
+            "terminal",
+            "dendrite",
+            "actin",
+            "psd",
+            "nmda",
+            "psd95",
+            "disc1",
+            "kalirin7"
+          ],
+          "timeline": {
+            "index": 5,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.8333333333333334,
+            "step": "structural-plasticity"
+          },
+          "particles": {
+            "glut": 0.12,
+            "activation": 0.12,
+            "ca": 0.04,
+            "scaffold": 0.65,
+            "disc1": 0.55,
+            "kalirin": 0.6,
+            "remodeling": 1
+          },
+          "camera": [
+            -1.0593846153846158,
+            3.1388213675213663,
+            10.25879487179487
+          ],
+          "target": [
+            -2.65,
+            1.7337777777777776,
+            0.45
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 18,
+          "triangles": 116424,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 105,
+            "textures": 2,
+            "sessions": 2
+          },
+          "model": {
+            "stage": 5,
+            "remodeling": 1,
+            "headRadialScale": 1.17,
+            "junction": {
+              "center": 0.2,
+              "width": 0.43,
+              "depth": 0.31,
+              "shaftRadius": 0.4
+            },
+            "channel": [
+              0.2808,
+              -0.15,
+              0.2886
+            ],
+            "proteins": {
+              "psd95": [
+                0.702,
+                -0.365,
+                0.4107
+              ],
+              "disc1": [
+                -0.8072999999999999,
+                -0.915,
+                0.3885
+              ],
+              "kalirin7": [
+                0.7369436839506173,
+                -1.1550948696844994,
+                0.3551486244170096
+              ]
+            },
+            "particles": {
+              "calcium": 0,
+              "glutamate": 0
+            },
+            "appearance": {
+              "membraneOpacity": 0.8
+            },
+            "actin": {
+              "time": 50,
+              "remodeling": 1,
+              "filamentCount": 50,
+              "primaryCount": 12,
+              "growingBranches": 27,
+              "triangles": 17856,
+              "totalLength": 43.158375234951535,
+              "headFraction": 0.9044683207226497,
+              "branchRecords": 47,
+              "vertexRanges": 50
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "navigation": []
+    },
+    "C": {
+      "id": "microglia",
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-c-stage-1.png",
+          "view": "synapse",
+          "mechanism": "microglia",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 0,
+          "availableKeys": [
+            "microglia",
+            "process",
+            "healthySpine",
+            "damagedSpine",
+            "terminal",
+            "dendrite"
+          ],
+          "timeline": {
+            "index": 0,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0,
+            "step": "functional-synapse"
+          },
+          "particles": {
+            "ca": 0,
+            "ros": 0,
+            "damage": 0,
+            "signals": 0,
+            "approach": 0,
+            "contact": 0,
+            "pruning": 0,
+            "activation": 0.05
+          },
+          "camera": [
+            -0.21131230769230758,
+            5.827978547008547,
+            16.149346153846157
+          ],
+          "target": [
+            -2.395,
+            3.961277777777778,
+            0.30000000000000004
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 13,
+          "triangles": 130320,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 118,
+            "textures": 2,
+            "sessions": 3
+          },
+          "model": {
+            "stage": 0,
+            "headScale": 1,
+            "pruning": 0,
+            "contactTarget": [
+              1.791646134853363,
+              0.20748792588710785,
+              0.36834588646888733
+            ],
+            "channel": [
+              1.28,
+              0.446,
+              0.18
+            ],
+            "cellPosition": [
+              3.45,
+              2.85,
+              -0.85
+            ],
+            "contactVertex": 4297,
+            "healthyPosition": [
+              -2.2,
+              0,
+              0
+            ],
+            "healthyScale": [
+              1,
+              1,
+              1
+            ],
+            "cell": {
+              "time": 0,
+              "approach": 0,
+              "contact": 0,
+              "pruning": 0,
+              "soma": [
+                0,
+                0,
+                0
+              ],
+              "contactTip": [
+                -1.3968846532615307,
+                -1.819400859960411,
+                0.806118737498276
+              ],
+              "branchCount": 47,
+              "triangles": 63608,
+              "vertexCount": 31806,
+              "leadingVertices": 2966
+            },
+            "particles": {
+              "glutamate": 0,
+              "calcium": 0,
+              "ros": 0
+            },
+            "markers": {
+              "c1q": false,
+              "c3": false,
+              "caspase3": false
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-c-stage-6.png",
+          "view": "synapse",
+          "mechanism": "microglia",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 50,
+          "availableKeys": [
+            "microglia",
+            "process",
+            "healthySpine",
+            "damagedSpine",
+            "terminal",
+            "dendrite"
+          ],
+          "timeline": {
+            "index": 5,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.8333333333333334,
+            "step": "connectivity-remodeling"
+          },
+          "particles": {
+            "ca": 0.18,
+            "ros": 0.28,
+            "damage": 0.58,
+            "signals": 0.5,
+            "approach": 1,
+            "contact": 1,
+            "pruning": 0.93,
+            "activation": 0.26
+          },
+          "camera": [
+            0.563544615384616,
+            5.82753700854701,
+            16.924203076923078
+          ],
+          "target": [
+            -2.395,
+            4.0312777777777775,
+            0.30000000000000004
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 11,
+          "triangles": 119768,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 118,
+            "textures": 2,
+            "sessions": 3
+          },
+          "model": {
+            "stage": 5,
+            "headScale": 0.46549999999999997,
+            "pruning": 0.93,
+            "contactTarget": [
+              1.4754112780094146,
+              -0.7822948694229126,
+              0.17146500945091248
+            ],
+            "channel": [
+              1.23724,
+              -0.6369456000000001,
+              0.08379
+            ],
+            "cellPosition": [
+              3.45,
+              2.85,
+              -0.85
+            ],
+            "contactVertex": 4297,
+            "healthyPosition": [
+              -2.2,
+              0,
+              0
+            ],
+            "healthyScale": [
+              1,
+              1,
+              1
+            ],
+            "cell": {
+              "time": 50,
+              "approach": 1,
+              "contact": 1,
+              "pruning": 0.93,
+              "soma": [
+                0,
+                0,
+                0
+              ],
+              "contactTip": [
+                -1.9745887219905855,
+                -3.6322948694229127,
+                1.0214650094509126
+              ],
+              "branchCount": 47,
+              "triangles": 63608,
+              "vertexCount": 31806,
+              "leadingVertices": 2966
+            },
+            "particles": {
+              "glutamate": 0,
+              "calcium": 0,
+              "ros": 0
+            },
+            "markers": {
+              "c1q": false,
+              "c3": false,
+              "caspase3": false
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "navigation": []
+    },
+    "D": {
+      "id": "mitochondrial",
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-d-stage-1.png",
+          "view": "synapse",
+          "mechanism": "mitochondrial",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 0,
+          "availableKeys": [
+            "nmda",
+            "calcium",
+            "membrane",
+            "mitochondria"
+          ],
+          "timeline": {
+            "index": 0,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0,
+            "step": "calcium-entry"
+          },
+          "particles": {
+            "ca": 0.88,
+            "redox": 0,
+            "lipid": 0,
+            "stress": 0,
+            "aif": 0,
+            "damage": 0,
+            "activation": 0.9
+          },
+          "camera": [
+            -3.3070015384615385,
+            0.5094600854700857,
+            7.62835846153846
+          ],
+          "target": [
+            -4.3,
+            -0.7187222222222223,
+            1.2000000000000002
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 18,
+          "triangles": 217542,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 136,
+            "textures": 2,
+            "sessions": 4
+          },
+          "model": {
+            "organelle": {
+              "cristae": 13,
+              "sharedInnerVertices": 20345,
+              "innerTriangles": 19809,
+              "foldTriangles": 20127
+            },
+            "reactionSite": [
+              0.52,
+              2.98,
+              0.28
+            ],
+            "nox2": [
+              2.39,
+              2.33027905152514,
+              -0.06
+            ],
+            "aifOrigin": [
+              1.500992000962266,
+              -0.7016400523884693,
+              0.2942205100171089
+            ],
+            "ptp": [
+              -1.168106178908715,
+              -0.34672828016419377,
+              0.3007005408255838
+            ],
+            "particles": {
+              "calcium": 22,
+              "no": 0,
+              "superoxide": 0,
+              "peroxynitrite": 0,
+              "ros": 0,
+              "aa": 0,
+              "eicosanoids": 0,
+              "sgc": 0
+            },
+            "membrane": {
+              "changedLipids": 0,
+              "maximumDisplacement": 0,
+              "totalLipids": 1076
+            },
+            "aifProgress": 0,
+            "aifPosition": [
+              1.500992000962266,
+              -0.7016400523884693,
+              0.2942205100171089
+            ],
+            "channel": [
+              -0.65,
+              2.2,
+              0.1
+            ],
+            "stage": 0
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase1-mobile390-d-stage-6.png",
+          "view": "synapse",
+          "mechanism": "mitochondrial",
+          "transitioning": false,
+          "exploring": false,
+          "selected": null,
+          "time": 50,
+          "availableKeys": [
+            "nmda",
+            "calcium",
+            "nnos",
+            "no",
+            "nox2",
+            "superoxide",
+            "peroxynitrite",
+            "membrane",
+            "mitochondria",
+            "ptp",
+            "aif",
+            "ros",
+            "dna"
+          ],
+          "timeline": {
+            "index": 5,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.8333333333333334,
+            "step": "damage-integration"
+          },
+          "particles": {
+            "ca": 0.74,
+            "redox": 0.86,
+            "lipid": 0.92,
+            "stress": 0.94,
+            "aif": 1,
+            "damage": 0.65,
+            "activation": 0.8
+          },
+          "camera": [
+            -2.6798446153846154,
+            0.16785470085470044,
+            8.67362
+          ],
+          "target": [
+            -4.3,
+            -1.1387222222222224,
+            1.2000000000000002
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 32,
+          "triangles": 239502,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "model": {
+            "organelle": {
+              "cristae": 13,
+              "sharedInnerVertices": 20345,
+              "innerTriangles": 19809,
+              "foldTriangles": 20127
+            },
+            "reactionSite": [
+              0.52,
+              2.98,
+              0.28
+            ],
+            "nox2": [
+              2.39,
+              2.33027905152514,
+              -0.06
+            ],
+            "aifOrigin": [
+              1.500992000962266,
+              -0.7016400523884693,
+              0.2942205100171089
+            ],
+            "ptp": [
+              -1.168106178908715,
+              -0.34672828016419377,
+              0.3007005408255838
+            ],
+            "particles": {
+              "calcium": 20,
+              "no": 5,
+              "superoxide": 5,
+              "peroxynitrite": 5,
+              "ros": 15,
+              "aa": 0,
+              "eicosanoids": 0,
+              "sgc": 0
+            },
+            "membrane": {
+              "changedLipids": 180,
+              "maximumDisplacement": 0.11804491409702217,
+              "totalLipids": 1076
+            },
+            "aifProgress": 1,
+            "aifPosition": [
+              2.5900000000000007,
+              -2.119999999999999,
+              0.14999999999999986
+            ],
+            "channel": [
+              -0.65,
+              2.2,
+              0.1
+            ],
+            "stage": 5
+          }
+        }
+      ],
+      "selections": [],
+      "navigation": []
+    }
+  },
+  "consoleErrors": [],
+  "consoleDetails": [],
+  "httpErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "runs": [
+    {
+      "modules": [
+        "B",
+        "A",
+        "C",
+        "D"
+      ],
+      "startedAt": "2026-10-08T12:09:41.554Z",
+      "status": "complete",
+      "quick": true,
+      "finishedAt": "2026-10-08T12:10:33.615Z"
+    }
+  ],
+  "webgl": {
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "resourceCycles": [
+    {
+      "cycle": 0,
+      "modules": {
+        "B": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "glutamate"
+        },
+        "A": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "signaling"
+        },
+        "C": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "microglia"
+        },
+        "D": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "mitochondrial"
+        }
+      },
+      "resources": {
+        "geometries": 149,
+        "textures": 2,
+        "sessions": 4
+      }
+    },
+    {
+      "cycle": 1,
+      "modules": {
+        "B": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "glutamate"
+        },
+        "A": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "signaling"
+        },
+        "C": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 54,
+          "triangles": 508384,
+          "paused": true,
+          "index": 0,
+          "mechanism": "microglia"
+        },
+        "D": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "mitochondrial"
+        }
+      },
+      "resources": {
+        "geometries": 149,
+        "textures": 2,
+        "sessions": 4
+      }
+    },
+    {
+      "cycle": 2,
+      "modules": {
+        "B": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "glutamate"
+        },
+        "A": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "signaling"
+        },
+        "C": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "microglia"
+        },
+        "D": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "mitochondrial"
+        }
+      },
+      "resources": {
+        "geometries": 149,
+        "textures": 2,
+        "sessions": 4
+      }
+    },
+    {
+      "cycle": 3,
+      "modules": {
+        "B": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "glutamate"
+        },
+        "A": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "signaling"
+        },
+        "C": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "microglia"
+        },
+        "D": {
+          "resources": {
+            "geometries": 149,
+            "textures": 2,
+            "sessions": 4
+          },
+          "drawCalls": 18,
+          "triangles": 217542,
+          "paused": true,
+          "index": 0,
+          "mechanism": "mitochondrial"
+        }
+      },
+      "resources": {
+        "geometries": 149,
+        "textures": 2,
+        "sessions": 4
+      }
+    }
+  ],
+  "resourcesStable": true
+}

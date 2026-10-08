@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { gridGeometry, organicLobe, physical, surfaceTexture, tissueMaterial, v3 } from './geometry.js';
+import { gridGeometry, createSpineShaftJunction, organicLobe, physical, surfaceTexture, tissueMaterial, v3 } from './geometry.js';
 import { createMolecularPool, molecularGlyph } from './molecular-particles.js';
 import { createMicrogliaCell } from './microglia-cell.js';
 
@@ -9,6 +9,13 @@ const bounded = value => THREE.MathUtils.clamp(value || 0, 0, 1);
 const fract = value => value - Math.floor(value);
 const HEALTHY_X = -2.2, DAMAGED_X = 1.2;
 const BASE_Y = -2.23;
+const ROOT_WIDTH = .37, ROOT_DEPTH = .26;
+const shaftY = x => -2.22 - .0053 * x * x;
+const shaftZ = x => -.03 - .0075 * x * x - .004 * x;
+const shaftRadius = x => .438 - .0038 * x;
+const junctions = [HEALTHY_X, DAMAGED_X].map(centerX => createSpineShaftJunction({
+  centerX, halfWidth: ROOT_WIDTH, halfDepth: ROOT_DEPTH, shaftY, shaftZ, shaftRadius,
+}));
 const STAGE_KEYS = [
   ['microglia', 'process', 'healthySpine', 'damagedSpine', 'terminal', 'dendrite'],
   ['microglia', 'process', 'healthySpine', 'damagedSpine', 'terminal', 'dendrite', 'nmda', 'glutamate', 'calcium', 'ros'],
@@ -40,32 +47,45 @@ function colouredMembrane(geometry, low, high) {
 
 // The neck, flared attachment and flattened mushroom head are one continuous
 // membrane. There is no sphere-to-cylinder junction, even at close range.
-function spineGeometry() {
+function spineGeometry(centerX) {
   const profile = [[.46, BASE_Y], [.36, -1.94], [.23, -1.60], [.19, -1.16],
     [.25, -.78], [.46, -.52], [.72, -.27], [.81, -.02], [.73, .22], [.46, .40], [0, .47]];
   const curve = new THREE.CatmullRomCurve3(profile.map(([r, y]) => v3(r, y)), false, 'centripetal');
+  const junction = junctions[centerX === HEALTHY_X ? 0 : 1];
   const geometry = gridGeometry(84, 64, (u, v) => {
     const point = curve.getPoint(u), angle = v * TAU;
     const radius = Math.max(0, point.x) * (1 + .035 * Math.sin(angle * 3 + point.y * 2.7) + .016 * Math.cos(angle * 5 - point.y * 4));
     const bend = .075 * Math.sin((point.y - BASE_Y) * 1.25);
-    return v3(bend + Math.cos(angle) * radius, point.y + radius * .024 * Math.sin(angle * 2), Math.sin(angle) * radius * .77);
+    const p = v3(bend + Math.cos(angle) * radius, point.y + radius * .024 * Math.sin(angle * 2), Math.sin(angle) * radius * .77);
+    const weight = THREE.MathUtils.smoothstep(-point.y, 1.45, -BASE_Y);
+    if (weight > 0) {
+      const attachment = junction.point(angle);
+      attachment.x -= centerX;
+      attachment.y += (point.y - BASE_Y) * .75;
+      p.lerp(attachment, weight);
+    }
+    return p;
   });
   return colouredMembrane(geometry, 0x98798f, 0xc5a0b5);
 }
 
 function dendriteGeometry() {
-  const curve = new THREE.CatmullRomCurve3([
-    v3(-6.0, -2.39, -.28), v3(-3.8, -2.23, -.10), v3(-1.6, -2.25, 0),
-    v3(.4, -2.24, -.04), v3(2.8, -2.21, -.11), v3(5.9, -2.39, -.31),
-  ]);
-  const frames = curve.computeFrenetFrames(100, false);
-  const geometry = gridGeometry(100, 40, (u, v) => {
-    const p = curve.getPointAt(u), frame = Math.min(100, Math.round(u * 100));
-    const angle = -v * TAU;
-    const radius = (.46 - u * .045) * (1 + .035 * Math.sin(u * 24) + .018 * Math.cos(angle * 5 + u * 19));
-    return p.addScaledVector(frames.normals[frame], Math.cos(angle) * radius)
-      .addScaledVector(frames.binormals[frame], Math.sin(angle) * radius);
-  });
+  // Two true openings share the necks' basal curves. Segment boundaries land
+  // on each oval end, avoiding a closed shaft roof inside either spine.
+  const boundaries = [-6, HEALTHY_X - ROOT_WIDTH, HEALTHY_X + ROOT_WIDTH,
+    DAMAGED_X - ROOT_WIDTH, DAMAGED_X + ROOT_WIDTH, 5.9];
+  const geometry = merge(boundaries.slice(0, -1).map((start, index) => {
+    const end = boundaries[index + 1], opening = index === 1 || index === 3;
+    return gridGeometry(opening ? 32 : 24, 40, (u, v) => {
+      const x = THREE.MathUtils.lerp(start, end, u);
+      const half = Math.max(...junctions.map(junction => junction.roofHalf(x)));
+      const angle = half + v * (TAU - 2 * half), radius = shaftRadius(x);
+      return v3(x, shaftY(x) + Math.cos(angle) * radius, shaftZ(x) + Math.sin(angle) * radius);
+    });
+  }));
+  const indices = geometry.index.array;
+  for (let i = 0; i < indices.length; i += 3) [indices[i + 1], indices[i + 2]] = [indices[i + 2], indices[i + 1]];
+  geometry.computeVertexNormals();
   return colouredMembrane(geometry, 0x8c7597, 0xb893aa);
 }
 
@@ -109,7 +129,7 @@ function createTerminal(texture, x, healthy) {
     return v3(Math.cos(a) * radius - .09 * Math.sin(point.y * 2), point.y, Math.sin(a) * radius * .70 - (point.y - .9) * .07);
   };
   const material = tissueMaterial(texture, {
-    vertexColors: true, roughness: .68, opacity: .70, side: THREE.FrontSide, relief: .006, bumpScale: .010,
+    vertexColors: true, roughness: .70, opacity: .70, side: THREE.FrontSide, relief: .002, bumpScale: .004,
     emissive: 0x3f314f, emissiveIntensity: .015,
   });
   const geometry = colouredMembrane(gridGeometry(62, 48, surface), 0x80718f, 0xb4a0c1);
@@ -160,12 +180,12 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     const item = { key, name, position: v3(...position), side, priority };
     labelAnchors.push(item); return item;
   };
-  const dendrite = new THREE.Mesh(dendriteGeometry(), tissueMaterial(texture, { opacity: 1, transparent: false, depthWrite: true, side: THREE.FrontSide, relief: .007 }));
+  const dendrite = new THREE.Mesh(dendriteGeometry(), tissueMaterial(texture, { opacity: 1, transparent: false, depthWrite: true, side: THREE.FrontSide, relief: .002, bumpScale: .004 }));
   dendrite.userData.key = 'dendrite'; dendrite.name = 'Continuous dendritic shaft'; root.add(dendrite); selectable.push(dendrite);
-  const healthyMaterial = tissueMaterial(texture, { opacity: .97, side: THREE.FrontSide, relief: .005, bumpScale: .010 });
-  const damagedMaterial = tissueMaterial(texture, { opacity: .92, side: THREE.FrontSide, relief: .005, bumpScale: .010, emissive: 0x68465e, emissiveIntensity: .025 });
-  const healthy = new THREE.Mesh(spineGeometry(), healthyMaterial);
-  const damaged = new THREE.Mesh(spineGeometry(), damagedMaterial);
+  const healthyMaterial = tissueMaterial(texture, { opacity: .97, side: THREE.FrontSide, relief: .0018, bumpScale: .004 });
+  const damagedMaterial = tissueMaterial(texture, { opacity: .92, side: THREE.FrontSide, relief: .0018, bumpScale: .004, emissive: 0x68465e, emissiveIntensity: .025 });
+  const healthy = new THREE.Mesh(spineGeometry(HEALTHY_X), healthyMaterial);
+  const damaged = new THREE.Mesh(spineGeometry(DAMAGED_X), damagedMaterial);
   healthy.name = 'Conserved mushroom spine'; damaged.name = 'Gradually remodelled mushroom spine';
   healthy.position.x = HEALTHY_X; damaged.position.x = DAMAGED_X;
   healthy.userData.key = 'healthySpine'; damaged.userData.key = 'damagedSpine';
@@ -179,7 +199,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
   root.add(nmda.group, nmdaHealthy.group); selectable.push(nmda.group);
 
   const cell = createMicrogliaCell({ texture });
-  cell.root.position.set(3.5, 3.3, -1);
+  cell.root.position.set(3.45, 2.85, -.85);
   root.add(cell.root); selectable.push(...cell.selectable);
   const cellAnchors = (cell.labelAnchors || []).map(item => {
     const entry = { ...item, position: item.position.clone().add(cell.root.position) };
@@ -188,6 +208,37 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
   if (!cellAnchors.some(item => item.entry.key === 'microglia')) anchor('microglia', 'Microglía', [3.5, 3.7, -.70], 'right', 5);
   const c1q = createComplement('c1q', texture), c3 = createComplement('c3', texture);
   root.add(c1q.mesh, c3.mesh); selectable.push(c1q.mesh, c3.mesh);
+  // Tie contact and extracellular markers to vertices of the actual membrane.
+  // The offset is in the current outward normal, so it survives retraction and
+  // stays anatomically correct from every camera angle.
+  const nearestSite = seed => {
+    const point = v3(), wanted = v3(...seed);
+    let site = 0, distance = Infinity;
+    for (let index = 0; index < baseline.length / 3; index++) {
+      point.fromArray(baseline, index * 3);
+      const candidate = point.distanceToSquared(wanted);
+      if (candidate < distance) { distance = candidate; site = index; }
+    }
+    return site;
+  };
+  const contactSite = nearestSite([.60, .20, .35]);
+  const complementSites = {
+    c1q: [[-.31, .32, .57], [.32, .18, .58], [.53, -.25, .38]].map(nearestSite),
+    c3: [[.67, -.12, .23], [-.03, -.50, .55]].map(nearestSite),
+  };
+  const membraneNormal = v3();
+  const atSite = (site, clearance = 0, result = v3()) => {
+    membraneNormal.fromBufferAttribute(damaged.geometry.attributes.normal, site).normalize();
+    return result.fromBufferAttribute(damaged.geometry.attributes.position, site)
+      .addScaledVector(membraneNormal, clearance).add(v3(DAMAGED_X, 0, 0));
+  };
+  const markerRadii = {};
+  for (const [key, item] of [['c1q', c1q], ['c3', c3]]) {
+    const positions = item.mesh.geometry.attributes.position;
+    let radius = 0;
+    for (let index = 0; index < positions.count; index++) radius = Math.max(radius, v3().fromBufferAttribute(positions, index).length());
+    markerRadii[key] = radius;
+  }
   const caspaseParts = [];
   for (const [index, x] of [-.10, .09].entries()) {
     addLobe(caspaseParts, 113 + index, [.12, .081, .09], [x, 0, 0], x * 1.7);
@@ -222,11 +273,11 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
   const channel = v3();
   function deform(point, damage, pruning) {
     const height = point.y, head = THREE.MathUtils.smoothstep(height, -1.25, -.47);
-    const radius = 1 - head * (damage * .20 + pruning * .65);
+    const radius = 1 - head * (damage * .20 + pruning * .45);
     point.x *= radius; point.z *= radius;
     // The attachment stays on the shaft; the mushroom head retracts through a
     // smooth neck deformation instead of vanishing or scaling the whole scene.
-    point.y = BASE_Y + (height - BASE_Y) * (1 - pruning * .72);
+    point.y -= (height - BASE_Y) * pruning * .42 * THREE.MathUtils.smoothstep(height, -1.55, -.70);
     point.y -= damage * head * .065;
     return point;
   }
@@ -249,7 +300,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
       ? bounded(state.contact) * THREE.MathUtils.smoothstep(approach, .96, 1)
       : 0;
     const pruning = lastStage >= 4 ? bounded(state.pruning) * contact : 0;
-    pruningAmount = pruning; headScale = 1 - damage * .20 - pruning * .65;
+    pruningAmount = pruning; headScale = 1 - damage * .20 - pruning * .45;
     if (damage !== lastDamage || pruning !== lastPruning) {
       const position = damaged.geometry.attributes.position, point = v3();
       for (let index = 0; index < position.count; index++) {
@@ -279,26 +330,27 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     damagedTerminal.vesicles.visible = pruning < .55;
     damagedTerminal.zone.material.opacity = .44 * (1 - pruning * .85);
 
-    contactTarget.copy(atSurface(v3(.60, .20, .35), damage, pruning));
+    atSite(contactSite, 0, contactTarget);
     const cellLocalTarget = contactTarget.clone().sub(cell.root.position);
     cell.update({ time, approach, contact, pruning, selected, target: cellLocalTarget });
     for (const item of cellAnchors) item.entry.position.copy(item.source.position).add(cell.root.position);
 
-    const c1qSeeds = [[-.31, .32, .57], [.32, .18, .58], [.53, -.25, .38]];
-    const c3Seeds = [[.67, -.12, .23], [-.03, -.50, .55]];
-    for (const [item, seeds, key] of [[c1q, c1qSeeds, 'c1q'], [c3, c3Seeds, 'c3']]) {
+    for (const [item, key] of [[c1q, 'c1q'], [c3, 'c3']]) {
       item.mesh.visible = stageKeys.has(key) && signals > .025;
-      for (let index = 0; index < seeds.length; index++) {
-        transform.position.copy(atSurface(v3(...seeds[index]), damage, pruning));
+      const sites = complementSites[key];
+      for (let index = 0; index < sites.length; index++) {
+        const scale = (.72 + signals * .28) * Math.max(.42, 1 - pruning * .66);
+        atSite(sites[index], markerRadii[key] * scale + .022, transform.position);
         transform.rotation.set(.4 + index * .7, index * 1.2, -.4 + index * .7);
-        transform.scale.setScalar((.72 + signals * .28) * Math.max(.42, 1 - pruning * .66));
+        transform.scale.setScalar(scale);
+        if ((key === 'c1q' && index === 1) || (key === 'c3' && index === 0)) {
+          (key === 'c1q' ? c1qAnchor : c3Anchor).position.copy(transform.position);
+        }
         transform.updateMatrix(); item.mesh.setMatrixAt(index, transform.matrix);
       }
       item.mesh.instanceMatrix.needsUpdate = true; item.mesh.computeBoundingSphere();
       item.material.emissiveIntensity = .02 + (selected === key ? .19 : 0);
     }
-    c1qAnchor.position.copy(atSurface(v3(.32, .18, .58), damage, pruning));
-    c3Anchor.position.copy(atSurface(v3(.67, -.12, .23), damage, pruning));
     caspase.visible = stageKeys.has('caspase3') && signals > .025;
     caspase.position.copy(atSurface(v3(-.07, -.23, .23), damage, pruning));
     caspase.scale.setScalar(Math.max(.25, headScale));
@@ -340,6 +392,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     diagnostics: () => ({
       stage: lastStage, headScale, pruning: pruningAmount,
       contactTarget: contactTarget.toArray(), channel: channel.toArray(),
+      cellPosition: cell.root.position.toArray(), contactVertex: contactSite,
       healthyPosition: healthy.position.toArray(), healthyScale: healthy.scale.toArray(),
       cell: cell.diagnostics(),
       particles: Object.fromEntries([...pools].map(([key, item]) => [key, item.mesh.count])),

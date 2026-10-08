@@ -7,7 +7,7 @@ const state = (ca, ros, damage, signals, approach, contact, pruning, activation 
 export const microgliaMechanism = {
   id: 'microglia',
   title: 'Remodelado microglial',
-  subtitle: 'Participación de la microglía en la eliminación de sinapsis dañadas',
+  subtitle: 'Vigilancia y remodelado contextual de conexiones sinápticas',
   description: 'Una conexión alterada, señales locales y el acercamiento de la microglía.',
   navLabel: 'Microglía',
   eyebrow: '04 / MICROGLÍA · PANEL C',
@@ -24,13 +24,13 @@ export const microgliaMechanism = {
   overviewCamera: 'microgliaOverview',
   initialState: state(0, 0, 0, 0, 0, 0, 0),
   cameraPoses: {
-    microgliaOverview: { position: [5, 3.5, 24.5], target: [.2, .6, 0] },
-    healthySynapse: { position: [3.4, 2.9, 23], target: [.3, .25, 0] },
+    microgliaOverview: { position: [4.5, 3.0, 23.6], target: [.3, .45, 0] },
+    healthySynapse: { position: [3.4, 2.9, 22.5], target: [.3, .25, 0] },
     damagedSpine: { position: [3.2, 1.7, 18.5], target: [.65, -.75, .1] },
     complementSignals: { position: [3.5, 1.5, 18.5], target: [1.0, -.6, .1] },
-    microgliaApproach: { position: [5.5, 4.2, 23], target: [1.3, .9, -.1] },
-    microgliaContact: { position: [4.8, 2.4, 21], target: [1.35, -.15, .1] },
-    postPruningOverview: { position: [5.1, 3.5, 24.5], target: [.2, .45, 0] },
+    microgliaApproach: { position: [4.2, 3.0, 21], target: [1.6, .8, .12] },
+    microgliaContact: { position: [4.0, 2.1, 19.7], target: [1.35, -.05, .18] },
+    postPruningOverview: { position: [4.5, 3.0, 23.6], target: [.3, .45, 0] },
   },
   steps: [
     {
@@ -54,7 +54,7 @@ export const microgliaMechanism = {
     {
       key: 'damage-associated-signals',
       title: 'Señales en la sinapsis alterada',
-      caption: 'C1q y C3 aparecen asociados a la superficie de la conexión alterada. En su interior, la caspasa-3 aporta una señal local relacionada con cambios de espinas y dendritas.',
+      caption: 'C1q y C3 se sitúan fuera de la membrana; no son exclusivos de sinapsis dañadas. Dentro, caspasa-3 aporta contexto de remodelado local, sin indicar apoptosis neuronal.',
       duration: 10,
       state: state(.7, .68, .28, .9, 0, 0, 0, .7),
       camera: 'complementSignals',
@@ -72,7 +72,7 @@ export const microgliaMechanism = {
     {
       key: 'contact-remodeling',
       title: 'Contacto y remodelado',
-      caption: 'El proceso alcanza la región sináptica. La cabeza de la espina se reduce y retrae gradualmente: una representación conceptual del remodelado local.',
+      caption: 'El extremo curvo alcanza la superficie de la espina. Su cabeza se reduce y retrae de forma localizada: una posibilidad de remodelado, sin fagocitosis completa.',
       duration: 12,
       state: state(.42, .48, .45, .9, 1, 1, .7, .48),
       camera: 'microgliaContact',
@@ -81,7 +81,7 @@ export const microgliaMechanism = {
     {
       key: 'connectivity-remodeling',
       title: 'Remodelado de la conectividad sináptica',
-      caption: 'La conexión en estudio se reduce mientras la vecina conserva su estructura. Una eliminación excesiva de conexiones durante el desarrollo puede alterar la organización de los circuitos neuronales.',
+      caption: 'La espina en estudio conserva un remanente continuo con la dendrita; la vecina permanece estable. El contacto o el complemento no obligan a eliminar una conexión.',
       duration: 10,
       state: state(.18, .28, .58, .5, 1, 1, .93, .26),
       camera: 'postPruningOverview',
@@ -103,7 +103,7 @@ export const microgliaMechanism = {
       text: 'Una prolongación fina y ramificada que puede extenderse o retraerse. Aquí se aproxima gradualmente a la sinapsis alterada sin desplazar todo el soma.',
       detail: 'La ramificación permite explorar regiones próximas y establecer contactos localizados. La secuencia concentra el movimiento en un proceso distal: primero reduce su distancia a la espina y después alcanza su superficie. El contacto y la reducción posterior representan una posibilidad de remodelado; la exploración microglial puede tener otros resultados según el estado de la conexión y del entorno.',
       observe: 'Sigue el extremo que avanza hacia la espina y distingue la aproximación, el contacto y la reducción posterior.',
-      note: 'La trayectoria y su duración son recursos de ilustración.',
+      note: 'La trayectoria y su duración son ilustrativas. No se representa ingestión ni digestión completa de la espina.',
     },
     healthySpine: {
       category: 'REFERENCIA MORFOLÓGICA',
@@ -162,7 +162,7 @@ export const microgliaMechanism = {
     ros: {
       category: 'ESTRÉS OXIDATIVO LOCAL',
       title: 'ROS · especies reactivas de oxígeno',
-      text: 'Esta señal reúne conceptualmente especies reactivas de oxígeno asociadas con el entorno de la sinapsis alterada.',
+      text: 'Las especies reactivas de oxígeno también participan en señalización fisiológica. Aquí se reúnen como indicador conceptual del contexto redox local de la sinapsis en estudio.',
       observe: 'Localiza la señal de ROS en torno a la espina en estudio y compara ambas conexiones durante las primeras etapas.',
       note: 'El módulo no atribuye una fuente molecular única ni añade rutas de producción.',
     },
