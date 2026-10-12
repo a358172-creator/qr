@@ -7,6 +7,9 @@ const loaders = {
 };
 
 export async function loadMechanism(id) {
+  if (['e-control', 'e-feso4', 'e-quin', 'e-3np'].includes(id)) {
+    return (await import('./evidence.js')).getEvidenceMechanism(id);
+  }
   if (!loaders[id]) throw new RangeError(`Unknown mechanism: ${id}`);
   return (await loaders[id]()).default;
 }

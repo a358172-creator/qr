@@ -78,6 +78,11 @@ try {
   page.on('requestfailed', request => report.failedRequests.push({ url: request.url(), error: request.failure()?.errorText }));
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.__atlas && document.querySelector('#scene-error').hidden, null, { timeout: 90000 });
+  // Phase 2 adds the shared entry menu; retain this runner's atlas-only scope.
+  await page.evaluate(() => {
+    if (window.__atlas.getState().experience === 'menu') document.querySelector('#experience-menu [data-experience="atlas"]').click();
+  });
+  await page.waitForFunction(() => !window.__atlas.getState().experience || window.__atlas.getState().experience === 'atlas');
   if (motion === 'normal') {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     report.motionWarmup = 'Stable hub with reduced motion; normal movement enabled for mechanism entry and stage transitions. Opening intro is not tested.';

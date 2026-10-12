@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#071923" />
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-  <meta name="description" content="Un atlas tridimensional de mecanismos de neurotoxicidad. Explora la neurona, su dendrita y el interior de una sinapsis glutamatérgica." />
-  <title>NEURO·VISTA — Atlas de neurotoxicidad</title>
+  <meta name="description" content="Explora los mecanismos de neurotoxicidad en un atlas 3D y consulta la evidencia experimental de vulnerabilidad redox cerebral durante el desarrollo posnatal." />
+  <title>NEURO·VISTA — Mecanismos y evidencia experimental</title>
 </head>
 <body>
   <a class="skip-link" href="#atlas-navigation">Ir a los controles del atlas</a>
-  <main id="atlas" class="atlas" data-view="hub">
+  <main id="atlas" class="atlas" data-view="hub" data-experience="menu">
     <canvas id="synapse-canvas" tabindex="0" aria-label="Atlas neuronal 3D. Arrastra para rotar y usa la rueda para acercarte. También puedes usar las flechas, los signos más y menos, y la tecla Inicio." aria-describedby="scene-hint"></canvas>
     <div class="atmosphere" aria-hidden="true"></div>
     <header class="masthead">
@@ -20,7 +20,7 @@
         <button data-view="hub" type="button" aria-current="location">Dendrita</button><span aria-hidden="true">/</span>
         <button data-view="synapse" type="button">Sinapsis</button>
       </nav>
-      <div class="header-actions"><button id="references-btn" type="button">Referencias <span aria-hidden="true">↗</span></button><button id="help-btn" type="button" aria-label="Ayuda de exploración">?</button></div>
+      <div class="header-actions"><button id="main-menu" type="button">Menú</button><button id="back-to-evidence" type="button" hidden>Volver a evidencia ↗</button><button id="references-btn" type="button">Referencias <span aria-hidden="true">↗</span></button><button id="help-btn" type="button" aria-label="Ayuda de exploración">?</button></div>
     </header>
     <section class="scene-heading" aria-labelledby="scene-title">
       <p class="eyebrow"><span class="live-dot"></span><span id="scene-eyebrow">01 / TERRITORIO NEURONAL</span></p>
@@ -61,7 +61,7 @@
     <p>El segundo recorrido interpreta el panel D y el tercero el panel C de la figura científica de referencia. La microglía se aproxima a una espina alterada mientras otra permanece conservada. El cuarto recorrido interpreta el panel A: organización postsináptica, actina y remodelado fisiológico. El módulo general de apoptosis permanece sin disponibilidad. La experiencia no estima susceptibilidad individual.</p>
     <p>En B, caspasa-3 local y retracción de la espina se distinguen de la alternativa citocromo c–Apaf-1–caspasa-9–ejecutoras. Esta última puede contribuir a apoptosis; no es obligatoria tras el remodelado ni demuestra muerte neuronal completa. Citocromo c sale del espacio intermembranal hacia el citosol en el contexto de permeabilización externa.</p>
     <p>NO y O₂•⁻ pueden reaccionar para formar ONOO⁻. PTP señala transición de permeabilidad interna, distinta de permeabilización externa. AIF puede participar en daño independiente de caspasas; no atraviesa ese poro. Su destino nuclear está comprimido espacialmente, sin situar un núcleo dentro de la dendrita.</p>
-    <p>La Figura 1 original no está accesible en esta revisión. Se conserva el alcance descrito en la documentación y se contrasta con las fuentes siguientes. La experiencia no presenta resultados propios ni mediciones de homogeneizados cerebrales.</p>
+    <p>La Figura 1 anatómica original no está accesible en esta revisión. Se conserva el alcance descrito en la documentación y se contrasta con las fuentes siguientes. El atlas de mecanismos no presenta mediciones experimentales. La sección Evidencia experimental muestra por separado las figuras proporcionadas del estudio en homogeneizados.</p>
     <p>En el panel C, C1q y C3 se representan como componentes conceptuales del reconocimiento sináptico, no como marcadores universales de daño. Caspasa-3 indica señalización local dentro de la espina: no se representa una cascada apoptótica ni una señal extracelular de atracción. El contacto y el remodelado microglial son posibilidades dependientes del contexto.</p>
     <p>En el panel A, PSD-95, DISC1 y Kalirin-7 ocupan posiciones conceptuales relacionadas con la organización de la espina. El recorrido guía la atención sin proponer una cadena molecular obligatoria. La entrada moderada de Ca²⁺ y el cambio de forma ilustran plasticidad estructural; no representan mediciones ni una respuesta universal.</p>
       <ol class="reference-list">

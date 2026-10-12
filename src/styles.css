@@ -1235,6 +1235,9 @@ dd {
     bottom:79px;
     width:calc(100% - 46px)
   }
+  .narrative::before {
+    inset:-26px -23px -12px
+  }
   .narrative-caption {
     gap:10px;
     min-height:96px

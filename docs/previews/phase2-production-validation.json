@@ -1,0 +1,210 @@
+{
+  "basePath": "/qr/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "startedAt": "2026-10-12T03:08:42.140Z",
+  "status": "complete",
+  "modes": {
+    "webgl": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "captures": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-menu.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "menu",
+          "mechanism": "glutamate"
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-evidence.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "evidence",
+          "mechanism": "e-control"
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-pn3-mtt-results.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "evidence",
+          "mechanism": "e-quin"
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-atlas-context.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "atlas",
+          "mechanism": "glutamate"
+        }
+      ],
+      "selections": [
+        {
+          "exposure": "control",
+          "loaded": true
+        },
+        {
+          "exposure": "feso4",
+          "loaded": true
+        },
+        {
+          "exposure": "3np",
+          "loaded": true
+        },
+        {
+          "exposure": "quin",
+          "loaded": true
+        }
+      ],
+      "assets": [
+        {
+          "assay": "dcfda",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-1-dcfda.svg",
+          "loaded": true
+        },
+        {
+          "assay": "tbars",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-2-tbars.svg",
+          "loaded": true
+        },
+        {
+          "assay": "mtt",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-3-mtt.svg",
+          "loaded": true
+        }
+      ],
+      "devHooksAbsent": true,
+      "webgl": {
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+      },
+      "headerReferences": "evidence-methods",
+      "contextReturnPreserved": true,
+      "menuReturn": true,
+      "brandReturn": true,
+      "expectedContextErrors": [],
+      "status": "complete"
+    },
+    "webgl-unavailable": {
+      "consoleErrors": [
+        "THREE.WebGLRenderer: Error creating WebGL context.",
+        "No se pudo iniciar el atlas WebGL: Error: Error creating WebGL context.\n    at new xd (http://127.0.0.1:5187/qr/assets/three-webgl-CZbN4f-I.js:3793:20814)\n    at an (http://127.0.0.1:5187/qr/assets/scene-Ccjf1TcD.js:47:13546)\n    at http://127.0.0.1:5187/qr/assets/index-CTwC7bvE.js:43:6635"
+      ],
+      "pageErrors": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "captures": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-unavailable-menu.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "menu"
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-unavailable-evidence.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "evidence"
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-production-webgl-unavailable-pn3-mtt-results.png",
+          "document": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "main": {
+            "clientWidth": 1280,
+            "scrollWidth": 1280
+          },
+          "experience": "evidence"
+        }
+      ],
+      "selections": [
+        {
+          "exposure": "control",
+          "loaded": true
+        },
+        {
+          "exposure": "feso4",
+          "loaded": true
+        },
+        {
+          "exposure": "3np",
+          "loaded": true
+        },
+        {
+          "exposure": "quin",
+          "loaded": true
+        }
+      ],
+      "assets": [
+        {
+          "assay": "dcfda",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-1-dcfda.svg",
+          "loaded": true
+        },
+        {
+          "assay": "tbars",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-2-tbars.svg",
+          "loaded": true
+        },
+        {
+          "assay": "mtt",
+          "url": "http://127.0.0.1:5187/qr/evidence/figure-3-mtt.svg",
+          "loaded": true
+        }
+      ],
+      "devHooksAbsent": true,
+      "headerReferences": "evidence-methods",
+      "menuReturn": true,
+      "brandReturn": true,
+      "expectedContextErrors": [
+        "THREE.WebGLRenderer: Error creating WebGL context.",
+        "No se pudo iniciar el atlas WebGL: Error: Error creating WebGL context.\n    at new xd (http://127.0.0.1:5187/qr/assets/three-webgl-CZbN4f-I.js:3793:20814)\n    at an (http://127.0.0.1:5187/qr/assets/scene-Ccjf1TcD.js:47:13546)\n    at http://127.0.0.1:5187/qr/assets/index-CTwC7bvE.js:43:6635"
+      ],
+      "status": "complete"
+    }
+  },
+  "finishedAt": "2026-10-12T03:09:41.102Z"
+}

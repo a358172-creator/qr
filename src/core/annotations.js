@@ -84,7 +84,7 @@ export function createAnnotations({
     width = Math.max(0, w);
     height = Math.max(0, h);
     const canvasBox = canvas.getBoundingClientRect();
-    interfaceBoxes = ['.scene-heading', '#narrative', '.masthead', '.scene-footer']
+    interfaceBoxes = ['.scene-heading', '#narrative', '.masthead', '.scene-footer', '#evidence-controls', '#evidence-model-heading', '#evidence-panel']
       .map(selector => document.querySelector(selector))
       .filter(element => element && !element.hidden)
       .map(element => {

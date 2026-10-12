@@ -4,6 +4,24 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Small instanced glyphs distinguish conceptual species by silhouette as well
 // as colour. They are not atomistic molecular structures.
 export function molecularGlyph(kind = 'single', radius = .038) {
+  if (kind === 'quinolinate') {
+    // Connectivity-inspired silhouette: a six-membered ring with two adjacent
+    // carboxyl branches (PubChem CID 1066). No atom positions, bond orders or
+    // protonation states are claimed by this compact educational glyph.
+    const ring = Array.from({ length: 6 }, (_, i) => new THREE.Vector3(
+      Math.cos(i * Math.PI / 3) * radius, Math.sin(i * Math.PI / 3) * radius, 0,
+    ));
+    const parts = [new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ring, true), 30, radius * .16, 6, true)];
+    for (const index of [1, 2]) {
+      const start = ring[index], end = start.clone().multiplyScalar(1.8);
+      parts.push(new THREE.TubeGeometry(new THREE.LineCurve3(start, end), 3, radius * .16, 6, false));
+      for (const side of [-1, 1]) {
+        const tip = end.clone().add(new THREE.Vector3(side * radius * .32, radius * .35, 0));
+        parts.push(new THREE.TubeGeometry(new THREE.LineCurve3(end, tip), 3, radius * .14, 6, false));
+      }
+    }
+    const geometry = mergeGeometries(parts); parts.forEach(part => part.dispose()); return geometry;
+  }
   if (kind === 'filament') {
     const points = Array.from({ length: 6 }, (_, index) => new THREE.Vector3(
       (index - 2.5) * radius * .9,

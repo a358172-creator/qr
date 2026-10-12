@@ -1,0 +1,1863 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "deviceScaleFactor": 1,
+  "exposures": {
+    "control": {
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-control-stage-1.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-control",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 0,
+            "availableKeys": [
+              "membrane",
+              "mitochondria"
+            ],
+            "timeline": {
+              "index": 0,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0,
+              "step": "reference-membrane"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              1.8609230769230771,
+              1.6557692307692318,
+              10.080000000000004
+            ],
+            "target": [
+              0,
+              0.105,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 15,
+            "triangles": 211496,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 59,
+              "textures": 2,
+              "sessions": 2
+            },
+            "model": {
+              "stage": 0,
+              "oxidation": 0,
+              "stress": 0,
+              "membrane": {
+                "changedLipids": 0,
+                "maximumDisplacement": 0,
+                "totalLipids": 1122
+              },
+              "ageDependentGeometry": false
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "control",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "Control de PN3: referencia experimental para las exposiciones de esa edad. La barra seleccionada y su error se mantienen en la figura original.",
+              "comparison": "Referencia: control correspondiente a la misma edad posnatal.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-control-stage-2.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-control",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 9,
+            "availableKeys": [
+              "membrane",
+              "mitochondria"
+            ],
+            "timeline": {
+              "index": 1,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0.5,
+              "step": "reference-compartments"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              1.5507692307692307,
+              1.4807692307692306,
+              9.149538461538464
+            ],
+            "target": [
+              0,
+              -0.06999999999999999,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 15,
+            "triangles": 211496,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 59,
+              "textures": 2,
+              "sessions": 2
+            },
+            "model": {
+              "stage": 1,
+              "oxidation": 0,
+              "stress": 0,
+              "membrane": {
+                "changedLipids": 0,
+                "maximumDisplacement": 0,
+                "totalLipids": 1122
+              },
+              "ageDependentGeometry": false
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "control",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "Control de PN3: referencia experimental para las exposiciones de esa edad. La barra seleccionada y su error se mantienen en la figura original.",
+              "comparison": "Referencia: control correspondiente a la misma edad posnatal.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "results": {
+        "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-control-results.png",
+        "scene": {
+          "experience": "evidence",
+          "view": "synapse",
+          "mechanism": "e-control",
+          "transitioning": false,
+          "cameraMoving": false,
+          "exploring": false,
+          "selected": null,
+          "time": 9,
+          "availableKeys": [
+            "membrane",
+            "mitochondria"
+          ],
+          "timeline": {
+            "index": 1,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.5,
+            "step": "reference-compartments"
+          },
+          "particles": {
+            "reaction": 0,
+            "oxidation": 0,
+            "inhibition": 0,
+            "flux": 0,
+            "activation": 0,
+            "stress": 0
+          },
+          "camera": [
+            1.5507692307692307,
+            1.4807692307692306,
+            9.149538461538464
+          ],
+          "target": [
+            0,
+            -0.06999999999999999,
+            0
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 15,
+          "triangles": 211496,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 59,
+            "textures": 2,
+            "sessions": 2
+          },
+          "model": {
+            "stage": 1,
+            "oxidation": 0,
+            "stress": 0,
+            "membrane": {
+              "changedLipids": 0,
+              "maximumDisplacement": 0,
+              "totalLipids": 1122
+            },
+            "ageDependentGeometry": false
+          }
+        },
+        "evidence": {
+          "age": "PN3",
+          "exposure": "control",
+          "assay": "tbars",
+          "experience": "evidence",
+          "busy": false,
+          "result": {
+            "status": "available",
+            "mean": null,
+            "sem": null,
+            "summary": "Control de PN3: referencia experimental para las exposiciones de esa edad. La barra seleccionada y su error se mantienen en la figura original.",
+            "comparison": "Referencia: control correspondiente a la misma edad posnatal.",
+            "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+            "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+          }
+        }
+      }
+    },
+    "feso4": {
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-feso4-stage-1.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-feso4",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 0,
+            "availableKeys": [
+              "membrane",
+              "pufa"
+            ],
+            "timeline": {
+              "index": 0,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0,
+              "step": "lipid-reference"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              2.477353846153846,
+              2.8562153846153855,
+              10.300553846153846
+            ],
+            "target": [
+              -0.13999999999999999,
+              0.06999999999999999,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 7,
+            "triangles": 151696,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 64,
+              "textures": 2,
+              "sessions": 3
+            },
+            "model": {
+              "stage": 0,
+              "oxidation": 0,
+              "reaction": [
+                -2.44,
+                0.3452090598173961,
+                0.3
+              ],
+              "reactionSites": [
+                [
+                  -2.58,
+                  0.3452090598173961,
+                  0.3
+                ],
+                [
+                  -2.44,
+                  0.3452090598173961,
+                  0.42
+                ],
+                [
+                  -2.3,
+                  0.3452090598173961,
+                  0.3
+                ]
+              ],
+              "radicalRange": 0.16,
+              "membrane": {
+                "changedLipids": 0,
+                "maximumDisplacement": 0,
+                "totalLipids": 1122
+              },
+              "particles": {
+                "fe2": 0,
+                "h2o2": 0,
+                "fe3": 0,
+                "hydroxide": 0,
+                "hydroxyl": 0,
+                "lipidProducts": 0
+              },
+              "ageDependentGeometry": false
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "feso4",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "El estudio documenta aumento de TBARS con FeSO₄. Consulta la barra de la edad seleccionada y las comparaciones indicadas en la figura; no se presupone la misma respuesta en todas las edades.",
+              "comparison": "Comparación de consulta: FeSO₄ y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-feso4-stage-4.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-feso4",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 29,
+            "availableKeys": [
+              "membrane",
+              "pufa",
+              "fe2",
+              "h2o2",
+              "fe3",
+              "hydroxide",
+              "hydroxyl",
+              "lipidProducts"
+            ],
+            "timeline": {
+              "index": 3,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0.7073170731707317,
+              "step": "localized-lipid-oxidation"
+            },
+            "particles": {
+              "reaction": 0.6,
+              "oxidation": 1,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              0.15459230769230792,
+              2.088724615384615,
+              6.437307692307694
+            ],
+            "target": [
+              -0.6475,
+              0.04550000000000001,
+              0.10500000000000001
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 13,
+            "triangles": 155296,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 70,
+              "textures": 2,
+              "sessions": 3
+            },
+            "model": {
+              "stage": 3,
+              "oxidation": 0.72,
+              "reaction": [
+                -2.44,
+                0.3452090598173961,
+                0.3
+              ],
+              "reactionSites": [
+                [
+                  -2.58,
+                  0.3452090598173961,
+                  0.3
+                ],
+                [
+                  -2.44,
+                  0.3452090598173961,
+                  0.42
+                ],
+                [
+                  -2.3,
+                  0.3452090598173961,
+                  0.3
+                ]
+              ],
+              "radicalRange": 0.16,
+              "membrane": {
+                "changedLipids": 166,
+                "maximumDisplacement": 0.08342071338802436,
+                "totalLipids": 1122
+              },
+              "particles": {
+                "fe2": 3,
+                "h2o2": 3,
+                "fe3": 3,
+                "hydroxide": 3,
+                "hydroxyl": 3,
+                "lipidProducts": 4
+              },
+              "ageDependentGeometry": false
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "feso4",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "El estudio documenta aumento de TBARS con FeSO₄. Consulta la barra de la edad seleccionada y las comparaciones indicadas en la figura; no se presupone la misma respuesta en todas las edades.",
+              "comparison": "Comparación de consulta: FeSO₄ y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "results": {
+        "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-feso4-results.png",
+        "scene": {
+          "experience": "evidence",
+          "view": "synapse",
+          "mechanism": "e-feso4",
+          "transitioning": false,
+          "cameraMoving": false,
+          "exploring": false,
+          "selected": null,
+          "time": 29,
+          "availableKeys": [
+            "membrane",
+            "pufa",
+            "fe2",
+            "h2o2",
+            "fe3",
+            "hydroxide",
+            "hydroxyl",
+            "lipidProducts"
+          ],
+          "timeline": {
+            "index": 3,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.7073170731707317,
+            "step": "localized-lipid-oxidation"
+          },
+          "particles": {
+            "reaction": 0.6,
+            "oxidation": 1,
+            "inhibition": 0,
+            "flux": 0,
+            "activation": 0,
+            "stress": 0
+          },
+          "camera": [
+            0.15459230769230792,
+            2.088724615384615,
+            6.437307692307694
+          ],
+          "target": [
+            -0.6475,
+            0.04550000000000001,
+            0.10500000000000001
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 13,
+          "triangles": 155296,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 70,
+            "textures": 2,
+            "sessions": 3
+          },
+          "model": {
+            "stage": 3,
+            "oxidation": 0.72,
+            "reaction": [
+              -2.44,
+              0.3452090598173961,
+              0.3
+            ],
+            "reactionSites": [
+              [
+                -2.58,
+                0.3452090598173961,
+                0.3
+              ],
+              [
+                -2.44,
+                0.3452090598173961,
+                0.42
+              ],
+              [
+                -2.3,
+                0.3452090598173961,
+                0.3
+              ]
+            ],
+            "radicalRange": 0.16,
+            "membrane": {
+              "changedLipids": 166,
+              "maximumDisplacement": 0.08342071338802436,
+              "totalLipids": 1122
+            },
+            "particles": {
+              "fe2": 3,
+              "h2o2": 3,
+              "fe3": 3,
+              "hydroxide": 3,
+              "hydroxyl": 3,
+              "lipidProducts": 4
+            },
+            "ageDependentGeometry": false
+          }
+        },
+        "evidence": {
+          "age": "PN3",
+          "exposure": "feso4",
+          "assay": "tbars",
+          "experience": "evidence",
+          "busy": false,
+          "result": {
+            "status": "available",
+            "mean": null,
+            "sem": null,
+            "summary": "El estudio documenta aumento de TBARS con FeSO₄. Consulta la barra de la edad seleccionada y las comparaciones indicadas en la figura; no se presupone la misma respuesta en todas las edades.",
+            "comparison": "Comparación de consulta: FeSO₄ y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+            "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+            "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+          }
+        }
+      }
+    },
+    "3np": {
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-3np-stage-1.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-3np",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 0,
+            "availableKeys": [
+              "mitochondria",
+              "sdh",
+              "respiratory",
+              "atpSynthase"
+            ],
+            "timeline": {
+              "index": 0,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0,
+              "step": "complex-ii-location"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              1.5507692307692307,
+              1.2831538461538463,
+              7.598769230769232
+            ],
+            "target": [
+              0,
+              -0.034999999999999996,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 16,
+            "triangles": 78120,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 86,
+              "textures": 2,
+              "sessions": 4
+            },
+            "model": {
+              "stage": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "sdhAnchor": [
+                -0.35621445523043044,
+                0.6747874260702833,
+                0.41071816695538765
+              ],
+              "activeSite": [
+                -0.35621445523043044,
+                0.39067753010546996,
+                0.22395209130227825
+              ],
+              "matrixDirection": [
+                0,
+                -0.8356173410729804,
+                -0.5493119872150276
+              ],
+              "qSite": [
+                -0.0392203558952676,
+                0.6896108908883132,
+                0.3932101517773357
+              ],
+              "protonPumpAtComplexII": false,
+              "ageDependentGeometry": false,
+              "particles": {
+                "succinate": 0,
+                "fumarate": 0,
+                "ubiquinone": 0,
+                "electronFlow": 0,
+                "threeNP": 0
+              }
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "3np",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "Consulta la señal TBARS de 3-NP y el control de la misma edad en la figura original. No se deduce significancia por la altura de las barras ni un aumento de ROS mitocondrial específico.",
+              "comparison": "Comparación de consulta: 3-NP y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-3np-stage-4.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-3np",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 32,
+            "availableKeys": [
+              "mitochondria",
+              "sdh",
+              "respiratory",
+              "atpSynthase",
+              "ubiquinone",
+              "threeNP"
+            ],
+            "timeline": {
+              "index": 3,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0.7441860465116279,
+              "step": "bioenergetic-context"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 1,
+              "flux": 1,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              1.5507692307692307,
+              1.2831538461538463,
+              7.598769230769232
+            ],
+            "target": [
+              0,
+              -0.034999999999999996,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 18,
+            "triangles": 79560,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 88,
+              "textures": 2,
+              "sessions": 4
+            },
+            "model": {
+              "stage": 3,
+              "inhibition": 1,
+              "flux": 0,
+              "sdhAnchor": [
+                -0.35621445523043044,
+                0.6747874260702833,
+                0.41071816695538765
+              ],
+              "activeSite": [
+                -0.35621445523043044,
+                0.39067753010546996,
+                0.22395209130227825
+              ],
+              "matrixDirection": [
+                0,
+                -0.8356173410729804,
+                -0.5493119872150276
+              ],
+              "qSite": [
+                -0.0392203558952676,
+                0.6896108908883132,
+                0.3932101517773357
+              ],
+              "protonPumpAtComplexII": false,
+              "ageDependentGeometry": false,
+              "particles": {
+                "succinate": 0,
+                "fumarate": 0,
+                "ubiquinone": 3,
+                "electronFlow": 0,
+                "threeNP": 3
+              }
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "3np",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "Consulta la señal TBARS de 3-NP y el control de la misma edad en la figura original. No se deduce significancia por la altura de las barras ni un aumento de ROS mitocondrial específico.",
+              "comparison": "Comparación de consulta: 3-NP y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "results": {
+        "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-3np-results.png",
+        "scene": {
+          "experience": "evidence",
+          "view": "synapse",
+          "mechanism": "e-3np",
+          "transitioning": false,
+          "cameraMoving": false,
+          "exploring": false,
+          "selected": null,
+          "time": 32,
+          "availableKeys": [
+            "mitochondria",
+            "sdh",
+            "respiratory",
+            "atpSynthase",
+            "ubiquinone",
+            "threeNP"
+          ],
+          "timeline": {
+            "index": 3,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.7441860465116279,
+            "step": "bioenergetic-context"
+          },
+          "particles": {
+            "reaction": 0,
+            "oxidation": 0,
+            "inhibition": 1,
+            "flux": 1,
+            "activation": 0,
+            "stress": 0
+          },
+          "camera": [
+            1.5507692307692305,
+            1.2831538461538463,
+            7.598769230769232
+          ],
+          "target": [
+            0,
+            -0.034999999999999996,
+            0
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 18,
+          "triangles": 79560,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 88,
+            "textures": 2,
+            "sessions": 4
+          },
+          "model": {
+            "stage": 3,
+            "inhibition": 1,
+            "flux": 0,
+            "sdhAnchor": [
+              -0.35621445523043044,
+              0.6747874260702833,
+              0.41071816695538765
+            ],
+            "activeSite": [
+              -0.35621445523043044,
+              0.39067753010546996,
+              0.22395209130227825
+            ],
+            "matrixDirection": [
+              0,
+              -0.8356173410729804,
+              -0.5493119872150276
+            ],
+            "qSite": [
+              -0.0392203558952676,
+              0.6896108908883132,
+              0.3932101517773357
+            ],
+            "protonPumpAtComplexII": false,
+            "ageDependentGeometry": false,
+            "particles": {
+              "succinate": 0,
+              "fumarate": 0,
+              "ubiquinone": 3,
+              "electronFlow": 0,
+              "threeNP": 3
+            }
+          }
+        },
+        "evidence": {
+          "age": "PN3",
+          "exposure": "3np",
+          "assay": "tbars",
+          "experience": "evidence",
+          "busy": false,
+          "result": {
+            "status": "available",
+            "mean": null,
+            "sem": null,
+            "summary": "Consulta la señal TBARS de 3-NP y el control de la misma edad en la figura original. No se deduce significancia por la altura de las barras ni un aumento de ROS mitocondrial específico.",
+            "comparison": "Comparación de consulta: 3-NP y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+            "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+            "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+          }
+        }
+      }
+    },
+    "quin": {
+      "stages": [
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-quin-stage-1.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-quin",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 0,
+            "availableKeys": [
+              "terminal",
+              "vesicles",
+              "ampa",
+              "nmda",
+              "spine",
+              "dendrite",
+              "mitochondria",
+              "quin"
+            ],
+            "timeline": {
+              "index": 0,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0,
+              "step": "quin-extracellular"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0,
+              "activation": 0,
+              "stress": 0
+            },
+            "camera": [
+              1.607846153846154,
+              0.7358076923076933,
+              15.232
+            ],
+            "target": [
+              0.06999999999999998,
+              -0.4725,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 44,
+            "triangles": 263364,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 129,
+              "textures": 2,
+              "sessions": 5
+            },
+            "model": {
+              "stage": 0,
+              "calcium": 0,
+              "stress": 0,
+              "potentialOnly": true,
+              "ageDependentGeometry": false,
+              "apoptosis": false,
+              "quinCount": 7,
+              "base": {
+                "stage": 0,
+                "local": 0,
+                "intrinsic": 0,
+                "headRadialScale": 1,
+                "mitochondria": [
+                  1.65,
+                  -3.72,
+                  0
+                ],
+                "mitochondrialScale": 0.4,
+                "cytochromeOrigin": [
+                  2.0102158198800497,
+                  -3.574496737879499,
+                  0.16219028698262355
+                ],
+                "caspasesVisible": false,
+                "cytochromeCount": 0,
+                "intrinsicVisible": false,
+                "channel": [
+                  0.2,
+                  -0.2154856,
+                  0.63
+                ]
+              }
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "quin",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "QUIN en PN3: la figura original señala una diferencia significativa respecto al control de la misma edad (* p<0.05, según su pie). No se observa un patrón consistente de incremento de TBARS entre todas las edades evaluadas.",
+              "comparison": "Comparación de consulta: QUIN y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "Aclaración del investigador: QUIN no mostró un patrón consistente de incremento de peroxidación lipídica entre las edades evaluadas. La figura conserva diferencias significativas respecto al control en condiciones tempranas, indicadas por asteriscos en PN3 y PN5. No se generaliza el efecto a todas las edades ni se recalculan resultados.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        },
+        {
+          "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-quin-stage-5.png",
+          "scene": {
+            "experience": "evidence",
+            "view": "synapse",
+            "mechanism": "e-quin",
+            "transitioning": false,
+            "cameraMoving": false,
+            "exploring": false,
+            "selected": null,
+            "time": 41,
+            "availableKeys": [
+              "terminal",
+              "vesicles",
+              "ampa",
+              "nmda",
+              "spine",
+              "dendrite",
+              "mitochondria",
+              "quin",
+              "calcium",
+              "ros"
+            ],
+            "timeline": {
+              "index": 4,
+              "elapsed": 0,
+              "playing": false,
+              "complete": false,
+              "progress": 0.7735849056603774,
+              "step": "quin-experimental-scope"
+            },
+            "particles": {
+              "reaction": 0,
+              "oxidation": 0,
+              "inhibition": 0,
+              "flux": 0.8,
+              "activation": 0.85,
+              "stress": 0.6
+            },
+            "camera": [
+              1.607846153846154,
+              0.7358076923076933,
+              15.232
+            ],
+            "target": [
+              0.06999999999999998,
+              -0.4725,
+              0
+            ],
+            "controlsEnabled": true,
+            "drawCalls": 46,
+            "triangles": 272196,
+            "contextParticlesVisible": false,
+            "resources": {
+              "geometries": 130,
+              "textures": 2,
+              "sessions": 5
+            },
+            "model": {
+              "stage": 4,
+              "calcium": 0.8,
+              "stress": 0.6,
+              "potentialOnly": true,
+              "ageDependentGeometry": false,
+              "apoptosis": false,
+              "quinCount": 7,
+              "base": {
+                "stage": 5,
+                "local": 0,
+                "intrinsic": 0,
+                "headRadialScale": 1,
+                "mitochondria": [
+                  1.65,
+                  -3.72,
+                  0
+                ],
+                "mitochondrialScale": 0.4,
+                "cytochromeOrigin": [
+                  2.0102158198800497,
+                  -3.574496737879499,
+                  0.16219028698262355
+                ],
+                "caspasesVisible": false,
+                "cytochromeCount": 0,
+                "intrinsicVisible": false,
+                "channel": [
+                  0.2,
+                  -0.2154856,
+                  0.63
+                ]
+              }
+            }
+          },
+          "evidence": {
+            "age": "PN3",
+            "exposure": "quin",
+            "assay": "tbars",
+            "experience": "evidence",
+            "busy": false,
+            "result": {
+              "status": "available",
+              "mean": null,
+              "sem": null,
+              "summary": "QUIN en PN3: la figura original señala una diferencia significativa respecto al control de la misma edad (* p<0.05, según su pie). No se observa un patrón consistente de incremento de TBARS entre todas las edades evaluadas.",
+              "comparison": "Comparación de consulta: QUIN y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+              "statisticalCaution": "Aclaración del investigador: QUIN no mostró un patrón consistente de incremento de peroxidación lipídica entre las edades evaluadas. La figura conserva diferencias significativas respecto al control en condiciones tempranas, indicadas por asteriscos en PN3 y PN5. No se generaliza el efecto a todas las edades ni se recalculan resultados.",
+              "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+            }
+          }
+        }
+      ],
+      "selections": [],
+      "results": {
+        "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-quin-results.png",
+        "scene": {
+          "experience": "evidence",
+          "view": "synapse",
+          "mechanism": "e-quin",
+          "transitioning": false,
+          "cameraMoving": false,
+          "exploring": false,
+          "selected": null,
+          "time": 41,
+          "availableKeys": [
+            "terminal",
+            "vesicles",
+            "ampa",
+            "nmda",
+            "spine",
+            "dendrite",
+            "mitochondria",
+            "quin",
+            "calcium",
+            "ros"
+          ],
+          "timeline": {
+            "index": 4,
+            "elapsed": 0,
+            "playing": false,
+            "complete": false,
+            "progress": 0.7735849056603774,
+            "step": "quin-experimental-scope"
+          },
+          "particles": {
+            "reaction": 0,
+            "oxidation": 0,
+            "inhibition": 0,
+            "flux": 0.8,
+            "activation": 0.85,
+            "stress": 0.6
+          },
+          "camera": [
+            1.6078461538461541,
+            0.7358076923076933,
+            15.232
+          ],
+          "target": [
+            0.06999999999999997,
+            -0.4725,
+            0
+          ],
+          "controlsEnabled": true,
+          "drawCalls": 46,
+          "triangles": 272196,
+          "contextParticlesVisible": false,
+          "resources": {
+            "geometries": 130,
+            "textures": 2,
+            "sessions": 5
+          },
+          "model": {
+            "stage": 4,
+            "calcium": 0.8,
+            "stress": 0.6,
+            "potentialOnly": true,
+            "ageDependentGeometry": false,
+            "apoptosis": false,
+            "quinCount": 7,
+            "base": {
+              "stage": 5,
+              "local": 0,
+              "intrinsic": 0,
+              "headRadialScale": 1,
+              "mitochondria": [
+                1.65,
+                -3.72,
+                0
+              ],
+              "mitochondrialScale": 0.4,
+              "cytochromeOrigin": [
+                2.0102158198800497,
+                -3.574496737879499,
+                0.16219028698262355
+              ],
+              "caspasesVisible": false,
+              "cytochromeCount": 0,
+              "intrinsicVisible": false,
+              "channel": [
+                0.2,
+                -0.2154856,
+                0.63
+              ]
+            }
+          }
+        },
+        "evidence": {
+          "age": "PN3",
+          "exposure": "quin",
+          "assay": "tbars",
+          "experience": "evidence",
+          "busy": false,
+          "result": {
+            "status": "available",
+            "mean": null,
+            "sem": null,
+            "summary": "QUIN en PN3: la figura original señala una diferencia significativa respecto al control de la misma edad (* p<0.05, según su pie). No se observa un patrón consistente de incremento de TBARS entre todas las edades evaluadas.",
+            "comparison": "Comparación de consulta: QUIN y control de PN3. La significancia se interpreta con el pie original, no con la altura de la barra.",
+            "statisticalCaution": "Aclaración del investigador: QUIN no mostró un patrón consistente de incremento de peroxidación lipídica entre las edades evaluadas. La figura conserva diferencias significativas respecto al control en condiciones tempranas, indicadas por asteriscos en PN3 y PN5. No se generaliza el efecto a todas las edades ni se recalculan resultados.",
+            "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+          }
+        }
+      }
+    }
+  },
+  "consoleErrors": [],
+  "httpErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "runs": [
+    {
+      "exposures": [
+        "control",
+        "feso4",
+        "3np",
+        "quin"
+      ],
+      "quick": true,
+      "startedAt": "2026-10-11T21:12:27.206Z",
+      "status": "complete",
+      "finishedAt": "2026-10-11T21:13:43.715Z"
+    }
+  ],
+  "webgl": {
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "menu": {
+    "screenshot": "/workspaces/qr/docs/previews/phase2-mobile390-menu.png",
+    "scene": {
+      "experience": "menu",
+      "view": "hub",
+      "mechanism": "glutamate",
+      "transitioning": false,
+      "cameraMoving": false,
+      "exploring": false,
+      "selected": null,
+      "time": 0,
+      "availableKeys": [
+        "terminal",
+        "vesicles",
+        "glutamate",
+        "ampa",
+        "nmda",
+        "spine",
+        "dendrite",
+        "mitochondria"
+      ],
+      "timeline": {
+        "index": 0,
+        "elapsed": 0,
+        "playing": false,
+        "complete": false,
+        "progress": 0,
+        "step": "glutamate"
+      },
+      "particles": {
+        "glut": 0.12,
+        "activation": 0.04,
+        "ca": 0,
+        "stress": 0,
+        "damage": 0,
+        "local": 0,
+        "intrinsic": 0
+      },
+      "camera": [
+        -0.28249999999999975,
+        9.703500000000005,
+        26.502500000000005
+      ],
+      "target": [
+        -2.1125,
+        1.4074999999999998,
+        -0.3375
+      ],
+      "controlsEnabled": false,
+      "drawCalls": 0,
+      "triangles": 0,
+      "contextParticlesVisible": false,
+      "resources": {
+        "geometries": 44,
+        "textures": 2,
+        "sessions": 1
+      },
+      "model": {
+        "stage": 0,
+        "local": 0,
+        "intrinsic": 0,
+        "headRadialScale": 1,
+        "mitochondria": [
+          1.65,
+          -3.72,
+          0
+        ],
+        "mitochondrialScale": 0.4,
+        "cytochromeOrigin": [
+          2.0102158198800497,
+          -3.574496737879499,
+          0.16219028698262355
+        ],
+        "caspasesVisible": false,
+        "cytochromeCount": 0,
+        "intrinsicVisible": false,
+        "channel": [
+          0.2,
+          -0.2154856,
+          0.63
+        ]
+      }
+    },
+    "evidence": {
+      "age": "PN3",
+      "exposure": "control",
+      "assay": "tbars",
+      "experience": "menu",
+      "busy": false,
+      "result": {
+        "status": "available",
+        "mean": null,
+        "sem": null,
+        "summary": "Control de PN3: referencia experimental para las exposiciones de esa edad. La barra seleccionada y su error se mantienen en la figura original.",
+        "comparison": "Referencia: control correspondiente a la misma edad posnatal.",
+        "statisticalCaution": "El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.",
+        "provenance": "Figura 2 de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales."
+      }
+    },
+    "keyboardControls": [
+      {
+        "disabled": false,
+        "label": "01 / ATLAS INTERACTIVO\nMecanismos\nfisiopatológicos\n\nExploración tridimensional de los procesos celulares y moleculares asociados con neurotoxicidad y plasticidad sináptica.\n\nExplorar el atlas\n↗"
+      },
+      {
+        "disabled": false,
+        "label": "02 / ESTUDIO EXPERIMENTAL\nEvidencia\nexperimental\n\nVulnerabilidad redox cerebral durante el desarrollo posnatal.\n\nConsultar el estudio\n↗"
+      }
+    ]
+  },
+  "bookmarks": [
+    {
+      "id": "signaling",
+      "before": {
+        "experience": "atlas",
+        "view": "synapse",
+        "mechanism": "signaling",
+        "transitioning": false,
+        "cameraMoving": false,
+        "exploring": true,
+        "selected": "spine",
+        "time": 28.266600000000007,
+        "availableKeys": [
+          "spine",
+          "terminal",
+          "dendrite",
+          "actin",
+          "psd",
+          "nmda",
+          "calcium",
+          "psd95",
+          "disc1",
+          "kalirin7"
+        ],
+        "timeline": {
+          "index": 3,
+          "elapsed": 1.266600000000006,
+          "playing": false,
+          "complete": false,
+          "progress": 0.47111000000000014,
+          "step": "kalirin-structural-context"
+        },
+        "particles": {
+          "glut": 0.24,
+          "activation": 0.32,
+          "ca": 0.13,
+          "scaffold": 0.82,
+          "disc1": 0.68,
+          "kalirin": 0.95,
+          "remodeling": 0.12
+        },
+        "camera": [
+          -0.924309506240993,
+          2.5010136752136742,
+          6.241618687129952
+        ],
+        "target": [
+          -2.6149999999999998,
+          1.8912777777777776,
+          0.48500000000000004
+        ],
+        "controlsEnabled": true,
+        "drawCalls": 19,
+        "triangles": 116514,
+        "contextParticlesVisible": false,
+        "resources": {
+          "geometries": 147,
+          "textures": 2,
+          "sessions": 6
+        },
+        "model": {
+          "stage": 3,
+          "remodeling": 0.12,
+          "headRadialScale": 1.0204,
+          "junction": {
+            "center": 0.2,
+            "width": 0.43,
+            "depth": 0.31,
+            "shaftRadius": 0.4
+          },
+          "channel": [
+            0.24489599999999997,
+            -0.2072,
+            0.26343200000000006
+          ],
+          "proteins": {
+            "psd95": [
+              0.61224,
+              -0.4222,
+              0.37488400000000005
+            ],
+            "disc1": [
+              -0.7040759999999999,
+              -0.9722,
+              0.35462
+            ],
+            "kalirin7": [
+              0.6428332420740741,
+              -1.2122113843621398,
+              0.32421783493004114
+            ]
+          },
+          "particles": {
+            "calcium": 1,
+            "glutamate": 0
+          },
+          "appearance": {
+            "membraneOpacity": 0.6029873898705767
+          },
+          "actin": {
+            "time": 28.266600000000007,
+            "remodeling": 0.12,
+            "filamentCount": 50,
+            "primaryCount": 12,
+            "growingBranches": 27,
+            "triangles": 17856,
+            "totalLength": 31.672005419363085,
+            "headFraction": 0.8698950533509525,
+            "branchRecords": 47,
+            "vertexRanges": 50
+          }
+        }
+      },
+      "after": {
+        "experience": "atlas",
+        "view": "synapse",
+        "mechanism": "signaling",
+        "transitioning": false,
+        "cameraMoving": false,
+        "exploring": true,
+        "selected": "spine",
+        "time": 28.266600000000007,
+        "availableKeys": [
+          "spine",
+          "terminal",
+          "dendrite",
+          "actin",
+          "psd",
+          "nmda",
+          "calcium",
+          "psd95",
+          "disc1",
+          "kalirin7"
+        ],
+        "timeline": {
+          "index": 3,
+          "elapsed": 1.266600000000006,
+          "playing": false,
+          "complete": false,
+          "progress": 0.47111000000000014,
+          "step": "kalirin-structural-context"
+        },
+        "particles": {
+          "glut": 0.24,
+          "activation": 0.32,
+          "ca": 0.13,
+          "scaffold": 0.82,
+          "disc1": 0.68,
+          "kalirin": 0.95,
+          "remodeling": 0.12
+        },
+        "camera": [
+          -0.9243095062409927,
+          2.5010136752136742,
+          6.241618687129953
+        ],
+        "target": [
+          -2.6149999999999998,
+          1.8912777777777776,
+          0.48500000000000004
+        ],
+        "controlsEnabled": true,
+        "drawCalls": 19,
+        "triangles": 116514,
+        "contextParticlesVisible": false,
+        "resources": {
+          "geometries": 147,
+          "textures": 2,
+          "sessions": 6
+        },
+        "model": {
+          "stage": 3,
+          "remodeling": 0.12,
+          "headRadialScale": 1.0204,
+          "junction": {
+            "center": 0.2,
+            "width": 0.43,
+            "depth": 0.31,
+            "shaftRadius": 0.4
+          },
+          "channel": [
+            0.24489599999999997,
+            -0.2072,
+            0.26343200000000006
+          ],
+          "proteins": {
+            "psd95": [
+              0.61224,
+              -0.4222,
+              0.37488400000000005
+            ],
+            "disc1": [
+              -0.7040759999999999,
+              -0.9722,
+              0.35462
+            ],
+            "kalirin7": [
+              0.6428332420740741,
+              -1.2122113843621398,
+              0.32421783493004114
+            ]
+          },
+          "particles": {
+            "calcium": 1,
+            "glutamate": 0
+          },
+          "appearance": {
+            "membraneOpacity": 0.6029873898705767
+          },
+          "actin": {
+            "time": 28.266600000000007,
+            "remodeling": 0.12,
+            "filamentCount": 50,
+            "primaryCount": 12,
+            "growingBranches": 27,
+            "triangles": 17856,
+            "totalLength": 31.672005419363085,
+            "headFraction": 0.8698950533509525,
+            "branchRecords": 47,
+            "vertexRanges": 50
+          }
+        }
+      },
+      "evidencePreserved": true
+    },
+    {
+      "id": "microglia",
+      "before": {
+        "experience": "atlas",
+        "view": "synapse",
+        "mechanism": "microglia",
+        "transitioning": false,
+        "cameraMoving": false,
+        "exploring": true,
+        "selected": "microglia",
+        "time": 27.833233999999997,
+        "availableKeys": [
+          "microglia",
+          "process",
+          "healthySpine",
+          "damagedSpine",
+          "terminal",
+          "dendrite",
+          "c1q",
+          "c3",
+          "caspase3",
+          "ros"
+        ],
+        "timeline": {
+          "index": 3,
+          "elapsed": 0.8332339999999967,
+          "playing": false,
+          "complete": false,
+          "progress": 0.4638872333333333,
+          "step": "microglial-recognition"
+        },
+        "particles": {
+          "ca": 0.58,
+          "ros": 0.6,
+          "damage": 0.32,
+          "signals": 1,
+          "approach": 0.9,
+          "contact": 0,
+          "pruning": 0,
+          "activation": 0.62
+        },
+        "camera": [
+          1.2060185803623513,
+          5.703491623931624,
+          14.82605448056795
+        ],
+        "target": [
+          -1.9400000000000008,
+          4.153777777777778,
+          0.342
+        ],
+        "controlsEnabled": true,
+        "drawCalls": 17,
+        "triangles": 143440,
+        "contextParticlesVisible": false,
+        "resources": {
+          "geometries": 164,
+          "textures": 2,
+          "sessions": 7
+        },
+        "model": {
+          "stage": 3,
+          "headScale": 0.9359999999999999,
+          "pruning": 0,
+          "contactTarget": [
+            1.7537807941436767,
+            0.18668793141841888,
+            0.34477174282073975
+          ],
+          "channel": [
+            1.27488,
+            0.4252,
+            0.16848
+          ],
+          "cellPosition": [
+            3.45,
+            2.85,
+            -0.85
+          ],
+          "contactVertex": 4297,
+          "healthyPosition": [
+            -2.2,
+            0,
+            0
+          ],
+          "healthyScale": [
+            1,
+            1,
+            1
+          ],
+          "cell": {
+            "time": 27.833233999999997,
+            "approach": 0.9,
+            "contact": 0,
+            "pruning": 0,
+            "soma": [
+              0,
+              0,
+              0
+            ],
+            "contactTip": [
+              -1.6666703564792915,
+              -2.5800905735453687,
+              1.1552853302974884
+            ],
+            "branchCount": 47,
+            "triangles": 63608,
+            "vertexCount": 31806,
+            "leadingVertices": 2966
+          },
+          "particles": {
+            "glutamate": 0,
+            "calcium": 0,
+            "ros": 6
+          },
+          "markers": {
+            "c1q": true,
+            "c3": true,
+            "caspase3": true
+          }
+        }
+      },
+      "after": {
+        "experience": "atlas",
+        "view": "synapse",
+        "mechanism": "microglia",
+        "transitioning": false,
+        "cameraMoving": false,
+        "exploring": true,
+        "selected": "microglia",
+        "time": 27.833233999999997,
+        "availableKeys": [
+          "microglia",
+          "process",
+          "healthySpine",
+          "damagedSpine",
+          "terminal",
+          "dendrite",
+          "c1q",
+          "c3",
+          "caspase3",
+          "ros"
+        ],
+        "timeline": {
+          "index": 3,
+          "elapsed": 0.8332339999999967,
+          "playing": false,
+          "complete": false,
+          "progress": 0.4638872333333333,
+          "step": "microglial-recognition"
+        },
+        "particles": {
+          "ca": 0.58,
+          "ros": 0.6,
+          "damage": 0.32,
+          "signals": 1,
+          "approach": 0.9,
+          "contact": 0,
+          "pruning": 0,
+          "activation": 0.62
+        },
+        "camera": [
+          1.2060185803623518,
+          5.703491623931624,
+          14.82605448056795
+        ],
+        "target": [
+          -1.9400000000000008,
+          4.153777777777778,
+          0.342
+        ],
+        "controlsEnabled": true,
+        "drawCalls": 17,
+        "triangles": 143440,
+        "contextParticlesVisible": false,
+        "resources": {
+          "geometries": 164,
+          "textures": 2,
+          "sessions": 7
+        },
+        "model": {
+          "stage": 3,
+          "headScale": 0.9359999999999999,
+          "pruning": 0,
+          "contactTarget": [
+            1.7537807941436767,
+            0.18668793141841888,
+            0.34477174282073975
+          ],
+          "channel": [
+            1.27488,
+            0.4252,
+            0.16848
+          ],
+          "cellPosition": [
+            3.45,
+            2.85,
+            -0.85
+          ],
+          "contactVertex": 4297,
+          "healthyPosition": [
+            -2.2,
+            0,
+            0
+          ],
+          "healthyScale": [
+            1,
+            1,
+            1
+          ],
+          "cell": {
+            "time": 27.833233999999997,
+            "approach": 0.9,
+            "contact": 0,
+            "pruning": 0,
+            "soma": [
+              0,
+              0,
+              0
+            ],
+            "contactTip": [
+              -1.6666703564792915,
+              -2.5800905735453687,
+              1.1552853302974884
+            ],
+            "branchCount": 47,
+            "triangles": 63608,
+            "vertexCount": 31806,
+            "leadingVertices": 2966
+          },
+          "particles": {
+            "glutamate": 0,
+            "calcium": 0,
+            "ros": 6
+          },
+          "markers": {
+            "c1q": true,
+            "c3": true,
+            "caspase3": true
+          }
+        }
+      },
+      "evidencePreserved": true
+    }
+  ],
+  "contextLinks": [
+    {
+      "exposure": "feso4",
+      "id": "mitochondrial",
+      "restored": true
+    },
+    {
+      "exposure": "quin",
+      "id": "glutamate",
+      "restored": true
+    }
+  ]
+}

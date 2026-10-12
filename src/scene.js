@@ -9,6 +9,7 @@ import { createCameraController } from './core/camera.js';
 import { createInteractionManager } from './core/interaction.js';
 import { createAnnotations } from './core/annotations.js';
 import { createMechanismSession } from './core/mechanism-session.js';
+import { createExperienceBookmarks } from './core/experience-bookmarks.js';
 import { loadMechanism } from './mechanisms/registry.js';
 
 const vector = (x, y, z = 0) => new THREE.Vector3(x, y, z);
@@ -70,13 +71,15 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     mesh.userData.key = item.id; scene.add(mesh); return mesh;
   });
   const annotations = createAnnotations({ hotspotLayer, labelLayer, camera, canvas, hotspots: hotspotConfigs, onHotspot: openHotspot, onSelect: select });
-  let view = 'neuron', selected = null, hovered = null, exploring = false, width = 0, height = 0;
+  let experience = 'atlas', view = 'neuron', selected = null, hovered = null, exploring = false, width = 0, height = 0;
   let frame = 0, lastTime = 0, disposed = false, contextLost = false, introTimer = null;
   let transitioning = false, dirty = true, navigationId = 0, active;
+  let atlasEntered = false;
   const sessions = new Map(), pending = new Map();
+  const bookmarks = createExperienceBookmarks();
   const abort = new AbortController(), listen = (element, name, callback) => element.addEventListener(name, callback, { signal: abort.signal });
   function emitView(loading = false) {
-    onView?.({ view, transitioning, exploring, loading, mechanism: active?.definition });
+    onView?.({ experience, view, transitioning, exploring, loading, mechanism: active?.definition });
     annotations.resize(width, height);
   }
   function availableKeys() {
@@ -85,7 +88,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       key !== 'caspases' && (key !== 'calcium' || index >= 2) && (key !== 'ros' || index >= 3));
   }
   function emitTimeline() {
-    if (active) onTimeline?.({ ...active.timeline.getState(), exploring, transitioning, mechanism: active.definition, availableKeys: availableKeys() });
+    if (active) onTimeline?.({ ...active.timeline.getState(), experience, exploring, transitioning, mechanism: active.definition, availableKeys: availableKeys() });
     annotations.resize(width, height);
   }
   async function getSession(id) {
@@ -105,7 +108,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         const site = hotspotConfigs.find(item => item.id === id);
         // A magnified open section sits at its dendritic site, in front of the
         // intact tissue. The camera visits that site before entering the section.
-        model.root.position.copy(site.position).add(vector(0, .25, 1.1));
+        model.root.position.copy(site ? site.position.clone().add(vector(0, .25, 1.1)) : vector(0, 0, 0));
         model.root.scale.setScalar(.35); model.root.visible = false;
         scene.add(model.root);
       }
@@ -113,7 +116,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         if (session !== active) return;
         if (selected && !availableKeys().includes(selected)) { selected = null; onSelect?.(null); }
         emitTimeline();
-        if (view === 'synapse' && !exploring && !transitioning) {
+        if (experience !== 'menu' && view === 'synapse' && !exploring && !transitioning) {
           if (state.playing) focusStep(state.step);
           controls.enabled = !state.playing && !cameraController.active;
         }
@@ -130,13 +133,17 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     active.model.root.updateMatrixWorld(true);
     active.anchors.forEach((anchor, i) => anchor.position.copy(active.model.labelAnchors[i].position).applyMatrix4(active.model.root.matrixWorld));
   }
-  function reconcileVisibility() {
-    for (const [id, session] of sessions) {
-      session.model.root.visible = view === 'synapse' && session === active;
-      if (view !== 'synapse' || session !== active) session.leave();
+  function reconcileVisibility({ resetAtlas = false } = {}) {
+    for (const session of sessions.values()) {
+      session.model.root.visible = experience !== 'menu' && view === 'synapse' && session === active;
+      if (!session.model.root.visible) {
+        if (resetAtlas && !session.definition.id.startsWith('e-')) session.leave();
+        else session.timeline.pause();
+      }
     }
   }
   function updateCellularContext() {
+    if (experience !== 'atlas') { cellularContext.visible = false; return; }
     // Keep the spatial landmark during the approach, then reveal the cutaway
     // without an opaque macro-scale branch behind the intracellular specimen.
     const section = active.definition.isolatedContext && active.model.root.visible;
@@ -213,6 +220,8 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   }
   async function navigate(nextView, { duration = 3.4, intro = false, mechanismId } = {}) {
     clearIntro();
+    if (experience === 'menu' || (experience === 'evidence' && nextView !== 'synapse')) return;
+    if (mechanismId && mechanismId.startsWith('e-') !== (experience === 'evidence')) return;
     if (!['hub', 'neuron', 'synapse'].includes(nextView)) return;
     const token = ++navigationId, previousView = view;
     cameraController.cancel();
@@ -233,7 +242,8 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         active = nextSession;
         if (previousSession !== active) {
           previousSession.model.root.visible = false;
-          previousSession.leave();
+          if (experience === 'atlas') previousSession.leave();
+          else previousSession.timeline.pause();
         }
         active.model.root.visible = true;
         syncAnchors(); annotations.setAnchors(active.anchors);
@@ -264,33 +274,88 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       if (view === 'synapse') {
         annotations.setVisited(active.definition.id);
         emitTimeline();
-      } else reconcileVisibility();
+      } else reconcileVisibility({ resetAtlas: experience === 'atlas' });
       emitView();
       invalidate();
     });
     if (!intro) canvas.focus({ preventScroll: true });
     invalidate();
   }
+  function currentBookmark() {
+    return { session: active, view, camera: camera.position.toArray(), target: controls.target.toArray(),
+      selected, exploring, width, height };
+  }
+  async function switchExperience(next, mechanismId) {
+    if (!['menu', 'atlas', 'evidence'].includes(next)) throw new RangeError(`Unknown experience: ${next}`);
+    if (mechanismId && (next === 'menu' || mechanismId.startsWith('e-') !== (next === 'evidence'))) {
+      throw new RangeError('The requested mechanism does not belong to this experience.');
+    }
+    if (next === experience && (!mechanismId || active.definition.id === mechanismId)) return;
+    clearIntro();
+    const token = ++navigationId;
+    transitioning = true;
+    active.timeline.pause(); cameraController.cancel(); controls.enabled = false; lastTime = 0;
+    bookmarks.save(experience, currentBookmark());
+    const saved = bookmarks.get(next, next === 'evidence' ? mechanismId : undefined);
+    let nextSession = saved?.session;
+    try {
+      if (next !== 'menu' && !nextSession) {
+        emitView(true);
+        nextSession = await getSession(next === 'evidence' ? mechanismId || 'e-control' : mechanismId || 'glutamate');
+      }
+    } catch (error) {
+      if (token !== navigationId || disposed) return;
+      transitioning = false; controls.enabled = experience !== 'menu'; emitView(); emitTimeline();
+      throw error;
+    }
+    if (token !== navigationId || disposed) return;
+    experience = next; transitioning = false; hovered = null;
+    if (next !== 'menu') {
+      active = nextSession;
+      view = saved?.view || (next === 'evidence' || mechanismId ? 'synapse' : 'hub');
+      selected = saved?.selected ?? null; exploring = saved?.exploring ?? false;
+      active.timeline.pause();
+      syncAnchors(); annotations.setAnchors(active.anchors);
+    }
+    reconcileVisibility();
+    // onView applies each experience's canvas layout synchronously. Measure it
+    // now, so a later ResizeObserver callback cannot replace the restored pose.
+    emitView();
+    resize(next === 'menu' ? {} : saved ? { bookmark: saved } : { overview: true });
+    controls.enabled = next !== 'menu';
+    onSelect?.(next === 'menu' ? null : selected);
+    emitTimeline(); invalidate();
+    if (next === 'atlas' && mechanismId) {
+      await navigate('synapse', { mechanismId });
+    }
+    if (next === 'atlas') {
+      if (!atlasEntered && !mechanismId && view === 'neuron' && !motion.matches) {
+        introTimer = setTimeout(() => navigate('hub', { duration: 4.2, intro: true }), 1900);
+      }
+      atlasEntered = true;
+    }
+  }
   function openHotspot(id) {
+    if (experience !== 'atlas') return;
     const entry = mechanisms.find(item => item.id === id);
     if (!entry) return;
     if (entry.available) navigate('synapse', { mechanismId: entry.id });
     else onRegion?.(entry);
   }
   function select(key) {
-    if (view !== 'synapse' || transitioning || contextLost) return;
+    if (experience === 'menu' || view !== 'synapse' || transitioning || contextLost) return;
     if (key && !availableKeys().includes(key)) return;
     selected = key; onSelect?.(key); invalidate();
   }
   function pauseForInspection() {
-    if (transitioning || contextLost || view !== 'synapse') return false;
+    if (experience === 'menu' || transitioning || contextLost || view !== 'synapse') return false;
     exploring = true;
     active.timeline.pause(); cameraController.cancel(); controls.enabled = true;
     emitTimeline(); invalidate();
     return true;
   }
   function focusSelected() {
-    if (!selected || transitioning || contextLost || view !== 'synapse') return false;
+    if (experience === 'menu' || !selected || transitioning || contextLost || view !== 'synapse') return false;
     const objects = active.model.selectable.filter(object => object.userData.key === selected && object.visible);
     const bounds = new THREE.Box3();
     active.model.root.updateMatrixWorld(true);
@@ -331,22 +396,39 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   }
   const interactive = createInteractionManager(canvas, camera, {
     objects: () => view === 'synapse' ? active.model.selectable : hotspotMeshes,
-    enabled: () => !transitioning && !cameraController.active,
+    enabled: () => experience !== 'menu' && !transitioning && !cameraController.active,
     onSelect: key => view === 'synapse' ? select(key) : key && openHotspot(key),
     onHover: key => { if (hovered !== key) { hovered = key; invalidate(); } },
   });
-  function resize() {
-    const rect = canvas.getBoundingClientRect(); width = rect.width; height = rect.height;
-    if (!width || !height) return;
+  function viewportFit(w, h) {
+    if (view !== 'synapse') return Math.max(1, h / w);
+    const short = active.definition.isolatedContext ? THREE.MathUtils.clamp((900 - h) / 180, 0, 1) : 0;
+    return Math.max(1 + short * .18, (active.definition.portraitFit ?? .69) * h / w);
+  }
+  function resize({ bookmark, overview = false } = {}) {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    if (rect.width === width && rect.height === height && !bookmark && !overview) return;
+    const previousWidth = width, previousHeight = height;
+    width = rect.width; height = rect.height;
     camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false);
-    const pose = poseFor(view);
+    let pose;
+    if (overview || (!previousWidth && !bookmark)) pose = poseFor(view);
+    else {
+      const target = bookmark ? vector(...bookmark.target) : controls.target.clone();
+      const position = bookmark ? vector(...bookmark.camera) : camera.position.clone();
+      const oldWidth = bookmark?.width || previousWidth, oldHeight = bookmark?.height || previousHeight;
+      const fit = viewportFit(width, height) / viewportFit(oldWidth, oldHeight);
+      pose = { target, position: position.sub(target).multiplyScalar(fit).add(target) };
+    }
     const wasPlaying = active.timeline.getState().playing;
+    const wasTransitioning = transitioning;
     navigationId++; cameraController.cancel(); transitioning = false;
     reconcileVisibility();
     limits(pose, view === 'synapse');
-    camera.position.copy(pose.position); controls.target.copy(pose.target);
-    controls.enabled = !wasPlaying;
-    emitView();
+    cameraController.move(pose.position, pose.target, { duration: 0 });
+    controls.enabled = experience !== 'menu' && !wasPlaying;
+    if (wasTransitioning) emitView();
     annotations.resize(width, height); controls.update(); invalidate();
   }
   const observer = new ResizeObserver(resize); observer.observe(canvas);
@@ -370,14 +452,21 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
     camera.position.copy(controls.target).add(offset.setFromSpherical(spherical)); controls.update(); invalidate();
   });
   listen(document, 'visibilitychange', () => { lastTime = 0; if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else invalidate(); });
-  listen(motion, 'change', () => { controls.enableDamping = !motion.matches; if (motion.matches) { clearIntro(); active.timeline.pause(); navigate(view, { duration: 0 }); } invalidate(); });
+  listen(motion, 'change', () => {
+    controls.enableDamping = !motion.matches;
+    if (motion.matches) {
+      clearIntro(); active.timeline.pause(); navigationId++; cameraController.cancel(); transitioning = false;
+      controls.enabled = experience !== 'menu'; emitView(); emitTimeline();
+    }
+    invalidate();
+  });
   listen(canvas, 'webglcontextlost', event => { event.preventDefault(); contextLost = true; cancelAnimationFrame(frame); frame = 0; clearIntro(); active.timeline.pause(); onContextLost?.(true); });
   listen(canvas, 'webglcontextrestored', () => { buildEnvironment(); contextLost = false; lastTime = 0; onContextLost?.(false); invalidate(); });
 
   function tick(now) {
     frame = 0; if (disposed || contextLost || document.hidden) return;
     const dt = lastTime ? (now - lastTime) / 1000 : 0; lastTime = now;
-    const running = view === 'synapse' && active.timeline.getState().playing && !exploring && !transitioning;
+    const running = experience !== 'menu' && view === 'synapse' && active.timeline.getState().playing && !exploring && !transitioning;
     if (running) active.advance(dt);
     // A slow render must not consume an entire cinematic leg in one frame.
     // Biological time keeps its own clock and is unaffected by this limit.
@@ -391,7 +480,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       const shortViewport = active.definition.isolatedContext ? THREE.MathUtils.clamp((900 - height) / 180, 0, 1) : 0;
       const fit = Math.max(1 + shortViewport * .18, (active.definition.portraitFit ?? .69) / camera.aspect);
       const viewDistance = camera.position.distanceTo(controls.target) / (active.model.root.scale.x * fit);
-      active.render({ selected, detail: view === 'synapse', viewDistance });
+      active.render({ selected, detail: experience !== 'menu' && view === 'synapse', viewDistance });
       syncAnchors();
       updateCellularContext();
       scene.updateMatrixWorld(); camera.updateMatrixWorld();
@@ -399,7 +488,10 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       for (const phase of state.step.labelPhases || []) {
         if (state.elapsed >= phase.after) visibleLabels = phase.labels;
       }
-      annotations.update({ view, transitioning, selected, hovered, stress: active.state.stress ?? active.state.ros, calcium: active.state.ca, visibleKeys: visibleLabels, availableKeys: availableKeys() });
+      annotations.update({ view: experience === 'menu' ? 'menu' : view, transitioning, selected, hovered,
+        stress: active.state.stress ?? active.state.ros,
+        calcium: active.state.ca ?? (active.definition.id === 'e-quin' ? active.state.flux : 0),
+        visibleKeys: visibleLabels, availableKeys: availableKeys() });
       renderer.render(scene, camera); onProgress?.(state.progress); dirty = false;
     }
     if ((running || cameraController.active) && !frame) frame = requestAnimationFrame(tick);
@@ -410,11 +502,11 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   else introTimer = setTimeout(() => navigate('hub', { duration: 4.2, intro: true }), 1900);
   emitView(); emitTimeline(); invalidate();
   return {
-    navigate, select, pauseForInspection, focusSelected,
+    navigate, switchExperience, select, pauseForInspection, focusSelected,
     setLabels(value) { annotations.setEnabled(value); invalidate(); },
     resetView() { navigate(view, { duration: 1.5 }); },
     playPause() {
-      if (transitioning || view !== 'synapse') return;
+      if (experience === 'menu' || transitioning || view !== 'synapse') return;
       if (active.timeline.getState().playing) { active.timeline.pause(); cameraController.cancel(); controls.enabled = true; }
       else {
         exploring = false; lastTime = 0;
@@ -424,7 +516,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       emitTimeline(); invalidate();
     },
     explore() {
-      if (transitioning || view !== 'synapse') return;
+      if (experience === 'menu' || transitioning || view !== 'synapse') return;
       if (!exploring) { exploring = true; active.timeline.pause(); cameraController.cancel(); controls.enabled = true; }
       else {
         exploring = false; lastTime = 0;
@@ -434,7 +526,7 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       emitTimeline(); invalidate();
     },
     seek(index) {
-      if (transitioning || view !== 'synapse') return;
+      if (experience === 'menu' || transitioning || view !== 'synapse') return;
       selected = null; hovered = null; onSelect?.(null);
       cameraController.cancel();
       active.seek(THREE.MathUtils.clamp(index, 0, active.definition.steps.length - 1));
@@ -442,18 +534,18 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
       emitTimeline(); invalidate();
     },
     restart() {
-      if (transitioning || view !== 'synapse') return;
+      if (experience === 'menu' || transitioning || view !== 'synapse') return;
       exploring = false; active.reset(); navigate('synapse', { duration: 1.2 });
     },
     suspend() {
       clearIntro(); active.timeline.pause(); navigationId++; cameraController.cancel(); transitioning = false;
       reconcileVisibility();
       limits({ position: camera.position, target: controls.target }, view === 'synapse');
-      controls.enabled = true; emitView(); invalidate();
+      controls.enabled = experience !== 'menu'; emitView(); invalidate();
     },
     getState() {
       return {
-        view, mechanism: active.definition.id, transitioning, cameraMoving: cameraController.active, exploring, selected, time: active.time, availableKeys: availableKeys(),
+        experience, view, mechanism: active.definition.id, transitioning, cameraMoving: cameraController.active, exploring, selected, time: active.time, availableKeys: availableKeys(),
         timeline: { ...active.timeline.getState(), step: active.timeline.getState().step.key },
         particles: { ...active.state }, camera: camera.position.toArray(), target: controls.target.toArray(),
         controlsEnabled: controls.enabled, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,

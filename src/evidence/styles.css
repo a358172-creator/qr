@@ -1,0 +1,167 @@
+/* The second experience uses the same specimen, controls and editorial tokens. */
+.atlas[data-experience=menu] > :is(.scene-heading,.scale-navigation,.hotspots-layer,.labels-layer,.scale-indicator,.specimen-note,.callout,.narrative,.scene-footer),
+.atlas[data-experience=menu] .masthead :is(.scale-navigation,.header-actions),
+.atlas[data-experience=evidence] :is(.scale-navigation,.scene-heading,.scale-indicator,.specimen-note,#back-btn),
+.atlas[data-experience=evidence] .transport-divider:last-of-type { display:none }
+.atlas[data-experience=menu] canvas { opacity:.18; pointer-events:none }
+.atlas[data-experience=menu] .masthead { pointer-events:none }
+.experience-menu { position:absolute; inset:105px 7% 0; z-index:9; overflow:auto; padding:12px 0 24px; scrollbar-width:thin }
+.menu-intro { display:flex; align-items:flex-end; gap:50px; position:relative; padding-top:32px; margin-bottom:30px }
+.menu-intro>.eyebrow { position:absolute; top:0; margin:0 }
+.menu-intro h1 { font:400 clamp(32px,4vw,60px)/1.02 var(--serif); letter-spacing:-.04em; margin:0 }
+.menu-intro h1 em,.experience-options h2 em,.evidence-panel h2 em { font-weight:400; color:#b8ced4 }
+.menu-intro>p:last-child { max-width:320px; color:#afc2cb; line-height:1.8; font-size:12px; margin-bottom:2px }
+.experience-options { display:grid; grid-template-columns:1fr 1fr; gap:36px }
+.experience-options>button { position:relative; text-align:left; border-top:1px solid #b0c9d34d; border-bottom:1px solid var(--line); padding:22px 10px 24px; display:flex; flex-direction:column; align-items:flex-start; background:linear-gradient(145deg,#739db108,transparent); transition:background .3s }
+.experience-options>button:hover { background:linear-gradient(145deg,#739db11a,transparent) }
+.experience-options .eyebrow { font-size:8px; margin-top:14px; color:#bdd1da }
+.experience-options h2 { font:400 34px/1.05 var(--serif); letter-spacing:-.03em; margin:15px 0 }
+.experience-options p { font-size:12px; line-height:1.8; color:#adc1cb; max-width:370px; margin:0 0 22px }
+.menu-specimen { color:#aac8cd; width:100%; max-width:260px; height:100px; align-self:flex-end }
+.experience-options>button:last-child .menu-specimen { color:#c4a7c4 }
+.menu-enter { font-size:11px; padding-top:10px; margin-top:auto; display:flex; justify-content:space-between; width:100%; color:#d8e3e7 }
+.menu-enter b { font-size:20px; font-weight:400 }
+.menu-footnote { font:8px/1.7 var(--mono); color:#94aeb9; margin:24px 0 0; letter-spacing:.04em }
+.evidence-controls { position:absolute; top:105px; left:42px; right:480px; z-index:7; display:grid; grid-template-columns:.75fr 1.5fr .85fr; gap:14px }
+.evidence-controls label { color:#93b0bd; font:9px/1.6 var(--mono) }
+.evidence-controls select { display:block; width:100%; margin-top:6px; padding:9px 6px; min-height:39px; font:12px var(--sans); color:#e5ecee; background:#102a38; border:1px solid #adc5d140; border-radius:0 }
+.evidence-controls select:focus-visible { outline:2px solid var(--cyan); outline-offset:3px }
+.evidence-controls>p { grid-column:1/-1; font-size:9px; margin:0; color:#9eb5c0 }
+#jump-to-results,#jump-to-model { display:none }
+.evidence-model-heading { position:absolute; top:213px; left:42px; z-index:2; pointer-events:none; max-width:calc(100% - 490px) }
+.evidence-model-heading .eyebrow { color:#bda8c6; font-size:7px }
+.evidence-model-heading h2 { font:400 23px var(--serif); margin:8px 0; color:#cad7dc }
+.atlas[data-experience=evidence] canvas { width:calc(100% - 440px) }
+.atlas[data-experience=evidence] .labels-layer { right:440px }
+.atlas[data-experience=evidence] .narrative { left:32px; transform:none; width:calc(100% - 500px); bottom:88px }
+.atlas[data-experience=evidence] .narrative-caption { gap:12px; min-height:88px }
+.atlas[data-experience=evidence] .narrative-caption h2 { font-size:20px }
+.atlas[data-experience=evidence] .scene-footer { right:480px; left:32px; gap:10px }
+.atlas[data-experience=evidence] .scene-hint { font-size:9px; max-width:190px }
+.atlas[data-experience=evidence] .figure-note { display:none }
+.atlas[data-experience=evidence] .view-tools { gap:13px }
+.atlas[data-experience=evidence] .callout { right:470px; bottom:295px; max-height:calc(100% - 510px); width:310px }
+.evidence-panel { position:absolute; right:24px; top:104px; bottom:22px; width:408px; padding:0 18px 20px 22px; border-left:1px solid var(--line); z-index:6; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#7895a04d transparent; background:linear-gradient(90deg,#071923e6,#07192399) }
+.evidence-panel>header { padding-bottom:16px }
+.evidence-panel .eyebrow { font-size:8px; color:#accdd1; margin:0 0 12px }
+.evidence-panel h2 { font:400 32px/1.1 var(--serif); letter-spacing:-.035em; margin:0 0 12px }
+.evidence-panel p { font-size:11px; color:#b7cad3; line-height:1.75; margin:10px 0 }
+.evidence-panel .study-line { font:9px/1.6 var(--mono); color:#99b4c0 }
+.evidence-results { border-top:1px solid var(--line); padding-top:18px }
+.result-heading { display:flex; justify-content:space-between; align-items:baseline; gap:12px }
+.result-heading h3 { font:400 20px/1.1 var(--serif); margin:0; color:#e2e8ea }
+.result-heading>span { font:9px var(--mono); white-space:nowrap; color:#c4d7dd }
+#evidence-status { font-size:10px; color:#a8c8c9 }
+#evidence-status[data-status=not-evaluated] { color:#e2bdad; border-left:2px solid #c79c8c; padding-left:10px }
+.chart-open { display:block; padding:0; width:100%; text-align:left }
+.evidence-chart { display:block; position:relative; background:white; color-scheme:light; padding:0; line-height:0 }
+.evidence-chart img { display:block; width:100%; height:auto }
+.chart-selection { position:absolute; border:2px solid #b45309; background:#f9bf4610; pointer-events:none }
+.chart-action { display:block; padding:8px 0 3px; text-align:right; color:#adcbd2; font:9px/1.8 var(--mono) }
+.evidence-panel .chart-key { font-size:9px; color:#9fb6c0; margin:4px 0 10px }
+.chart-key i { display:inline-block; width:8px; height:8px; border:1px solid #dfa46c; margin-right:5px }
+#evidence-units,#evidence-numbers { font-size:9px; color:#b4c3ca }
+#evidence-summary { color:#e0e9eb; margin-top:18px }
+.evidence-panel .evidence-caution { border-left:2px solid #b596a8; padding:4px 0 4px 10px; font-size:10px; color:#d4c3cf }
+.evidence-panel details { border-top:1px solid var(--line); padding:13px 0; margin-top:10px }
+.evidence-panel summary { font-size:11px; color:#c2d5dd; cursor:pointer }
+.evidence-panel :is(a,button:not(.chart-open)) { font-size:11px; color:#bfd6de; text-align:left; padding:6px 0; text-underline-offset:4px }
+.evidence-relationship,.quin-context { margin-top:22px; padding-top:20px; border-top:1px solid var(--line) }
+.evidence-relationship .eyebrow,.quin-context .eyebrow { color:#cbb4d1 }
+.conceptual-warning { padding:15px; background:#adc6cf09; border:1px solid #adc6cf28; margin:22px 0!important; font-size:10px!important; color:#c7d6dc!important }
+.evidence-reading button { display:block; width:100%; line-height:1.7 }
+.kynurenine-path { list-style:none; padding:0 0 0 15px; border-left:1px solid #baa0c267; font-size:11px; color:#cfc0d5 }
+.kynurenine-path li { padding:8px 0 }
+.kynurenine-path li+li::before { content:'↓'; display:block; font-size:12px; color:#a4bdc9; margin-bottom:8px }
+.kynurenine-path small { display:block; color:#a9c8cf; font-size:10px; margin-top:5px }
+.evidence-references { padding-left:18px; font-size:12px; line-height:1.8 }
+.evidence-references li { padding:9px 0; border-top:1px solid var(--line) }
+.evidence-references p { font-size:10px; color:#a8bdc7; margin:5px 0 }
+#assay-methods section { border-top:1px solid var(--line); margin-top:18px; padding-top:10px }
+#evidence-methods :is(p,h3) { line-height:1.8 }
+#evidence-methods section p { font-size:12px; color:#b8cbd4 }
+.chart-dialog { width:min(1000px,calc(100% - 24px)) }
+.chart-scroll { width:100%; overflow:auto; background:white; color-scheme:light }
+.chart-scroll img { display:block; width:100%; min-width:620px }
+.chart-dialog>a { font-size:12px }
+.atlas[data-experience=evidence] .masthead { padding-right:32px }
+.atlas[data-experience=evidence] .header-actions { gap:18px }
+.header-actions #back-to-evidence { color:#c3b3d1 }
+.atlas[data-webgl=unavailable][data-experience=menu] .scene-error { display:none }
+.atlas[data-webgl=unavailable][data-experience=evidence] .scene-error { right:440px }
+#evidence-availability { color:#d7bbb4; font-size:12px }
+@media (max-width:1100px) and (min-width:901px) {
+  .evidence-controls { left:28px; right:449px; gap:8px }
+  .evidence-panel { right:10px; width:408px }
+  .evidence-model-heading { left:28px }
+  .atlas[data-experience=evidence] .scene-hint { display:none }
+  .atlas[data-experience=evidence] .scene-footer { right:452px; justify-content:center }
+  .atlas[data-experience=evidence] .narrative { width:calc(100% - 477px); left:26px }
+  .atlas[data-experience=evidence] .callout { right:442px; width:calc(100% - 470px) }
+  .atlas[data-experience=evidence] .header-actions { gap:12px }
+}
+@media (max-width:900px) {
+  .atlas[data-experience=evidence] { overflow-y:auto; overscroll-behavior:contain }
+  .atlas[data-experience=evidence] canvas { width:100%; height:960px }
+  .atlas[data-experience=evidence] .atmosphere { height:960px; bottom:auto }
+  .atlas[data-experience=evidence] .labels-layer { right:0; height:960px; bottom:auto }
+  .atlas[data-experience=evidence] .masthead { padding:23px; gap:12px }
+  .atlas[data-experience=evidence] .header-actions { gap:16px }
+  .evidence-controls { top:99px; left:23px; right:23px; gap:10px }
+  .evidence-controls select { font-size:11px; padding-left:5px }
+  .evidence-controls label { font-size:8px }
+  #jump-to-results,#jump-to-model { display:inline-block; color:#d0dce0; font-size:10px; padding:6px 0; text-decoration:underline; text-underline-offset:4px }
+  #jump-to-results { margin-left:8px }
+  .evidence-model-heading { top:204px; left:23px; max-width:calc(100% - 46px) }
+  .evidence-model-heading h2 { font-size:21px }
+  .atlas[data-experience=evidence] .narrative { left:23px; right:23px; width:auto; bottom:auto; top:713px }
+  .atlas[data-experience=evidence] .narrative::before { inset:-26px -23px -12px }
+  .atlas[data-experience=evidence] .narrative-caption { min-height:110px }
+  .atlas[data-experience=evidence] .narrative-caption p { font-size:11px }
+  .atlas[data-experience=evidence] .scene-footer { left:23px; right:23px; top:890px; bottom:auto; height:70px }
+  .atlas[data-experience=evidence] .scene-hint { max-width:160px; font-size:8px }
+  .atlas[data-experience=evidence] .callout { top:290px; bottom:auto; left:23px; right:23px; width:auto; max-height:380px }
+  .atlas[data-webgl=unavailable][data-experience=evidence] .scene-error { right:0; height:960px; bottom:auto }
+  .evidence-panel { position:relative; top:auto; right:auto; bottom:auto; width:auto; margin:0 23px 30px; padding:24px 0 0; border-left:0; border-top:1px solid var(--line); overflow:visible }
+  .evidence-panel p { font-size:12px }
+  .evidence-panel h2 { font-size:36px }
+  .experience-menu { inset:100px 28px 0 }
+  .menu-intro { gap:25px }
+  .menu-intro h1 { font-size:40px }
+  .menu-intro>p:last-child { font-size:11px; max-width:240px }
+  .experience-options { gap:25px }
+  .experience-options h2 { font-size:29px }
+}
+@media (max-width:540px) {
+  .experience-menu { inset:90px 23px 0; padding-top:0 }
+  .menu-intro { display:block; margin-bottom:24px; padding-top:26px }
+  .menu-intro h1 { font-size:37px }
+  .menu-intro>p:last-child { max-width:290px; margin-top:15px }
+  .experience-options { grid-template-columns:1fr; gap:15px }
+  .experience-options>button { min-height:237px; padding:17px 0 20px }
+  .experience-options h2 { font-size:29px; margin:12px 0 }
+  .experience-options .eyebrow { margin:0; font-size:7px }
+  .experience-options p { font-size:11px; max-width:85%; margin-bottom:10px }
+  .menu-specimen { position:absolute; top:15px; right:0; width:125px; height:63px; opacity:.65 }
+  .menu-enter { font-size:10px }
+  .menu-footnote { font-size:7px }
+  .atlas[data-experience=atlas] .header-actions { gap:11px; flex-wrap:wrap; justify-content:flex-end; max-width:185px }
+  .header-actions #back-to-evidence { font-size:9px; order:5 }
+  .evidence-controls { grid-template-columns:.8fr 1.3fr .8fr; gap:7px }
+  .evidence-controls>p { font-size:8px }
+  .evidence-controls select { padding:8px 2px; font-size:10px }
+  .evidence-controls label { font-size:7px }
+  .atlas[data-experience=evidence] .header-actions #references-btn { display:none }
+  .atlas[data-experience=evidence] .narrative-caption { gap:10px }
+  .atlas[data-experience=evidence] .narrative-caption h2 { font-size:19px }
+  .atlas[data-experience=evidence] .narrative-caption p { font-size:10px }
+}
+@media (max-height:760px) and (min-width:901px) {
+  .menu-intro { margin-bottom:16px }
+  .menu-intro h1 { font-size:37px }
+  .experience-options h2 { font-size:28px }
+  .menu-specimen { height:68px }
+  .experience-options>button { padding:14px 10px }
+  .evidence-model-heading { top:195px }
+  .evidence-model-heading h2 { font-size:19px }
+}

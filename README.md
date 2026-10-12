@@ -1,6 +1,6 @@
 # NEURO·VISTA
 
-**Atlas 3D interactivo de mecanismos de neurotoxicidad.** La exploración comienza en una neurona y se aproxima a la dendrita, que permite entrar en cuatro microambientes celulares. Una cámara recorre estas escalas dentro de un mismo mundo 3D.
+**Mecanismos de neurotoxicidad y evidencia experimental.** El menú permite entrar en el atlas neuronal A–D o consultar las figuras del estudio de vulnerabilidad redox posnatal. Las dos experiencias comparten una aplicación, un renderizador y los controles de exploración.
 
 Los módulos disponibles son **excitotoxicidad glutamatérgica**, **disfunción mitocondrial, especies reactivas y daño de membranas**, **remodelado microglial** y **plasticidad sináptica**. Se conserva el alcance de los paneles **B, D, C y A** descrito en la documentación científica. B distingue remodelado local de una posibilidad intrínseca de señalización apoptótica. C muestra una microglía ramificada en contacto con una espina en remodelado, mientras una vecina permanece estable. A muestra una conexión fisiológica con organización postsináptica y actina. No se añade un módulo independiente de apoptosis.
 
@@ -20,11 +20,19 @@ npm run build
 npm run preview
 ```
 
-El resultado está en `dist/`. La aplicación necesita WebGL 2 para mostrar el modelo. Si no está disponible, muestra un aviso y permite acceder a las referencias.
+El resultado está en `dist/`. La aplicación necesita WebGL 2 para mostrar el modelo. Si no está disponible, muestra un aviso y mantiene accesibles las figuras experimentales, los selectores y las referencias.
 
 ## Subir la web
 
 Tras `npm run build`, se puede servir el contenido de `dist/` en un hosting estático. La web compilada no necesita Node.js en el servidor. Cada compilación verifica las rutas y la presencia de los recursos locales. La configuración de GitHub Pages se describe más abajo; no es necesario generar archivos de entrega ni paquetes ZIP.
+
+## Evidencia experimental
+
+La segunda experiencia permite elegir PN3, PN5, PN9, PN12 o PN30; control, FeSO₄ 1 mM, QUIN 100 µM o 3-NP 3 mM; y DCFDA, TBARS o MTT. Las figuras proceden de `assets/graficas.docx`: se muestran los vectores originales convertidos para el navegador, con un resaltado de consulta independiente. No hay Excel ni tablas de medias/SEM; no se digitalizan valores. PN3/MTT aparece como **No evaluado**.
+
+Los modelos ilustran Fenton y oxidación lipídica localizada, inhibición de SDH/complejo II y excitotoxicidad potencial de QUIN. La edad y el ensayo cambian únicamente la consulta de resultados, nunca la geometría o intensidad del modelo. El panel distingue observaciones, mecanismos publicados e interpretaciones; los homogeneizados no demuestran actividad sináptica organizada ni los procesos animados.
+
+El menú y los accesos contextuales permiten volver al atlas y a la selección experimental. Al alternar experiencias se conserva la etapa, el estado, la selección y la cámara de A y C, aunque su política normal al salir hacia la dendrita siga siendo reiniciar. Cada exposición experimental conserva su sesión pausada. Fuentes y límites: [documentación de fase 2](docs/phase2-experimental-evidence.md). Comprobaciones y capturas: [informe técnico de fase 2](docs/phase2-validation.md).
 
 ## Explorar
 
@@ -52,6 +60,10 @@ Tras `npm run build`, se puede servir el contenido de `dist/` en un hosting est�
 | `src/core/camera.js` | Transiciones entre escalas y control de cámara |
 | `src/core/interaction.js`, `src/core/annotations.js` | Selección espacial, etiquetas y puntos de navegación |
 | `src/core/timeline.js` | Reloj narrativo, pausa, reanudación y navegación por etapas |
+| `src/evidence/interface.js`, `src/evidence/styles.css` | Menú, selectores, figuras originales, lectura metodológica y conexiones con el atlas |
+| `src/evidence/data.js`, `src/evidence/figure-source.js` | Evidencia y procedencia sin valores numéricos inventados; posiciones gráficas para resaltar selecciones |
+| `src/core/experience-bookmarks.js` | Conservación de sesiones y cámaras entre experiencias y exposiciones |
+| `src/mechanisms/evidence.js`, `src/scene/evidence-environment.js` | Definiciones y modelos de referencia, FeSO₄, 3-NP y QUIN con anatomía reutilizada |
 | `src/core/mechanism-session.js` | Estado y tiempo independientes por módulo; pausa, búsqueda de etapas y reinicio coherentes |
 | `src/mechanisms/registry.js` | Registro de módulos y carga diferida por identificador |
 | `src/mechanisms/glutamate.js` | Definición de B, ocho etapas, contenido y fábrica de escena |
@@ -92,9 +104,9 @@ La comprobación local de un prefijo de proyecto no modifica la configuración r
 
 ## Alcance científico y técnico
 
-Representación conceptual, no simulación cuantitativa ni reconstrucción molecular. Las escalas, partículas, intensidades y duraciones son ilustrativas. En B la mitocondria ocupa un segmento dendrítico proximal conectado con la espina. Se omiten visualmente astrocitos, recaptación, Mg²⁺ y coagonistas; el texto sí explica las condiciones de NMDA. No se comparan grupos de edad ni se calculan riesgos individuales. Los procesos pueden coexistir y retroalimentarse; el daño no es inevitable.
+Representación conceptual, no simulación cuantitativa ni reconstrucción molecular. Las escalas, partículas, intensidades y duraciones son ilustrativas. En B la mitocondria ocupa un segmento dendrítico proximal conectado con la espina. Se omiten visualmente astrocitos, recaptación, Mg²⁺ y coagonistas; el texto sí explica las condiciones de NMDA. El atlas no compara grupos de edad ni calcula riesgos individuales; las edades de la sección experimental seleccionan las figuras proporcionadas. Los procesos pueden coexistir y retroalimentarse; el daño no es inevitable.
 
-La Figura 1 original no está accesible en esta fase. Dos archivos de referencia del repositorio están vacíos; `assets/image.png` es un mockup de interfaz. Las relaciones documentadas se contrastan con fuentes primarias sin inventar la procedencia de la figura. No se presentan resultados experimentales propios ni mediciones de homogeneizados cerebrales.
+La Figura 1 original no está accesible en esta fase. Dos archivos de referencia del repositorio están vacíos; `assets/image.png` es un mockup de interfaz. Las relaciones documentadas se contrastan con fuentes primarias sin inventar la procedencia de la figura. Esta limitación se refiere a los paneles anatómicos A–D. La fase 2 incorpora por separado las figuras experimentales de homogeneizados proporcionadas en `graficas.docx`.
 
 B diferencia la caspasa-3 local y retracción de la espina de otra posibilidad: liberación de citocromo c desde el espacio intermembranal, Apaf-1/caspasa-9 y caspasas ejecutoras. La última etapa no es consecuencia obligatoria de la anterior ni simula muerte neuronal completa. La cabeza basal de esa vista indica un escenario alternativo, no recuperación biológica. Fuentes y límites en [panel-b.md](docs/panel-b.md).
 

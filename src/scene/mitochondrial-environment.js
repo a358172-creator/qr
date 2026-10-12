@@ -26,13 +26,13 @@ function lobe(parts, seed, scale, position, rotation = 0) {
   parts.push(geometry);
 }
 
-function membraneHeight(x, z) {
+export function membraneHeight(x, z) {
   return 2.20 + .024 * Math.sin(x * 1.6) + .026 * Math.cos(z * 3.4) + .021 * x * x;
 }
 
 // A true bilayer specimen: local oxidation displaces both heads and tails.
 // The NMDAR opening is removed from each sheet and lipid lattice geometrically.
-function createBilayer(texture) {
+export function createBilayer(texture, { holes = [CHANNEL, NOX_SITE] } = {}) {
   const group = new THREE.Group();
   group.name = 'Postsynaptic lipid bilayer';
   group.userData.key = 'membrane';
@@ -45,7 +45,7 @@ function createBilayer(texture) {
     const position = geometry.attributes.position, indices = [];
     for (let index = 0; index < geometry.index.count; index += 3) {
       const face = [0, 1, 2].map(n => geometry.index.getX(index + n));
-      if (face.some(vertex => [CHANNEL,NOX_SITE].some(site=>Math.hypot(position.getX(vertex)-site.x,position.getZ(vertex)-site.z)<.25))) continue;
+      if (face.some(vertex => holes.some(site=>Math.hypot(position.getX(vertex)-site.x,position.getZ(vertex)-site.z)<.25))) continue;
       indices.push(...face);
     }
     geometry.setIndex(indices);
@@ -59,7 +59,7 @@ function createBilayer(texture) {
     for (let column = 0; column < 51; column++) {
       const x = -3.50 + column * .14 + (row % 2) * .052;
       const z = -.85 + row * .17;
-      if ([CHANNEL,NOX_SITE].some(site=>Math.hypot(x-site.x,z-site.z)<.285)) continue;
+      if (holes.some(site=>Math.hypot(x-site.x,z-site.z)<.285)) continue;
       const susceptibility = Math.exp(-((x + 2.48) ** 2 / .36 + (z - .29) ** 2 / .30));
       for (const side of [-1, 1]) seeds.push({ x, z, side, phase: rng() * TAU, susceptibility });
     }

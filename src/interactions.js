@@ -96,7 +96,11 @@ export function bindInteractions() {
   on($('#structure-select'), 'change', event => scene?.select(event.target.value || null));
   function openDialog(id) { scene?.suspend(); $(id).showModal(); }
   all('.scale-navigation button').forEach(button => on(button, 'click', () => scene?.navigate(button.dataset.view)));
-  on($('#brand-home'), 'click', event => { event.preventDefault(); scene?.navigate('neuron'); });
+  on($('#brand-home'), 'click', event => {
+    event.preventDefault();
+    if ($('#atlas').dataset.experience !== 'atlas') $('#main-menu').click();
+    else scene?.navigate('neuron');
+  });
   on($('#play-btn'), 'click', () => scene?.playPause());
   on($('#explore-btn'), 'click', () => scene?.explore());
   on($('#previous-btn'), 'click', () => scene?.seek(currentIndex - 1));
@@ -116,7 +120,10 @@ export function bindInteractions() {
     $('#structure-select').value = '';
     $('#synapse-canvas').focus({ preventScroll: true });
   });
-  on($('#references-btn'), 'click', () => openDialog('#references'));
+  on($('#references-btn'), 'click', () => {
+    if ($('#atlas').dataset.experience === 'evidence') $('#evidence-info').click();
+    else openDialog('#references');
+  });
   on($('#error-references-btn'), 'click', () => openDialog('#references'));
   on($('#help-btn'), 'click', () => openDialog('#help'));
   on($('#close-references'), 'click', () => $('#references').close());
