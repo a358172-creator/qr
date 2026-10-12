@@ -88,9 +88,11 @@ QUIN utiliza una silueta anular con dos ramas carboxilo adyacentes, distinta del
 
 El desarrollo implica cambios en la actividad de complejos respiratorios y de enzimas antioxidantes, documentados en otras series de cerebro de rata [15, 16]. Sus trayectorias no son todas paralelas; no permiten asignar una intensidad anatómica universal a PN3–PN30. Las diferencias del estudio deben leerse en sus propias figuras, sin equivalencias lineales con edades humanas ni inferencias sobre densidad sináptica, microglía o morfología no medidas.
 
-Advertencia central de la interfaz:
+Nota científica de referencia interna:
 
 > Representación conceptual: los ensayos fueron realizados en homogeneizados cerebrales de ratas Wistar. Los modelos tridimensionales ilustran mecanismos celulares y moleculares descritos en la literatura, pero no representan observaciones directas de dichos procesos en las muestras experimentales.
+
+Tras la [ronda editorial puntual](visual-editorial-polish.md), la interfaz presenta este alcance de forma compacta en Metodología. Las notas técnicas de importación, los pies literales y las aclaraciones editoriales se conservan en las fuentes internas; el panel público utiliza leyendas breves y comparaciones según la figura original.
 
 La homogeneización limita la polarización normal de membranas, la integridad de circuitos, la transmisión organizada, el contacto intercelular y las relaciones neuronales/gliales. Puede conservar componentes moleculares y actividades enzimáticas, sin reproducir tejido intacto. No se atribuyen a estos ensayos activación directa de NMDAR, microglía, caspasas, apoptosis o pérdida de neuronas.
 

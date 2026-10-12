@@ -1,0 +1,24 @@
+{
+  "tag": "after",
+  "errors": [],
+  "captures": [
+    "hub",
+    "neuron",
+    "mechanism-b",
+    "hub-return",
+    "tbars-results",
+    "tbars-caption",
+    "dcfda-results",
+    "dcfda-caption",
+    "mtt-results",
+    "mtt-caption",
+    "methods",
+    "quin-results"
+  ],
+  "figures": [
+    "/evidence/figure-2-tbars.svg",
+    "/evidence/figure-1-dcfda.svg",
+    "/evidence/figure-3-mtt.svg"
+  ],
+  "status": "complete"
+}

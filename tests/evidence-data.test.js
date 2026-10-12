@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { AGES, EXPOSURES, ASSAYS, getEvidence, visualSelection, MTT_NOTE, TBARS_NOTE } from '../src/evidence/data.js';
+import { AGES, EXPOSURES, ASSAYS, getEvidence, getEvidencePresentation, visualSelection, MTT_NOTE, TBARS_NOTE } from '../src/evidence/data.js';
 import { figureSource } from '../src/evidence/figure-source.js';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url));
@@ -97,7 +97,7 @@ test('conversion keeps every statistical symbol and age label without adding PN3
   }
 });
 
-test('MTT ambiguity stays a proposed editorial interpretation for every age and exposure', () => {
+test('MTT source ambiguity remains documented internally for every age and exposure', () => {
   assert.match(MTT_NOTE, /PN3/);
   assert.match(MTT_NOTE, /asteriscos/);
   assert.match(MTT_NOTE, /probablemente/);
@@ -121,11 +121,57 @@ test('QUIN TBARS preserves clarified early differences without generalizing an i
     if (['PN3', 'PN5'].includes(age.id)) {
       assert.match(result.summary, new RegExp(`QUIN en ${age.id}`));
       assert.match(result.summary, /diferencia significativa respecto al control de la misma edad/);
-      assert.match(result.summary, /p<0\.05, según su pie/);
+      assert.match(result.summary, /\* p<0\.05/);
     } else {
-      assert.match(result.summary, /no justifican atribuir un efecto generalizado/);
+      assert.match(result.summary, /diferencias significativas se observaron en condiciones tempranas/);
     }
     assert.equal(Object.hasOwn(result, 'pValue'), false);
+  }
+});
+
+test('public figure presentation retains scientific essentials without exposing source-audit notes', () => {
+  const auditCopy = /\bEMF\b|\bSVG\b|\bExcel\b|coordenadas|graficas\.docx|discrepancia|nota editorial|probablemente|no se recalcul|tabla fuente|no disponibles|sin desplazamientos/i;
+  for (const age of AGES) for (const exposure of EXPOSURES) for (const assay of ASSAYS) {
+    const presentation = getEvidencePresentation(age.id, exposure.id, assay.id);
+    const result = getEvidence(age.id, exposure.id, assay.id);
+    assert.equal(presentation.status, result.status);
+    assert.equal(presentation.summary, result.summary);
+    assert.equal(presentation.comparison, result.comparison);
+    assert.match(presentation.unit, /^Unidad: .+\.$/);
+    assert.equal(presentation.source, 'Figura original del análisis experimental.');
+    assert.doesNotMatch(Object.values(presentation).join(' '), auditCopy);
+    for (const field of ['originalCaption', 'statisticalCaution', 'provenance', 'mean', 'sem']) assert.equal(Object.hasOwn(presentation, field), false);
+    if (presentation.status === 'available') {
+      assert.equal(presentation.sample, 'Media ± SEM, n = 5–6.');
+      assert.equal(presentation.statistics, 'Comparaciones estadísticas según la figura original.');
+      assert.equal(presentation.comparison, 'Referencia: control correspondiente a la misma edad posnatal.');
+    } else {
+      assert.equal(presentation.sample, '');
+      assert.equal(presentation.statistics, '');
+      assert.equal(presentation.comparison, '');
+    }
+  }
+});
+
+test('public QUIN copy retains early TBARS differences and distinguishes detection from absence of effect', () => {
+  for (const age of AGES) {
+    for (const assay of ['dcfda', 'mtt']) {
+      const presentation = getEvidencePresentation(age.id, 'quin', assay);
+      if (presentation.status === 'available') {
+        assert.match(presentation.summary, /No se detectaron diferencias estadísticamente significativas/);
+        assert.doesNotMatch(presentation.summary, /no produjo|ausencia de efecto|no tiene efecto/i);
+      }
+    }
+    const presentation = getEvidencePresentation(age.id, 'quin', 'tbars');
+    assert.match(presentation.summary, /no mostró un patrón consistente de incremento/);
+    if (['PN3', 'PN5'].includes(age.id)) assert.match(presentation.summary, /diferencia significativa.*\* p<0\.05/);
+  }
+});
+
+test('3-NP DCFDA copy does not infer a statistical comparison from unmarked bars', () => {
+  for (const age of AGES) {
+    const result = getEvidencePresentation(age.id, '3np', 'dcfda');
+    assert.doesNotMatch(result.summary, /significativ|incremento|disminuci[oó]n/i);
   }
 });
 

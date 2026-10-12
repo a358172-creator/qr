@@ -54,6 +54,12 @@ export function createNeuron() {
       spineAnchors.push(base.clone().addScaledVector(direction, length * .83));
     }
   });
+  // The glutamatergic access uses the same scale and membrane as neighbouring
+  // spines; its receptor-level illustration is reserved for mechanism B.
+  const synapseBase = point(1,-.28,0), synapseDirection = point(0,1,.15).normalize();
+  const synapseHead = synapseBase.clone().addScaledVector(synapseDirection,.65*.83);
+  geometries.push(mushroomSpine(synapseBase,synapseDirection,point(1,.1,0),.65,.19,.35,'mushroom'));
+  spineAnchors.push(synapseHead);
   const tissueGeometry = mergeGeometries(geometries);
   geometries.forEach(g => g.dispose());
   const tissueMaterial = organicMaterial({ window: true, opacity: .99 });
@@ -87,7 +93,7 @@ export function createNeuron() {
   chromatin.renderOrder = 2; root.add(chromatin);
 
   const hotspots = [
-    { id:'synapse', position:synapseOrigin.clone(), normal:point(0,1,.15).normalize() },
+    { id:'synapse', position:synapseHead.clone(), normal:synapseDirection.clone() },
     { id:'mitochondria', position:point(-4.3,-1.12,.1), normal:point(0,1,.2).normalize() },
     { id:'signaling', position:point(-2.65,2.05,-.65), normal:point(0,.6,1).normalize() },
     { id:'microglia', position:point(-2.5,3.7,-.8), normal:point(-.2,0,1).normalize() },

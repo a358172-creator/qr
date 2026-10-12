@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createNeuron } from './atlas/neuron.js';
 import { mechanisms } from './atlas/config.js';
-import { createAfferentAxon } from './atlas/axon.js';
 import { createAnatomy } from './scene/anatomy.js';
 import { createCameraController } from './core/camera.js';
 import { createInteractionManager } from './core/interaction.js';
@@ -47,9 +46,12 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   const neuron = createNeuron(); scene.add(neuron.root);
   const anatomy = createAnatomy({ includeDendrite: false });
   anatomy.root.position.copy(neuron.synapseOrigin); anatomy.root.scale.setScalar(neuron.synapseScale);
+  // Shared anatomy supplies resources; the atlas displays ordinary dendritic
+  // spines. Each mechanism owns its detailed cutaway, revealed on entry.
+  anatomy.root.visible = false;
   scene.add(anatomy.root);
   const cellularContext = new THREE.Group();
-  cellularContext.add(neuron.root, anatomy.root, createAfferentAxon(anatomy.texture));
+  cellularContext.add(neuron.root);
   scene.add(cellularContext);
   const contextMaterials = new Map();
   cellularContext.traverse(object => {

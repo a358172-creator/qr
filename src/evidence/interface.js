@@ -1,8 +1,7 @@
-import { AGES, EXPOSURES, ASSAYS, getEvidence, visualSelection, REFERENCES } from './data.js';
+import { AGES, EXPOSURES, ASSAYS, getEvidence, getEvidencePresentation, visualSelection, REFERENCES } from './data.js';
 import './styles.css';
 
-const conceptualWarning = 'Representación conceptual: los ensayos fueron realizados en homogeneizados cerebrales de ratas Wistar. Los modelos tridimensionales ilustran mecanismos celulares y moleculares descritos en la literatura, pero no representan observaciones directas de dichos procesos en las muestras experimentales.';
-const quinInterpretation = 'La ausencia de modificaciones estadísticamente significativas tras la exposición aguda a QUIN podría estar relacionada con la duración del tratamiento y con las características de la preparación experimental. Algunos mecanismos excitotóxicos pueden requerir condiciones de estimulación sostenida o una organización celular funcional que no se conserva íntegramente en el homogeneizado.';
+const quinInterpretation = 'En los resultados sin diferencias significativas tras la exposición aguda a QUIN, la duración del tratamiento y las características de la preparación son posibles factores de interpretación. Algunos mecanismos excitotóxicos pueden requerir condiciones de estimulación sostenida y una organización celular funcional.';
 
 // DOM, results and interpretation live separately from biological scene state.
 // Age and assay never enter the renderer or the mechanism factories.
@@ -31,12 +30,11 @@ export function createEvidenceInterface() {
       <label>Edad posnatal<select id="evidence-age"></select></label>
       <label>Exposición · 2 horas<select id="evidence-exposure"></select></label>
       <label>Ensayo<select id="evidence-assay"></select></label>
-      <p>La edad selecciona resultados; el modelo 3D conserva su escala e intensidad. <button type="button" id="jump-to-results">Ver resultados ↓</button></p>
+      <p><button type="button" id="jump-to-results">Ver resultados ↓</button></p>
     </section>
     <div id="evidence-model-heading" class="evidence-model-heading" hidden><p class="eyebrow">MECANISMO MOLECULAR / LITERATURA</p><h2 id="evidence-model-title"></h2></div>
     <aside id="evidence-panel" class="evidence-panel" aria-labelledby="evidence-title" hidden>
       <header><p class="eyebrow">EVIDENCIA EXPERIMENTAL</p><h2 id="evidence-title">Vulnerabilidad <em>redox.</em></h2><p class="study-line">Cerebro de rata Wistar · Homogeneizado · 2 h</p><button type="button" id="jump-to-model">Volver al modelo ↑</button></header>
-      <p class="conceptual-warning">${conceptualWarning}</p>
       <section class="evidence-results" aria-labelledby="evidence-assay-title">
         <div class="result-heading"><h3 id="evidence-assay-title"></h3><span id="evidence-selection"></span></div>
         <p id="evidence-status" role="status"></p>
@@ -44,18 +42,18 @@ export function createEvidenceInterface() {
           <span class="evidence-chart"><img alt=""/><span class="chart-selection" aria-hidden="true"></span></span>
           <span class="chart-action">Figura original · Ampliar ↗</span>
         </button>
-        <p class="chart-key"><i aria-hidden="true"></i> Resaltado de consulta; no modifica barras ni significancia.</p>
+        <p class="chart-key"><i aria-hidden="true"></i> Selección actual</p>
         <p id="evidence-units"></p><p id="evidence-numbers"></p>
-        <p id="evidence-summary"></p><p id="evidence-comparison"></p><p id="evidence-statistics" class="evidence-caution"></p>
-        <details><summary>Leyenda y procedencia de la figura</summary><p id="evidence-caption"></p><p id="evidence-provenance"></p><a id="evidence-original" download>Descargar vector original (EMF) ↗</a></details>
+        <p id="evidence-summary"></p><p id="evidence-comparison"></p><p id="evidence-statistics"></p>
+        <details><summary>Leyenda de la figura</summary><p id="evidence-caption"></p><p id="evidence-provenance"></p><a id="evidence-original" download>Descargar figura original ↗</a></details>
       </section>
       <section class="evidence-relationship"><p class="eyebrow">MECANISMO DESCRITO EN LITERATURA</p><p id="evidence-mechanism"></p><button id="evidence-context-link" type="button" data-atlas-target="mitochondrial">Explorar el mecanismo en el atlas ↗</button></section>
-      <section id="quin-context" class="quin-context" hidden><p class="eyebrow">INTERPRETACIÓN / HIPÓTESIS</p><p>Esta hipótesis se refiere a los resultados sin significancia detectada; no invalida las diferencias tempranas de TBARS indicadas en la figura.</p><p>${quinInterpretation}</p><p>La exposición fue de <strong>2 horas</strong>. No hubo comparación temporal: el resultado no puede atribuirse definitivamente al tiempo ni demuestra ausencia de efecto.</p><details><summary>Contexto: vía de las quinureninas</summary><ol class="kynurenine-path"><li>Triptófano</li><li>Quinurenina <small>↳ Rama hacia ácido quinurénico (KYNA)</small></li><li>3-hidroxiquinurenina</li><li>Ácido 3-hidroxiantranílico</li><li>Intermediarios</li><li>Ácido quinolínico (QUIN)</li></ol><p>QUIN puede activar receptores NMDA; KYNA modula receptores glutamatérgicos según concentración y contexto. Esta simplificación no implica un antagonismo absoluto ni actividad metabólica medida en el estudio.</p></details></section>
-      <div class="evidence-reading"><button type="button" id="evidence-info">Tres perspectivas, metodología y referencias ↗</button><details><summary>Desarrollo posnatal y contexto celular</summary><p>Durante el desarrollo cambian el metabolismo energético, la regulación redox, la maduración celular y la organización de conexiones. Estas relaciones de la literatura orientan preguntas; el estudio no midió anatomía sináptica ni establece equivalencias entre edades de rata y humanas.</p><button type="button" data-atlas-target="signaling">A · Plasticidad sináptica ↗</button><button type="button" data-atlas-target="microglia">C · Remodelado microglial ↗</button><p>Las interacciones microgliales no fueron evaluadas en estos homogeneizados.</p></details></div>
+      <section id="quin-context" class="quin-context" hidden><p class="eyebrow">INTERPRETACIÓN / EXPOSICIÓN AGUDA</p><p>${quinInterpretation}</p><p>La exposición fue de <strong>2 horas</strong>. La posible dependencia temporal requiere estudios específicos.</p><details><summary>Contexto: vía de las quinureninas</summary><ol class="kynurenine-path"><li>Triptófano</li><li>Quinurenina <small>↳ Rama hacia ácido quinurénico (KYNA)</small></li><li>3-hidroxiquinurenina</li><li>Ácido 3-hidroxiantranílico</li><li>Intermediarios</li><li>Ácido quinolínico (QUIN)</li></ol><p>QUIN puede activar receptores NMDA; KYNA modula receptores glutamatérgicos según concentración y contexto.</p></details></section>
+      <div class="evidence-reading"><button type="button" id="evidence-info">Metodología y referencias ↗</button><details><summary>Desarrollo posnatal y contexto celular</summary><p>Durante el desarrollo cambian el metabolismo energético, la regulación redox, la maduración celular y la organización de conexiones. Estas relaciones, descritas en la literatura, orientan la exploración del atlas.</p><button type="button" data-atlas-target="signaling">A · Plasticidad sináptica ↗</button><button type="button" data-atlas-target="microglia">C · Remodelado microglial ↗</button></details></div>
     </aside>`);
   document.body.insertAdjacentHTML('beforeend', `
-    <dialog id="evidence-methods" aria-labelledby="evidence-methods-title"><button type="button" class="close" data-close-dialog="evidence-methods" aria-label="Cerrar metodología">×</button><p class="eyebrow">ALCANCE DE LA EVIDENCIA</p><h2 id="evidence-methods-title">Tres perspectivas de la respuesta cerebral</h2><p>Age-Dependent Cerebral Redox Vulnerability to Excitotoxic, Oxidative, and Mitochondrial Challenges.</p><p>Homogeneizados cerebrales de ratas Wistar: PN3, PN5, PN9, PN12 y PN30. Exposiciones independientes durante 2 horas: control, FeSO₄ 1 mM, QUIN 100 µM y 3-NP 3 mM. Las leyendas reportan promedio ± SEM, n = 5–6 y Kruskal–Wallis seguido de Dunn. MTT no está representado en PN3.</p><div id="assay-methods"></div><p><strong>Son variables diferentes.</strong> TBARS puede aumentar sin un incremento significativo de DCFDA: las reacciones detectadas, sensibilidad e interferencias de cada ensayo son distintas. Ninguno identifica por sí solo una fuente celular específica.</p><p>No se midieron directamente radicales hidroxilo, ROS mitocondrial específica, actividad del complejo II, ATP, muerte neuronal, activación de NMDAR, microglía ni apoptosis.</p><h3>Qué permite el homogeneizado</h3><p>La preparación puede conservar componentes moleculares y actividades enzimáticas, pero limita la polarización normal de membranas, la integridad de circuitos, la transmisión sináptica organizada, el contacto intercelular y las relaciones funcionales entre neuronas y glía. No reproduce un tejido intacto.</p><h3>Fuente de las figuras</h3><p>Figuras vectoriales extraídas de graficas.docx. Se conserva su contenido gráfico y sus leyendas, incluidas las discrepancias documentadas. No se aportó el Excel ni una tabla con medias y SEM: no se estiman valores por la altura de las barras. Las unidades impresas se transcriben sin corregirlas por inferencia.</p><h3>Literatura y métodos</h3><ul class="evidence-references" id="evidence-references"></ul></dialog>
-    <dialog id="evidence-chart-dialog" class="chart-dialog" aria-labelledby="chart-dialog-title"><button type="button" class="close" data-close-dialog="evidence-chart-dialog" aria-label="Cerrar gráfica">×</button><p class="eyebrow">FIGURA ORIGINAL / SIN RECONSTRUIR VALORES</p><h2 id="chart-dialog-title"></h2><div class="chart-scroll"><img id="large-evidence-chart" alt=""/></div><p id="large-chart-caption"></p><a id="large-chart-source" target="_blank" rel="noopener">Abrir vector SVG en tamaño completo ↗</a></dialog>`);
+    <dialog id="evidence-methods" aria-labelledby="evidence-methods-title"><button type="button" class="close" data-close-dialog="evidence-methods" aria-label="Cerrar metodología">×</button><p class="eyebrow">METODOLOGÍA EXPERIMENTAL</p><h2 id="evidence-methods-title">Tres perspectivas de la respuesta cerebral</h2><p>Age-Dependent Cerebral Redox Vulnerability to Excitotoxic, Oxidative, and Mitochondrial Challenges.</p><p>Cerebro de ratas Wistar: PN3, PN5, PN9, PN12 y PN30. Exposiciones independientes durante 2 horas: control, FeSO₄ 1 mM, QUIN 100 µM y 3-NP 3 mM. Media ± SEM, n = 5–6. Análisis mediante Kruskal–Wallis seguido de Dunn; comparaciones estadísticas según cada figura. MTT se presenta para PN5, PN9, PN12 y PN30.</p><div id="assay-methods"></div><p>DCFDA, TBARS y MTT describen dimensiones complementarias de la respuesta: procesos oxidativos, productos de oxidación lipídica y capacidad reductora.</p><h3>Alcance de la preparación</h3><p>Los ensayos se realizaron en homogeneizados cerebrales, que pueden conservar componentes moleculares y actividad enzimática, con una organización celular y sináptica limitada. Los modelos 3D contextualizan mecanismos descritos en la literatura; las figuras presentan los resultados experimentales.</p><h3>Figuras del estudio</h3><p>Figuras originales del análisis experimental. Media ± SEM, n = 5–6; comparaciones estadísticas según la figura original.</p><h3>Literatura y métodos</h3><ul class="evidence-references" id="evidence-references"></ul></dialog>
+    <dialog id="evidence-chart-dialog" class="chart-dialog" aria-labelledby="chart-dialog-title"><button type="button" class="close" data-close-dialog="evidence-chart-dialog" aria-label="Cerrar gráfica">×</button><p class="eyebrow">FIGURA EXPERIMENTAL</p><h2 id="chart-dialog-title"></h2><div class="chart-scroll"><img id="large-evidence-chart" alt=""/></div><p id="large-chart-caption"></p><a id="large-chart-source" target="_blank" rel="noopener">Abrir figura en tamaño completo ↗</a></dialog>`);
   for (const age of AGES) $('#evidence-age').add(new Option(age.id, age.id));
   for (const exposure of EXPOSURES) $('#evidence-exposure').add(new Option(`${exposure.label}${exposure.concentration ? ` — ${exposure.concentration}` : ''}`, exposure.id));
   for (const assay of ASSAYS) $('#evidence-assay').add(new Option(assay.label, assay.id));
@@ -75,11 +73,11 @@ export function createEvidenceInterface() {
   function render() {
     const assay = ASSAYS.find(item => item.id === state.assay);
     const exposure = EXPOSURES.find(item => item.id === state.exposure);
-    const result = getEvidence(state.age, state.exposure, state.assay);
+    const result = getEvidencePresentation(state.age, state.exposure, state.assay);
     $('#evidence-assay-title').textContent = assay.title;
     $('#evidence-selection').textContent = `${state.age} · ${exposure.label}`;
     $('#evidence-model-title').textContent = exposure.label === 'Control' ? 'Preparación de referencia' : `${exposure.label} · mecanismo potencial`;
-    $('#evidence-status').textContent = result.status === 'not-evaluated' ? 'No evaluado · MTT no incluye PN3 en la figura proporcionada.' : 'Resultado en la figura original';
+    $('#evidence-status').textContent = result.status === 'not-evaluated' ? 'No evaluado · MTT en PN3.' : 'Resultado experimental';
     $('#evidence-status').dataset.status = result.status;
     const img = $('.evidence-chart img'); img.src = assay.imagePath;
     img.alt = `${assay.title}. Grupos completos y anotaciones originales; selección: ${state.age}, ${exposure.label}. ${assay.unit}.`;
@@ -87,14 +85,15 @@ export function createEvidenceInterface() {
     const highlight = $('.chart-selection'); highlight.hidden = !box;
     if (box) Object.assign(highlight.style, { left: `${box.left}%`, top: `${box.top}%`, width: `${box.width}%`, height: `${box.height}%` });
     $('.chart-key').hidden = !box;
-    $('#evidence-units').textContent = `Unidad impresa: ${assay.unit}`;
-    $('#evidence-numbers').textContent = result.status === 'not-evaluated' ? 'Sin media ni SEM para esta selección.' : 'Media ± SEM · n = 5–6. Valores numéricos exactos no disponibles en una tabla fuente.';
+    $('#evidence-units').textContent = result.unit;
+    $('#evidence-numbers').textContent = result.sample;
+    $('#evidence-numbers').hidden = !result.sample;
     $('#evidence-summary').textContent = result.summary;
     $('#evidence-comparison').textContent = result.comparison;
-    $('#evidence-statistics').textContent = result.statisticalCaution;
-    $('#evidence-statistics').hidden = !result.statisticalCaution;
-    $('#evidence-caption').textContent = assay.originalCaption;
-    $('#evidence-provenance').textContent = result.provenance;
+    $('#evidence-statistics').textContent = result.statistics;
+    $('#evidence-statistics').hidden = !result.statistics;
+    $('#evidence-caption').textContent = result.caption;
+    $('#evidence-provenance').textContent = result.source;
     $('#evidence-original').href = assay.originalPath;
     $('#evidence-mechanism').textContent = exposure.mechanism;
     $('#evidence-context-link').dataset.atlasTarget = exposure.atlasTarget || 'mitochondrial';
@@ -102,7 +101,7 @@ export function createEvidenceInterface() {
     $('#quin-context').hidden = state.exposure !== 'quin';
     $('#chart-dialog-title').textContent = assay.title;
     $('#large-evidence-chart').src = assay.imagePath; $('#large-evidence-chart').alt = img.alt;
-    $('#large-chart-caption').textContent = assay.originalCaption;
+    $('#large-chart-caption').textContent = `${result.caption} Media ± SEM, n = 5–6. Comparaciones estadísticas según la figura original.`;
     $('#large-chart-source').href = assay.imagePath;
   }
   function updateView(next) {
