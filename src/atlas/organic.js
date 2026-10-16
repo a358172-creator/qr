@@ -129,8 +129,8 @@ export function membraneColor(geometry, kind = 'neuron') {
   const p = geometry.attributes.position, colors = [], color = new THREE.Color();
   // THREE.Color decodes these sRGB pigments into linear light before they
   // become vertex colors; HSL values here previously washed out the tissue.
-  const shadow = new THREE.Color(kind === 'neuron' ? 0x75658c : 0x74668d);
-  const pigment = new THREE.Color(kind === 'neuron' ? 0xae8eb0 : 0xaa89ad);
+  const shadow = new THREE.Color(kind === 'neuron' ? 0x454B50 : 0x454B50);
+  const pigment = new THREE.Color(kind === 'neuron' ? 0x6D9FC3 : 0x6D9FC3);
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
     const cloud = Math.sin(x * 1.7 + Math.sin(y * 1.1)) * Math.cos(y * 1.2 + z * 2.3);
@@ -173,8 +173,8 @@ export function mushroomSpine(base, direction, tangent, length, width, phase, mo
   return membraneColor(g);
 }
 
-export function organicMaterial({ nucleus = false, window = false, color = 0xffffff, ...options } = {}) {
-  const material = new THREE.MeshPhysicalMaterial({ color, vertexColors: !nucleus, roughness: .6, metalness: 0, clearcoat: .05, clearcoatRoughness: .55, sheen: .16, sheenRoughness: .75, sheenColor: new THREE.Color(0x9a84a5), transparent: window, depthWrite: true, ...options });
+export function organicMaterial({ nucleus = false, window = false, color = 0xFAF8F2, ...options } = {}) {
+  const material = new THREE.MeshPhysicalMaterial({ color, vertexColors: !nucleus, roughness: .6, metalness: 0, clearcoat: .05, clearcoatRoughness: .55, sheen: .16, sheenRoughness: .75, sheenColor: new THREE.Color(0x6D9FC3), transparent: window, depthWrite: true, ...options });
   material.onBeforeCompile = shader => {
     shader.vertexShader = 'varying vec3 vCellPosition;\n' + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvCellPosition = position;');

@@ -27,7 +27,7 @@ export function createAnnotations({
   }
 
   const hotspotNodes = hotspots.map((hotspot, index) => {
-    const el = button(hotspotLayer, 'hotspot', `${hotspot.title}${hotspot.available ? '' : ' · Próximamente'}`);
+    const el = button(hotspotLayer, 'hotspot', `${hotspot.title}${hotspot.available ? '' : ' · Coming soon'}`);
     el.dataset.id = hotspot.id;
     el.dataset.available = String(Boolean(hotspot.available));
     el.classList.toggle('available', Boolean(hotspot.available));

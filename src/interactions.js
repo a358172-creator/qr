@@ -11,12 +11,12 @@ export function bindInteractions() {
     $('#timeline-track').replaceChildren();
     stepButtons = next.steps.map((step, index) => {
       const button = document.createElement('button'); button.type = 'button'; button.dataset.step = index;
-      button.setAttribute('aria-label', `Etapa ${index + 1}: ${step.title}`); button.title = step.title;
+      button.setAttribute('aria-label', `Stage ${index + 1}: ${step.title}`); button.title = step.title;
       $('#timeline-track').append(button); return button;
     });
     $('#context-panel').hidden = true;
-    $('#narrative').setAttribute('aria-label', `Recorrido: ${next.title}`);
-    $('#labels-layer').setAttribute('aria-label', `Estructuras: ${next.title}`);
+    $('#narrative').setAttribute('aria-label', `Tour: ${next.title}`);
+    $('#labels-layer').setAttribute('aria-label', `Structures: ${next.title}`);
   }
   function closeCallout() {
     const restoreFocus = $('#context-panel').contains(document.activeElement);
@@ -33,7 +33,7 @@ export function bindInteractions() {
     $('#detail-expansion').open = false;
     $('#detail-expansion').hidden = !entry.detail;
     $('#detail-expanded-text').textContent = entry.detail || '';
-    $('#focus-structure-btn').setAttribute('aria-label', `Enfocar ${entry.title} y pausar para explorar`);
+    $('#focus-structure-btn').setAttribute('aria-label', `Focus on ${entry.title} and pause to explore`);
     $('#context-panel').scrollTop = 0;
     $('#context-panel').hidden = false;
     $('#structure-select').value = key;
@@ -42,7 +42,7 @@ export function bindInteractions() {
     setMechanism(next); transitioning = moving; currentView = view;
     if (scene) {
       $('#scene-loading').hidden = !loading;
-      if (loading) $('#scene-loading p').textContent = 'Preparando el microambiente celular';
+      if (loading) $('#scene-loading p').textContent = 'Preparing the cellular microenvironment';
     }
     $('#atlas').dataset.view = view; $('#atlas').classList.toggle('transitioning', transitioning);
     all('.scale-navigation button').forEach(button => {
@@ -50,17 +50,17 @@ export function bindInteractions() {
       else button.removeAttribute('aria-current');
     });
     const detail = view === 'synapse';
-    $('#scene-eyebrow').textContent = detail ? mechanism.eyebrow : view === 'neuron' ? '00 / UNA NEURONA, UN UNIVERSO' : '01 / TERRITORIO NEURONAL';
+    $('#scene-eyebrow').textContent = detail ? mechanism.eyebrow : view === 'neuron' ? '00 / ONE NEURON, ONE UNIVERSE' : '01 / NEURONAL TERRITORY';
     if (detail) {
       const emphasis = document.createElement('em'); emphasis.textContent = mechanism.heading[1];
       $('#scene-title').replaceChildren(document.createTextNode(mechanism.heading[0]), document.createElement('br'), emphasis);
-    } else $('#scene-title').innerHTML = view === 'neuron' ? 'Donde todo<br><em>se conecta.</em>' : 'El paisaje<br><em>sináptico.</em>';
-    $('#scene-description').textContent = detail ? mechanism.title : 'Cada conexión, una puerta al universo celular.';
-    $('.scale-navigation [data-view="synapse"]').textContent = detail ? mechanism.navLabel : 'Sinapsis';
+    } else $('#scene-title').innerHTML = view === 'neuron' ? 'Where everything<br><em>connects.</em>' : 'The synaptic<br><em>landscape.</em>';
+    $('#scene-description').textContent = detail ? mechanism.title : 'Every connection, a gateway to the cellular universe.';
+    $('.scale-navigation [data-view="synapse"]').textContent = detail ? mechanism.navLabel : 'Synapse';
     $('#structure-picker').hidden = !detail;
     $('#specimen-note').hidden = detail || view === 'neuron';
     $('#narrative').hidden = !detail;
-    $('#scale-name').textContent = detail ? mechanism.scaleLabel : 'ESCALA CELULAR';
+    $('#scale-name').textContent = detail ? mechanism.scaleLabel : 'CELLULAR SCALE';
     $('#scale-index').textContent = detail ? mechanism.scaleIndex : view === 'neuron' ? '00' : '01';
     all('.transport button, .timeline-track button').forEach(button => { button.disabled = transitioning; });
     $('#focus-structure-btn').disabled = transitioning;
@@ -76,7 +76,7 @@ export function bindInteractions() {
     const { index = 0, playing = false, exploring = false, complete = false } = state;
     const keys = state.availableKeys || scene?.getState().availableKeys || [];
     const picker = $('#structure-select'), previous = picker.value;
-    picker.replaceChildren(new Option('Elegir estructura…', ''));
+    picker.replaceChildren(new Option('Choose a structure…', ''));
     keys.filter(key => mechanism.content[key]).forEach(key => picker.add(new Option(mechanism.content[key].title, key)));
     picker.value = keys.includes(previous) ? previous : '';
     picker.disabled = transitioning;
@@ -85,12 +85,12 @@ export function bindInteractions() {
     $('#step-number').textContent = `${String(index + 1).padStart(2, '0')} / ${String(mechanism.steps.length).padStart(2, '0')}`;
     $('#step-title').textContent = step.title; $('#step-caption').textContent = step.caption;
     $('#play-icon').textContent = playing ? 'Ⅱ' : '▷';
-    $('#play-btn').setAttribute('aria-label', playing ? 'Pausar recorrido' : complete ? 'Repetir recorrido' : 'Reproducir recorrido');
-    $('#explore-btn').textContent = exploring ? 'Continuar' : 'Explorar';
+    $('#play-btn').setAttribute('aria-label', playing ? 'Pause tour' : complete ? 'Replay tour' : 'Play tour');
+    $('#explore-btn').textContent = exploring ? 'Continue' : 'Explore';
     $('#explore-btn').setAttribute('aria-pressed', String(exploring));
     $('#previous-btn').disabled = transitioning || index === 0; $('#next-btn').disabled = transitioning || index === mechanism.steps.length - 1;
     stepButtons.forEach((button, i) => { if (i === index) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current'); button.classList.toggle('done', i < index); });
-    $('#hint-text').innerHTML = playing ? 'Observa el recorrido <b>·</b> Pausa para explorar' : 'Arrastra para explorar <b>·</b> Rueda para acercarte';
+    $('#hint-text').innerHTML = playing ? 'Watch the tour <b>·</b> Pause to explore' : 'Drag to explore <b>·</b> Scroll to zoom';
   }
   on($('#timeline-track'), 'click', event => { const step = event.target.closest('button[data-step]'); if (step && !step.disabled) scene?.seek(Number(step.dataset.step)); });
   on($('#structure-select'), 'change', event => scene?.select(event.target.value || null));
@@ -137,7 +137,7 @@ export function bindInteractions() {
   return {
     attachScene(value) { scene = value; },
     updateView, updateTimeline, select,
-    showRegion(entry) { clearTimeout(toastTimer); $('#region-toast').textContent = entry.error ? entry.title : `${entry.title} · Próximamente`; $('#region-toast').hidden = false; toastTimer = setTimeout(() => { $('#region-toast').hidden = true; }, 3600); },
+    showRegion(entry) { clearTimeout(toastTimer); $('#region-toast').textContent = entry.error ? entry.title : `${entry.title} · Coming soon`; $('#region-toast').hidden = false; toastTimer = setTimeout(() => { $('#region-toast').hidden = true; }, 3600); },
     setProgress(value) { $('#timeline-track').style.setProperty('--progress', value); },
     unavailable() { all('.scale-navigation button, .transport button, .view-tools button, .view-tools select, .timeline-track button').forEach(button => { button.disabled = true; }); $('#narrative').hidden = true; $('#context-panel').hidden = true; },
     available() { all('.scale-navigation button, .transport button, .view-tools button, .view-tools select, .timeline-track button').forEach(button => { button.disabled = false; }); updateView({ view: currentView, transitioning: false }); },

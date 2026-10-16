@@ -69,7 +69,7 @@ function skeleton() {
 
 function pigment(geometry) {
   const positions = geometry.attributes.position, colors = new Float32Array(positions.count * 3);
-  const shade = new THREE.Color(0x7186a8), lit = new THREE.Color(0xa7aed0), color = new THREE.Color();
+  const shade = new THREE.Color(0x454B50), lit = new THREE.Color(0x6D9FC3), color = new THREE.Color();
   for (let index = 0; index < positions.count; index++) {
     const x = positions.getX(index), y = positions.getY(index), z = positions.getZ(index);
     const amount = THREE.MathUtils.clamp(.52 + Math.sin(x * 2.8 + y) * Math.cos(z * 3.2 - y * 1.5) * .18, 0, 1);
@@ -147,17 +147,17 @@ export function createMicrogliaCell({ texture, target = DEFAULT_TARGET } = {}) {
     return mesh;
   };
   const materialOptions = {
-    color: 0xffffff, roughness: .71, clearcoat: .015, sheen: .17, sheenColor: new THREE.Color(0xa5b7d2),
+    color: 0xFAF8F2, roughness: .71, clearcoat: .015, sheen: .17, sheenColor: new THREE.Color(0x6D9FC3),
     transparent: false, opacity: 1, depthWrite: true, side: THREE.FrontSide,
-    relief: .0016, bumpScale: .002, emissive: 0x35445f, emissiveIntensity: .025,
+    relief: .0016, bumpScale: .002, emissive: 0x454B50, emissiveIntensity: .025,
   };
   const bodyMaterial = tissueMaterial(texture ?? null, materialOptions), processMaterial = tissueMaterial(texture ?? null, materialOptions);
   const body = makePartition(bodyIndices, 'microglia', bodyMaterial), process = makePartition(processIndices, 'process', processMaterial);
   const defaultTarget = target.clone ? target.clone() : point(...target);
   const contactTip = LEADING_TIP.clone(), processAnchor = LEADING_TIP.clone();
   const labelAnchors = [
-    { key: 'microglia', name: 'Microglía', position: point(.24, .20, .23), side: 'right', priority: 5 },
-    { key: 'process', name: 'Proceso microglial', position: processAnchor, side: 'right', priority: 4 },
+    { key: 'microglia', name: 'Microglia', position: point(.24, .20, .23), side: 'right', priority: 5 },
+    { key: 'process', name: 'Microglial process', position: processAnchor, side: 'right', priority: 4 },
   ];
   let lastState = { time: 0, approach: 0, contact: 0, pruning: 0 };
   let lastSurfaceFrame = null;

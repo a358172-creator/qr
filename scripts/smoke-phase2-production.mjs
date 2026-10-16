@@ -130,7 +130,7 @@ try {
         assert.ok(absolute.pathname.startsWith('/qr/evidence/'), `Image escaped the project subpath: ${absolute}`);
         entry.assets.push({ assay, url: absolute.href, loaded: true });
         if (assay === 'mtt') {
-          assert.match(await page.locator('#evidence-status').innerText(), /No evaluado/);
+          assert.match(await page.locator('#evidence-status').innerText(), /Not evaluated/);
           assert.equal(await page.locator('.chart-selection').isHidden(), true);
         }
         await uiClick('#open-evidence-chart');
@@ -142,7 +142,7 @@ try {
       }
       await uiClick('#evidence-info');
       await page.waitForFunction(() => document.querySelector('#evidence-methods').open);
-      assert.match(await page.locator('#evidence-methods').innerText(), /homogeneizado/i);
+      assert.match(await page.locator('#evidence-methods').innerText(), /homogenate/i);
       await uiClick('[data-close-dialog="evidence-methods"]');
       if (await page.locator('#references-btn').isVisible()) {
         await uiClick('#references-btn');
@@ -166,7 +166,7 @@ try {
       await uiClick('#experience-menu [data-experience="evidence"]'); await ready('evidence', 'e-quin');
       await uiClick('#brand-home'); await ready('menu');
       entry.brandReturn = true;
-      entry.expectedContextErrors = fallback ? entry.consoleErrors.filter(message => /THREE\.WebGLRenderer: Error creating WebGL context\.|No se pudo iniciar el atlas WebGL:/.test(message)) : [];
+      entry.expectedContextErrors = fallback ? entry.consoleErrors.filter(message => /THREE\.WebGLRenderer: Error creating WebGL context\.|Unable to initialize the WebGL atlas:/.test(message)) : [];
       const unexpected = entry.consoleErrors.filter(message => !entry.expectedContextErrors.includes(message));
       if (fallback) assert.ok(entry.expectedContextErrors.length > 0, 'Fallback did not exercise WebGL initialization failure');
       assert.deepEqual(unexpected, [], 'Unexpected console error');

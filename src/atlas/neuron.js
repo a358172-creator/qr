@@ -76,13 +76,13 @@ export function createNeuron() {
     p.setXYZ(i,x*r,y*r,z*r);
   }
   nuclearGeometry.computeVertexNormals();
-  const nuclearMaterial = organicMaterial({ nucleus: true, color: 0x795776, roughness: .52, clearcoat: .08, transparent: true, opacity: .79, depthWrite: false });
+  const nuclearMaterial = organicMaterial({ nucleus: true, color: 0xE88A38, roughness: .52, clearcoat: .08, transparent: true, opacity: .79, depthWrite: false });
   const nucleus = new THREE.Mesh(nuclearGeometry, nuclearMaterial);
   nucleus.position.set(-9.05,-3.1,-1.02); nucleus.scale.set(1.21,1.34,1.13); nucleus.rotation.set(.17,-.24,.13); nucleus.renderOrder = 1;
   root.add(nucleus);
-  const nucleolus = new THREE.Mesh(new THREE.SphereGeometry(.41,32,24), organicMaterial({ nucleus: true, color: 0x695173, roughness: .58 }));
+  const nucleolus = new THREE.Mesh(new THREE.SphereGeometry(.41,32,24), organicMaterial({ nucleus: true, color: 0x454B50, roughness: .58 }));
   nucleolus.position.set(-8.77,-3.27,-.24); nucleolus.scale.set(1,.87,.52); nucleolus.renderOrder = 2; root.add(nucleolus);
-  const chromatin = new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,10), organicMaterial({ nucleus: true, color: 0x997797, roughness: .64 }), 46);
+  const chromatin = new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,10), organicMaterial({ nucleus: true, color: 0xE5D8BE, roughness: .64 }), 46);
   const matrix = new THREE.Object3D();
   for (let i = 0; i < chromatin.count; i++) {
     const angle = i * 2.399963, y = 1 - (i / (chromatin.count - 1)) * 2, r = Math.sqrt(1 - y * y);

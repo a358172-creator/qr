@@ -7,7 +7,7 @@ const evidence = createEvidenceInterface();
 let atlas;
 const showUnavailable = (lost = false) => {
   document.querySelector('#scene-loading').hidden = true;
-  if (lost) document.querySelector('#scene-error-text').textContent = 'La conexión gráfica se ha interrumpido. La escena se recuperará cuando vuelva la conexión.';
+  if (lost) document.querySelector('#scene-error-text').textContent = 'The graphics connection was interrupted. The scene will recover when the connection is restored.';
   document.querySelector('#scene-error').hidden = false;
   ui.unavailable();
   evidence.unavailable();
@@ -34,7 +34,7 @@ try {
     window.__evidence = { getState: () => evidence.getState() };
   }
 } catch (error) {
-  console.error('No se pudo iniciar el atlas WebGL:', error);
+  console.error('Unable to initialize the WebGL atlas:', error);
   showUnavailable();
 }
 if (import.meta.hot) import.meta.hot.dispose(() => { ui.dispose(); evidence.dispose(); atlas?.dispose(); });

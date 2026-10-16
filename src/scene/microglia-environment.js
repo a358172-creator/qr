@@ -66,7 +66,7 @@ function spineGeometry(centerX) {
     }
     return p;
   });
-  return colouredMembrane(geometry, 0x98798f, 0xc5a0b5);
+  return colouredMembrane(geometry, 0xA8A9A3, 0xE5D8BE);
 }
 
 function dendriteGeometry() {
@@ -86,7 +86,7 @@ function dendriteGeometry() {
   const indices = geometry.index.array;
   for (let i = 0; i < indices.length; i += 3) [indices[i + 1], indices[i + 2]] = [indices[i + 2], indices[i + 1]];
   geometry.computeVertexNormals();
-  return colouredMembrane(geometry, 0x8c7597, 0xb893aa);
+  return colouredMembrane(geometry, 0xA8A9A3, 0xE5D8BE);
 }
 
 function addLobe(parts, seed, scale, position, angle = 0) {
@@ -108,7 +108,7 @@ function createNmda(texture) {
     addLobe(parts, index + 2, [.058, .082, .055], [dx * .09, .12, dz * .09], -dx * .24);
     addLobe(parts, index + 7, [.060, .089, .054], [dx * .102, .23, dz * .102], dx * .32);
   }
-  const material = physical(0x9895c4, { roughness: .57, bumpMap: texture, bumpScale: .007, emissive: 0x51496a, emissiveIntensity: .04 });
+  const material = physical(0xE88A38, { roughness: .57, bumpMap: texture, bumpScale: .007, emissive: 0xE88A38, emissiveIntensity: .04 });
   group.add(new THREE.Mesh(merge(parts), material));
   group.userData.key = 'nmda';
   group.name = 'NMDAR contextual channel';
@@ -130,11 +130,11 @@ function createTerminal(texture, x, healthy) {
   };
   const material = tissueMaterial(texture, {
     vertexColors: true, roughness: .70, opacity: .70, side: THREE.FrontSide, relief: .002, bumpScale: .004,
-    emissive: 0x3f314f, emissiveIntensity: .015,
+    emissive: 0x454B50, emissiveIntensity: .015,
   });
-  const geometry = colouredMembrane(gridGeometry(62, 48, surface), 0x80718f, 0xb4a0c1);
+  const geometry = colouredMembrane(gridGeometry(62, 48, surface), 0xA8A9A3, 0x6D9FC3);
   root.add(new THREE.Mesh(geometry, material));
-  const vesicles = new THREE.InstancedMesh(organicLobe(24), physical(0xb8aac8, { roughness: .61 }), 11);
+  const vesicles = new THREE.InstancedMesh(organicLobe(24), physical(0x6D9FC3, { roughness: .61 }), 11);
   const transform = new THREE.Object3D();
   for (let index = 0; index < 11; index++) {
     const angle = index * 2.399963, radius = .30 + .10 * Math.sin(index * 1.4);
@@ -143,7 +143,7 @@ function createTerminal(texture, x, healthy) {
     transform.updateMatrix(); vesicles.setMatrixAt(index, transform.matrix);
   }
   root.add(vesicles);
-  const zone = new THREE.Mesh(new THREE.SphereGeometry(1, 30, 12), physical(0xaea0b4, { roughness: .71, transparent: true, opacity: .44, depthWrite: false }));
+  const zone = new THREE.Mesh(new THREE.SphereGeometry(1, 30, 12), physical(0xA8A9A3, { roughness: .71, transparent: true, opacity: .44, depthWrite: false }));
   zone.position.set(-.02, .916, 0); zone.scale.set(.58, .022, .36); root.add(zone);
   return { root, material, vesicles, zone };
 }
@@ -164,7 +164,7 @@ function createComplement(key, texture) {
     addLobe(parts, 76, [.097, .084, .075], [.105, .036, .016], .44);
     addLobe(parts, 84, [.063, .069, .06], [.026, -.122, .005], -.17);
   }
-  const material = physical(key === 'c1q' ? 0xb7c3cf : 0xaba997, { roughness: .63, bumpMap: texture, bumpScale: .007, emissive: key === 'c1q' ? 0x557587 : 0x625e42, emissiveIntensity: .02 });
+  const material = physical(key === 'c1q' ? 0x6D9FC3 : 0xA8A9A3, { roughness: .63, bumpMap: texture, bumpScale: .007, emissive: key === 'c1q' ? 0x6D9FC3 : 0x454B50, emissiveIntensity: .02 });
   const mesh = new THREE.InstancedMesh(merge(parts), material, key === 'c1q' ? 3 : 2);
   mesh.userData.key = key;
   mesh.name = `${key.toUpperCase()} conceptual recognition complexes`;
@@ -183,7 +183,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
   const dendrite = new THREE.Mesh(dendriteGeometry(), tissueMaterial(texture, { opacity: 1, transparent: false, depthWrite: true, side: THREE.FrontSide, relief: .002, bumpScale: .004 }));
   dendrite.userData.key = 'dendrite'; dendrite.name = 'Continuous dendritic shaft'; root.add(dendrite); selectable.push(dendrite);
   const healthyMaterial = tissueMaterial(texture, { opacity: .97, side: THREE.FrontSide, relief: .0018, bumpScale: .004 });
-  const damagedMaterial = tissueMaterial(texture, { opacity: .92, side: THREE.FrontSide, relief: .0018, bumpScale: .004, emissive: 0x68465e, emissiveIntensity: .025 });
+  const damagedMaterial = tissueMaterial(texture, { opacity: .92, side: THREE.FrontSide, relief: .0018, bumpScale: .004, emissive: 0x454B50, emissiveIntensity: .025 });
   const healthy = new THREE.Mesh(spineGeometry(HEALTHY_X), healthyMaterial);
   const damaged = new THREE.Mesh(spineGeometry(DAMAGED_X), damagedMaterial);
   healthy.name = 'Conserved mushroom spine'; damaged.name = 'Gradually remodelled mushroom spine';
@@ -205,7 +205,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     const entry = { ...item, position: item.position.clone().add(cell.root.position) };
     labelAnchors.push(entry); return { entry, source: item };
   });
-  if (!cellAnchors.some(item => item.entry.key === 'microglia')) anchor('microglia', 'Microglía', [3.5, 3.7, -.70], 'right', 5);
+  if (!cellAnchors.some(item => item.entry.key === 'microglia')) anchor('microglia', 'Microglia', [3.5, 3.7, -.70], 'right', 5);
   const c1q = createComplement('c1q', texture), c3 = createComplement('c3', texture);
   root.add(c1q.mesh, c3.mesh); selectable.push(c1q.mesh, c3.mesh);
   // Tie contact and extracellular markers to vertices of the actual membrane.
@@ -244,7 +244,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     addLobe(caspaseParts, 113 + index, [.12, .081, .09], [x, 0, 0], x * 1.7);
     addLobe(caspaseParts, 133 + index, [.063, .052, .056], [x * 1.2, -.066, .033]);
   }
-  const caspase = new THREE.Mesh(merge(caspaseParts), physical(0xb68da5, { roughness: .60, bumpMap: texture, bumpScale: .008, emissive: 0x64314f, emissiveIntensity: .10 }));
+  const caspase = new THREE.Mesh(merge(caspaseParts), physical(0xE88A38, { roughness: .60, bumpMap: texture, bumpScale: .008, emissive: 0x454B50, emissiveIntensity: .10 }));
   caspase.userData.key = 'caspase3'; caspase.name = 'Intracellular conceptual caspase-3 signal'; root.add(caspase); selectable.push(caspase);
 
   const pools = new Map();
@@ -252,20 +252,20 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     const item = createMolecularPool(root, { key, capacity, geometry: molecularGlyph(shape, radius), material: physical(color, { roughness: .59, emissive: color, emissiveIntensity: .045 }) });
     pools.set(key, item); selectable.push(item.mesh); return item;
   };
-  const glutamate = pool('glutamate', 9, 0xc6ae8e, 'single', .025);
-  const calcium = pool('calcium', 13, 0xe1a088, 'single', .030);
-  const ros = pool('ros', 9, 0xd6a0b4, 'cluster', .033);
-  anchor('healthySpine', 'Espina conservada', [HEALTHY_X - .54, -.12, .46], 'left', 5);
-  const damagedAnchor = anchor('damagedSpine', 'Espina en estudio', [DAMAGED_X - .40, -.08, .49], 'left', 5);
-  anchor('dendrite', 'Dendrita', [-.73, -2.21, .36], 'left', 1);
-  anchor('terminal', 'Terminal presináptica', [.80, 1.65, .30], 'left', 2);
+  const glutamate = pool('glutamate', 9, 0xE5D8BE, 'single', .025);
+  const calcium = pool('calcium', 13, 0xE88A38, 'single', .030);
+  const ros = pool('ros', 9, 0xE5D8BE, 'cluster', .033);
+  anchor('healthySpine', 'Preserved spine', [HEALTHY_X - .54, -.12, .46], 'left', 5);
+  const damagedAnchor = anchor('damagedSpine', 'Spine under study', [DAMAGED_X - .40, -.08, .49], 'left', 5);
+  anchor('dendrite', 'Dendrite', [-.73, -2.21, .36], 'left', 1);
+  anchor('terminal', 'Presynaptic terminal', [.80, 1.65, .30], 'left', 2);
   const nmdaAnchor = anchor('nmda', 'NMDAR', [1.28, .68, .26], 'left', 4);
-  anchor('glutamate', 'Glutamato', [1.19, .81, .30], 'left', 2);
+  anchor('glutamate', 'Glutamate', [1.19, .81, .30], 'left', 2);
   anchor('calcium', 'Ca²⁺', [1.34, .07, .38], 'left', 4);
   const rosAnchor = anchor('ros', 'ROS', [1.65, -.42, .55], 'right', 3);
   const c1qAnchor = anchor('c1q', 'C1q', [1.50, .12, .76], 'left', 6);
   const c3Anchor = anchor('c3', 'C3', [1.88, -.28, .34], 'right', 6);
-  const caspaseAnchor = anchor('caspase3', 'Caspasa-3 · señal', [1.13, -.27, .33], 'left', 3);
+  const caspaseAnchor = anchor('caspase3', 'Caspase-3 · signal', [1.13, -.27, .33], 'left', 3);
 
   let lastStage = 0, headScale = 1, pruningAmount = 0;
   let lastDamage = NaN, lastPruning = NaN;
@@ -314,7 +314,7 @@ export function createMicrogliaEnvironment({ texture = surfaceTexture() } = {}) 
     }
     // The conserved spine, terminal, receptor and their material state are never
     // modified. Morphology, markers and contact all identify the affected site.
-    damagedMaterial.color.set(0xffffff).lerp(new THREE.Color(0xc3b4c2), damage * .28);
+    damagedMaterial.color.set(0xFAF8F2).lerp(new THREE.Color(0xA8A9A3), damage * .28);
     damagedMaterial.opacity = .92 - signals * .22;
     damagedMaterial.emissiveIntensity = .025 + (selected === 'damagedSpine' ? .13 : 0);
     nmda.group.position.copy(atSurface(v3(.08, .446, .18), damage, pruning));

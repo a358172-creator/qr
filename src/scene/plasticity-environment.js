@@ -39,9 +39,9 @@ export function createPlasticityEnvironment({ texture } = {}) {
     if (kind==='pre') {
       geometry = gridGeometry(40,42,surface.sample); surface.geometry.dispose();
     }
-    const material = tissueMaterial(texture, {color:kind==='post'?0xf2ddea:0xbeb0ca,
+    const material = tissueMaterial(texture, {color:kind==='post'?0xE5D8BE:0x6D9FC3,
       vertexColors:kind==='post',side:THREE.FrontSide,opacity:kind==='post'?.80:.46,
-      roughness:.67,bumpScale:.009,relief:.003,emissive:kind==='post'?0x503549:0x343044,emissiveIntensity:.06});
+      roughness:.67,bumpScale:.009,relief:.003,emissive:kind==='post'?0x454B50:0x454B50,emissiveIntensity:.06});
     const membrane = register(new THREE.Mesh(geometry,material),kind==='post'?'spine':'terminal',kind==='post'?'Continuous mushroom membrane':'Contextual presynaptic terminal');
     membrane.renderOrder=2;
     (kind==='post'?membraneMaterials:terminalMaterials).push({material,opacity:material.opacity});
@@ -49,14 +49,14 @@ export function createPlasticityEnvironment({ texture } = {}) {
     // Both cutaways retain their far wall: otherwise the presynaptic terminal
     // reads as an empty outline with free-floating vesicles. The inset shares
     // the real section boundary and keeps the vesicles inside a tissue volume.
-    const innerMaterial=tissueMaterial(texture,{color:kind==='post'?0xc3a6ba:0x9c90ad,
+    const innerMaterial=tissueMaterial(texture,{color:kind==='post'?0xE5D8BE:0x6D9FC3,
       vertexColors:kind==='post',side:THREE.BackSide,opacity:kind==='post'?.72:.58,
-      roughness:.78,bumpScale:.007,relief:.002,emissive:kind==='post'?0x513f50:0x3f364c,emissiveIntensity:.08});
+      roughness:.78,bumpScale:.007,relief:.002,emissive:kind==='post'?0x454B50:0x454B50,emissiveIntensity:.08});
     const inner=new THREE.Mesh(geometry,innerMaterial);
     if(kind==='pre') inner.scale.set(.99,1,.99);
     register(inner,kind==='post'?'spine':'terminal',kind==='post'?'Inner mushroom membrane':'Inner presynaptic membrane');
     (kind==='post'?membraneMaterials:terminalMaterials).push({material:innerMaterial,opacity:innerMaterial.opacity});
-    const edgeMat = physical(kind==='post'?0xd2a9c2:0xb8a5c7,{roughness:.65,transparent:true,opacity:kind==='post'?.84:.46,depthWrite:false,bumpMap:texture,bumpScale:.008});
+    const edgeMat = physical(kind==='post'?0xE5D8BE:0x6D9FC3,{roughness:.65,transparent:true,opacity:kind==='post'?.84:.46,depthWrite:false,bumpMap:texture,bumpScale:.008});
     const parts=[];
     for(const side of [0,1]) {
       const points = Array.from({length:75},(_,i)=>surface.sample(THREE.MathUtils.lerp(...surface.windowRange,i/74),side));
@@ -80,11 +80,11 @@ export function createPlasticityEnvironment({ texture } = {}) {
   const shaftIndices=shaftGeometry.index.array;
   for(let i=0;i<shaftIndices.length;i+=3) [shaftIndices[i+1],shaftIndices[i+2]]=[shaftIndices[i+2],shaftIndices[i+1]];
   shaftGeometry.index.needsUpdate=true;shaftGeometry.computeVertexNormals();
-  register(new THREE.Mesh(shaftGeometry,tissueMaterial(texture,{vertexColors:false,color:0xbda0b6,side:THREE.FrontSide,opacity:.84,bumpScale:.007,relief:.002})),'dendrite','Supporting dendritic shaft');
+  register(new THREE.Mesh(shaftGeometry,tissueMaterial(texture,{vertexColors:false,color:0xE5D8BE,side:THREE.FrontSide,opacity:.84,bumpScale:.007,relief:.002})),'dendrite','Supporting dendritic shaft');
 
   // Modest presynaptic context: eleven membrane-bound vesicles, no unrelated
   // organelles or damage machinery are constructed for this mechanism.
-  const vesicleMat=physical(0xc2b3cd,{roughness:.63,transparent:true,opacity:.64,depthWrite:false,bumpMap:texture,bumpScale:.008});
+  const vesicleMat=physical(0x6D9FC3,{roughness:.63,transparent:true,opacity:.64,depthWrite:false,bumpMap:texture,bumpScale:.008});
   const vesicles=new THREE.InstancedMesh(organicLobe(19),vesicleMat,11), transform=new THREE.Object3D(), rng=random(142);
   vesicles.name='Contextual synaptic vesicles';
   for(let i=0;i<11;i++) {
@@ -96,7 +96,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
   // Four separated organic subunits maintain the existing receptor language.
   // Their very small radial excursion changes the pore rather than moving the receptor.
   const receptor=new THREE.Group(); receptor.position.copy(CHANNEL);
-  const receptorMat=physical(0x8386b6,{roughness:.58,bumpMap:texture,bumpScale:.01,emissive:0x34394f,emissiveIntensity:.07});
+  const receptorMat=physical(0xE88A38,{roughness:.58,bumpMap:texture,bumpScale:.01,emissive:0xE88A38,emissiveIntensity:.07});
   const receptorSubunits=[];
   for(let i=0;i<4;i++) {
     const a=i*Math.PI/2+.35,dx=Math.cos(a),dz=Math.sin(a),parts=[];
@@ -106,7 +106,7 @@ export function createPlasticityEnvironment({ texture } = {}) {
     }
     const subunit=new THREE.Mesh(merge(parts),receptorMat);subunit.name=`NMDAR subunit ${i+1}`;receptor.add(subunit);receptorSubunits.push({subunit,dx,dz});
   }
-  const poreMat=physical(0xb2abc9,{roughness:.61});
+  const poreMat=physical(0xE5D8BE,{roughness:.61});
   const pore=new THREE.Mesh(new THREE.TorusGeometry(.080,.017,8,24),poreMat);pore.rotation.x=Math.PI/2;pore.position.y=-.005;receptor.add(pore);
   register(receptor,'nmda','NMDAR physiological channel');
 
@@ -166,17 +166,17 @@ export function createPlasticityEnvironment({ texture } = {}) {
     const tip=v3(start.x*.96,-.31-.035*Math.abs(start.x),start.z*.97);
     latticeParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start,start.clone().lerp(tip,.5).add(v3(.02,0,-.015)),tip]),8,.012+(i%3)*.002,5,false));
   }
-  const psdMat=physical(0x6f958c,{roughness:.81,clearcoat:.02,transparent:true,opacity:.72,depthWrite:false,emissive:0x24433a,emissiveIntensity:.025});
+  const psdMat=physical(0x6D9FC3,{roughness:.81,clearcoat:.02,transparent:true,opacity:.72,depthWrite:false,emissive:0x6D9FC3,emissiveIntensity:.025});
   const psd=register(new THREE.Mesh(merge(latticeParts),psdMat),'psd','Porous postsynaptic protein scaffold');rememberMorph(psd.geometry);
 
   const proteinSpecs=[
-    {key:'psd95',name:'PSD-95 scaffold complex',position:v3(.60,-.43,.37),color:0x8ea99f,emissive:0x344c43,
+    {key:'psd95',name:'PSD-95 scaffold complex',position:v3(.60,-.43,.37),color:0x6D9FC3,emissive:0x6D9FC3,
       scales:[[.075,.048,.065],[.079,.052,.059],[.081,.050,.065],[.072,.069,.058],[.105,.074,.075]],
       offsets:[[-.25,.025,-.025],[-.11,.012,.035],[.035,-.018,.03],[.13,-.085,-.008],[.25,-.13,-.015]]},
-    {key:'disc1',name:'DISC1 structural complex',position:v3(-.69,-.98,.35),color:0x91a3b5,emissive:0x334453,
+    {key:'disc1',name:'DISC1 structural complex',position:v3(-.69,-.98,.35),color:0x454B50,emissive:0x454B50,
       scales:[[.086,.112,.072],[.049,.145,.052],[.057,.128,.048],[.089,.090,.063]],
       offsets:[[-.054,.19,-.025],[.007,.055,.012],[.02,-.115,.005],[.075,-.265,-.01]]},
-    {key:'kalirin7',name:'Kalirin-7 actin-adjacent complex',position:v3(.63,-1.22,.32),color:0x99b6a4,emissive:0x3d5347,
+    {key:'kalirin7',name:'Kalirin-7 actin-adjacent complex',position:v3(.63,-1.22,.32),color:0xE88A38,emissive:0xE88A38,
       scales:[[.091,.064,.058],[.082,.041,.047],[.091,.044,.050],[.102,.045,.056],[.13,.085,.073],[.080,.059,.067]],
       offsets:[[-.35,.045,-.018],[-.22,-.025,.012],[-.075,-.073,.04],[.09,-.073,.027],[.27,-.02,0],[.31,.105,-.018]]},
   ];
@@ -192,17 +192,17 @@ export function createPlasticityEnvironment({ texture } = {}) {
 
   const actin=createActinNetwork({texture});root.add(actin.root);selectable.push(...actin.selectable);
   for(const item of actin.labelAnchors) labelAnchors.push(item);
-  const calcium=createMolecularPool(root,{key:'calcium',capacity:8,geometry:molecularGlyph('single',.044),material:physical(0xd3a293,{roughness:.52,emissive:0x6b413b,emissiveIntensity:.16})});
-  const glutamate=createMolecularPool(root,{key:'glutamate',capacity:7,geometry:molecularGlyph('triple',.035),material:physical(0xbeae8f,{roughness:.64,emissive:0x3f3827,emissiveIntensity:.05})});
+  const calcium=createMolecularPool(root,{key:'calcium',capacity:8,geometry:molecularGlyph('single',.044),material:physical(0xE88A38,{roughness:.52,emissive:0x454B50,emissiveIntensity:.16})});
+  const glutamate=createMolecularPool(root,{key:'glutamate',capacity:7,geometry:molecularGlyph('triple',.035),material:physical(0xE5D8BE,{roughness:.64,emissive:0x454B50,emissiveIntensity:.05})});
   selectable.push(calcium.mesh,glutamate.mesh);
 
-  anchor('spine','Espina dendrítica',[-1.38,-1.1,.65],'left',3);
-  anchor('terminal','Terminal presináptica',[-1.02,1.96,.35],'left');
-  anchor('dendrite','Dendrita',[-2.1,-3.55,.24],'left',1);
+  anchor('spine','Dendritic spine',[-1.38,-1.1,.65],'left',3);
+  anchor('terminal','Presynaptic terminal',[-1.02,1.96,.35],'left');
+  anchor('dendrite','Dendrite',[-2.1,-3.55,.24],'left',1);
   anchor('nmda','NMDAR',[.45,.13,.32],'right',3);
-  anchor('glutamate','Glutamato',[-.14,.55,.37],'left');
+  anchor('glutamate','Glutamate',[-.14,.55,.37],'left');
   anchor('calcium','Ca²⁺',[.17,-.66,.55],'left',3);
-  anchor('psd','Densidad postsináptica',[-.91,-.45,.39],'left');
+  anchor('psd','Postsynaptic density',[-.91,-.45,.39],'left');
   anchor('psd95','PSD-95',[.79,-.52,.4],'right',3);
   anchor('disc1','DISC1',[-.68,-.98,.40],'left',3);
   anchor('kalirin7','Kalirin-7',[.88,-1.22,.37],'right',3);

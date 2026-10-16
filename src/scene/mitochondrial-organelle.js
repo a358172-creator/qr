@@ -26,12 +26,12 @@ export function createMitochondrialOrganelle(texture) {
     const relief = 1 + .018 * Math.sin(u * 71 + a * 3) + .009 * Math.sin(u * 133 - a * 7);
     return c.add(v3(.027 * Math.sin(a * 3) * r, Math.sin(a) * r * relief, Math.cos(a) * r * .91 * relief));
   };
-  const outerMat = physical(0xb57f83, {
+  const outerMat = physical(0xE88A38, {
     side: THREE.DoubleSide, roughness: .61, bumpMap: texture, bumpScale: .010,
-    sheen: .24, sheenColor: new THREE.Color(0xedb9b2), sheenRoughness: .7,
-    emissive: 0x5f2635, emissiveIntensity: .025,
+    sheen: .24, sheenColor: new THREE.Color(0xE5D8BE), sheenRoughness: .7,
+    emissive: 0xE88A38, emissiveIntensity: .025,
   });
-  const innerMat = physical(0x7a536a, { side: THREE.DoubleSide, roughness: .77, bumpMap: texture, bumpScale: .006 });
+  const innerMat = physical(0x454B50, { side: THREE.DoubleSide, roughness: .77, bumpMap: texture, bumpScale: .006 });
   const outer = new THREE.Mesh(gridGeometry(104, 66, (u, v) => surface(u, v)), outerMat);
   // One continuous inner-membrane manifold, locally invaginated. The fold
   // material partitions this same indexed surface; no floating sheets, rods,
@@ -64,12 +64,12 @@ export function createMitochondrialOrganelle(texture) {
     geometry.setIndex(indices);return geometry;
   };
   const inner=new THREE.Mesh(partition(innerIndices),innerMat);
-  const foldMat=physical(0xc59194,{side:THREE.DoubleSide,roughness:.74,clearcoat:.025,bumpMap:texture,bumpScale:.006,emissive:0x6a3040,emissiveIntensity:.035});
+  const foldMat=physical(0xE88A38,{side:THREE.DoubleSide,roughness:.74,clearcoat:.025,bumpMap:texture,bumpScale:.006,emissive:0xE88A38,emissiveIntensity:.035});
   const folds=new THREE.Mesh(partition(foldIndices),foldMat);
   outer.name='Outer mitochondrial membrane';inner.name='Inner mitochondrial membrane';folds.name='Invaginated cristae membranes';
   group.add(outer,inner,folds);
 
-  const cutMat = physical(0xdbb1a7, { roughness: .62, bumpMap: texture, bumpScale: .012 });
+  const cutMat = physical(0xE5D8BE, { roughness: .62, bumpMap: texture, bumpScale: .012 });
   const outerEdges = [], innerEdges = [];
   for (const side of [0, 1]) {
     // The intermembrane space stays open at the cut. Each membrane has its
@@ -84,9 +84,9 @@ export function createMitochondrialOrganelle(texture) {
     innerEdges.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(innerPoints), 100, .012, 7, false));
   }
   group.add(new THREE.Mesh(merged(outerEdges), cutMat));
-  group.add(new THREE.Mesh(merged(innerEdges), physical(0x80516a, { roughness: .7 })));
+  group.add(new THREE.Mesh(merged(innerEdges), physical(0x454B50, { roughness: .7 })));
 
-  const granules = new THREE.InstancedMesh(new THREE.SphereGeometry(.026, 7, 5), physical(0xb79a9f, { roughness: .92 }), 76);
+  const granules = new THREE.InstancedMesh(new THREE.SphereGeometry(.026, 7, 5), physical(0xA8A9A3, { roughness: .92 }), 76);
   const rng = random(847), transform = new THREE.Object3D();
   for (let index = 0; index < granules.count; index++) {
     let u=.07+rng()*.86;
@@ -111,10 +111,10 @@ export function createMitochondrialOrganelle(texture) {
     }
     reliefParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 28, .007, 5, false));
   }
-  group.add(new THREE.Mesh(merged(reliefParts), physical(0xc49797, { roughness: .83 })));
+  group.add(new THREE.Mesh(merged(reliefParts), physical(0xE5D8BE, { roughness: .83 })));
 
-  const healthy = new THREE.Color(0xb57f83), stressed = new THREE.Color(0x9e6b80);
-  const healthyFold = new THREE.Color(0xc99192), stressedFold = new THREE.Color(0xb48194);
+  const healthy = new THREE.Color(0xE88A38), stressed = new THREE.Color(0x454B50);
+  const healthyFold = new THREE.Color(0xE88A38), stressedFold = new THREE.Color(0x454B50);
   return {
     group, outer, inner, folds, surface, innerSurface, outerMat, foldMat,
     diagnostics:()=>({cristae:foldSites.length,sharedInnerVertices:continuousInner.attributes.position.count,innerTriangles:innerIndices.length/3,foldTriangles:foldIndices.length/3}),

@@ -253,7 +253,7 @@ try {
       assert.ok(rows.every(row => row.modelUnchanged), 'Age and assay altered the conceptual scene');
       for (const row of rows) {
         if (row.age === 'PN3' && row.assay === 'mtt') {
-          assert.equal(row.status, 'not-evaluated'); assert.match(row.statusText, /No evaluado/);
+          assert.equal(row.status, 'not-evaluated'); assert.match(row.statusText, /Not evaluated/);
         }
       }
       report.matrix.push(...rows); await save();

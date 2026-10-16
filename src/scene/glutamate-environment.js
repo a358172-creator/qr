@@ -29,16 +29,16 @@ export function createGlutamateEnvironment({ texture } = {}) {
   const selectable=[...anatomy.selectable,...particles.selectable,...actin.selectable];
   const labelAnchors=anatomy.labelAnchors;
   const anchor=(key,name,position,side='right')=>labelAnchors.push({key,name,position:v3(...position),side,priority:3});
-  anchor('dendrite','Dendrita proximal',[3.45,-3.78,.25]);anchor('actin','F-actina',[-.7,-1.30,.25],'left');
-  anchor('cytochrome','Citocromo c',[2.32,-3.45,.30]);anchor('apaf1','Apaf-1',[2.93,-3.60,.24]);
-  anchor('caspase9','Caspasa-9',[3.27,-3.61,.23]);anchor('executioners','Caspasas ejecutoras',[3.63,-3.76,.23]);
+  anchor('dendrite','Proximal dendrite',[3.45,-3.78,.25]);anchor('actin','F-actin',[-.7,-1.30,.25],'left');
+  anchor('cytochrome','Cytochrome c',[2.32,-3.45,.30]);anchor('apaf1','Apaf-1',[2.93,-3.60,.24]);
+  anchor('caspase9','Caspase-9',[3.27,-3.61,.23]);anchor('executioners','Executioner caspases',[3.63,-3.76,.23]);
   const anchorBases=labelAnchors.map(a=>a.position.clone());
   const actinGeometry=actin.selectable[0].geometry;
   const surfaces=[...new Set(anatomy.spineSurfaces),actinGeometry].map(geometry=>({geometry,base:geometry.attributes.position.array.slice()}));
   const postZoneBase=anatomy.postZone.position.clone(), postZoneScale=anatomy.postZone.scale.clone();
   const receptorBases=anatomy.receptors.map(r=>r.group.position.clone());
   const caspaseBases=anatomy.caspases.children.map(child=>child.position.clone());
-  const cytochrome=createMolecularPool(root,{key:'cytochrome',capacity:6,geometry:molecularGlyph('single',.030),material:physical(0xd1ad85,{roughness:.76})});
+  const cytochrome=createMolecularPool(root,{key:'cytochrome',capacity:6,geometry:molecularGlyph('single',.030),material:physical(0xE5D8BE,{roughness:.76})});
   selectable.push(cytochrome.mesh);
   function complex(key,position,ring=false){
     const parts=[];
@@ -49,7 +49,7 @@ export function createGlutamateEnvironment({ texture } = {}) {
       g.translate(ring?Math.cos(a)*.118:(i%2-.5)*.084,ring?Math.sin(a)*.118:(Math.floor(i/2)-.5)*.054,Math.sin(i)*.012);parts.push(g);
     }
     const geometry=mergeGeometries(parts);parts.forEach(g=>g.dispose());
-    const material=physical(ring?0x9eb0ad:0xb787a2,{roughness:.78,emissive:0x654452,emissiveIntensity:.025});
+    const material=physical(ring?0x6D9FC3:0xE88A38,{roughness:.78,emissive:0xE88A38,emissiveIntensity:.025});
     const mesh=new THREE.Mesh(geometry,material);mesh.position.copy(position);mesh.userData.key=key;mesh.name=key;root.add(mesh);selectable.push(mesh);return mesh;
   }
   const apaf=complex('apaf1',v3(2.93,-3.60,.23),true);

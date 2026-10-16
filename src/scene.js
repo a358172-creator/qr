@@ -29,11 +29,11 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
   controls.minAzimuthAngle = -.85; controls.maxAzimuthAngle = 1.0;
   controls.target.copy(vector(-5, -.4, -1)); camera.position.copy(vector(-3, 8, 35));
   const cameraController = createCameraController(camera, controls, () => motion.matches);
-  const ambient = new THREE.HemisphereLight(0xd2e0ed, 0x3b294b, .6); scene.add(ambient);
-  const key = new THREE.DirectionalLight(0xffe5dc, 2.35); key.position.set(-8, 12, 11); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xc0d9ea, .55); fill.position.set(8, 3, 9); scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xcbbae7, 1.65); rim.position.set(-5, 7, -8); scene.add(rim);
-  const bounce = new THREE.DirectionalLight(0xd19ba9, .35); bounce.position.set(0, -7, 4); scene.add(bounce);
+  const ambient = new THREE.HemisphereLight(0xFAF8F2, 0x454B50, .6); scene.add(ambient);
+  const key = new THREE.DirectionalLight(0xFAF8F2, 2.35); key.position.set(-8, 12, 11); scene.add(key);
+  const fill = new THREE.DirectionalLight(0x6D9FC3, .55); fill.position.set(8, 3, 9); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xFAF8F2, 1.65); rim.position.set(-5, 7, -8); scene.add(rim);
+  const bounce = new THREE.DirectionalLight(0xE5D8BE, .35); bounce.position.set(0, -7, 4); scene.add(bounce);
   let environmentTarget;
   function buildEnvironment() {
     environmentTarget?.dispose();
@@ -251,9 +251,9 @@ export async function createAtlas(canvas, { hotspotLayer, labelLayer, onView, on
         syncAnchors(); annotations.setAnchors(active.anchors);
       } catch (error) {
         if (token !== navigationId || disposed) return;
-        console.error('No se pudo cargar el mecanismo:', error);
+        console.error('Unable to load the mechanism:', error);
         transitioning = false; controls.enabled = true; emitView();
-        onRegion?.({ title: 'No se pudo preparar el mecanismo. Inténtalo de nuevo.', error: true }); return;
+        onRegion?.({ title: 'Unable to prepare the mechanism. Please try again.', error: true }); return;
       }
     }
     view = nextView;

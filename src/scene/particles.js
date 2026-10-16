@@ -9,10 +9,10 @@ export function createParticles(root, channels, receptors, {rosOrigin = null, pr
     const mesh=new THREE.InstancedMesh(geometry,mat,count);mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     mesh.frustumCulled=false;mesh.userData.key=key;root.add(mesh);return mesh;
   };
-  const glutamate=make(36,0xe7ae68,'glutamate',.18);
-  const calcium=make(28,0xe27d72,'calcium',.24);
-  const ros=make(18,0xc7739b,'ros',.20);
-  const sodium=make(9,0x94cfc1,'ampa',.08);
+  const glutamate=make(36,0xE5D8BE,'glutamate',.18);
+  const calcium=make(28,0xE88A38,'calcium',.24);
+  const ros=make(18,0xE88A38,'ros',.20);
+  const sodium=make(9,0x6D9FC3,'ampa',.08);
   const glutPaths = Array.from({length:36},(_,i)=>{
     const target=receptors[i%receptors.length].group.position;
     const x=-.72+(i%5)*.35,z=.14+(i%3)*.19;

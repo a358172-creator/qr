@@ -22,7 +22,7 @@ export function createControlEnvironment({texture}={}) {
   const root=new THREE.Group();root.name='Experimental evidence anatomical reference';
   const membrane=createBilayer(texture,{holes:[]});membrane.group.scale.setScalar(.74);membrane.group.position.y=.12;root.add(membrane.group);
   const mito=createMitochondrialOrganelle(texture);mito.group.position.set(.12,-.68,0);root.add(mito.group);
-  const labelAnchors=[label('membrane','Bicapa de referencia',v3(-1.8,1.92,.45)),label('mitochondria','Mitocondria de referencia',v3(.65,-1.0,.4),'right')];
+  const labelAnchors=[label('membrane','Reference bilayer',v3(-1.8,1.92,.45)),label('mitochondria','Reference mitochondrion',v3(.65,-1.0,.4),'right')];
   let stage=0;
   function update({stepIndex=0,selected=null}={}) {
     stage=stages(stepIndex,2);membrane.update(0,selected==='membrane');mito.update(0,selected==='mitochondria');root.updateMatrixWorld(true);
@@ -46,26 +46,26 @@ export function createIronEnvironment({texture}={}) {
     const points=Array.from({length:7},(_,i)=>at(x+(i%2?.018:-.018),z+Math.sin(i*1.9)*.025,.085-i*.025));
     parts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),18,.015,6,false));
   }
-  const pufa=new THREE.Mesh(merge(parts),physical(0x93bcb0,{roughness:.78,clearcoat:.01,emissive:0x335849,emissiveIntensity:.035}));
+  const pufa=new THREE.Mesh(merge(parts),physical(0x6D9FC3,{roughness:.78,clearcoat:.01,emissive:0x6D9FC3,emissiveIntensity:.035}));
   pufa.name='Illustrative polyunsaturated acyl chains';pufa.userData.key='pufa';root.add(pufa);
-  const ferrous=particle(root,'fe2',0xa4bec7,'single',3,.065);
-  const peroxide=particle(root,'h2o2',0xc8b1c9,'double',3,.052);
-  const ferric=particle(root,'fe3',0xbb9990,'single',3,.062);
-  const hydroxide=particle(root,'hydroxide',0xa1bfb5,'double',3,.033);
-  const hydroxyl=particle(root,'hydroxyl',0xd28b9f,'double',3,.035);
-  const products=particle(root,'lipidProducts',0xbb8ba0,'cluster',4,.032);
+  const ferrous=particle(root,'fe2',0x6D9FC3,'single',3,.065);
+  const peroxide=particle(root,'h2o2',0xE5D8BE,'double',3,.052);
+  const ferric=particle(root,'fe3',0xE5D8BE,'single',3,.062);
+  const hydroxide=particle(root,'hydroxide',0x6D9FC3,'double',3,.033);
+  const hydroxyl=particle(root,'hydroxyl',0xE88A38,'double',3,.035);
+  const products=particle(root,'lipidProducts',0xE88A38,'cluster',4,.032);
   const pools={fe2:ferrous,h2o2:peroxide,fe3:ferric,hydroxide,hydroxyl,lipidProducts:products};
-  const labelAnchors=[label('membrane','Bicapa fosfolipídica',at(1.42,.5,.18),'right'),label('pufa','Cadenas poliinsaturadas',at(-2.4,.42,-.04)),
+  const labelAnchors=[label('membrane','Phospholipid bilayer',at(1.42,.5,.18),'right'),label('pufa','Polyunsaturated chains',at(-2.4,.42,-.04)),
     label('fe2','Fe²⁺',reaction.clone().add(v3(-.2,.24,0))),label('h2o2','H₂O₂',reaction.clone().add(v3(.46,.26,.06)),'right'),
     label('fe3','Fe³⁺',reaction.clone().add(v3(.05,.04,0))),label('hydroxide','OH⁻',reaction.clone().add(v3(.27,.10,.04)),'right'),
-    label('hydroxyl','•OH · reacción local',reaction.clone().add(v3(0,-.09,.06))),label('lipidProducts','Productos lipídicos · esquema',at(-2.1,.40,.19),'right')];
+    label('hydroxyl','•OH · local reaction',reaction.clone().add(v3(0,-.09,.06))),label('lipidProducts','Lipid products · schematic',at(-2.1,.40,.19),'right')];
   const keys=[['membrane','pufa'],['membrane','pufa','fe2','h2o2'],['membrane','pufa','fe2','h2o2','fe3','hydroxide','hydroxyl'],['membrane','pufa','fe2','h2o2','fe3','hydroxide','hydroxyl','lipidProducts']];
   let stage=0,oxidation=0;
   const site=i=>reaction.clone().add(v3((i-1)*.14,0,(i%2)*.12));
   function update({time=0,state={},stepIndex=0,elapsed=0,selected=null}={}) {
     stage=stages(stepIndex,4);time=clock(time);elapsed=clock(elapsed);oxidation=stage===3?bounded(state.oxidation)*.72:0;
     membrane.update(oxidation,selected==='membrane');selectMaterial(pufa.material,selected==='pufa');
-    pufa.material.color.set(0x93bcb0).lerp(new THREE.Color(0xbb7e97),oxidation*.85);
+    pufa.material.color.set(0x6D9FC3).lerp(new THREE.Color(0xE88A38),oxidation*.85);
     const phase=i=>stage<2?.05+.42*THREE.MathUtils.smoothstep(elapsed,0,8):fract(elapsed*.14+i*.29+.59);
     ferrous.update(stage>=1?3:0,(i,o)=>{const q=phase(i);o.position.copy(site(i));o.scale.setScalar(q<.53?1:.00001);});
     peroxide.update(stage>=1?3:0,(i,o)=>{const q=phase(i);o.position.copy(site(i)).add(v3((1-Math.min(1,q/.53))*.47,.13*(1-Math.min(1,q/.53)),.03));o.scale.setScalar(q<.53?1:.00001);});
@@ -104,32 +104,32 @@ export function createThreeNPEnvironment({texture}={}) {
     mesh.position.copy(anchor);mesh.quaternion.setFromUnitVectors(v3(0,1,0),towardMatrix);root.add(mesh);
     return {anchor,towardMatrix};
   }
-  const sdh=complex('sdh',[[0,-.015,0,.13,.12,.095],[-.075,.18,0,.12,.16,.10],[.08,.34,.015,.16,.14,.12],[-.08,.43,-.015,.11,.085,.09]],0x8eafa2);
+  const sdh=complex('sdh',[[0,-.015,0,.13,.12,.095],[-.075,.18,0,.12,.16,.10],[.08,.34,.015,.16,.14,.12],[-.08,.43,-.015,.11,.085,.09]],0x6D9FC3);
   const {anchor:sdhAnchor,towardMatrix}=attach(sdh,.42);
   const context=[];
   for(const [u,size] of [[.16,.78],[.63,.86],[.82,.62]]) {
-    const item=complex('respiratory',[[0,0,0,.13,.11,.10],[.02,.21,.01,.14,.18,.12],[-.12,.30,.01,.085,.08,.09]],0x9298ac,Math.round(u*100));
+    const item=complex('respiratory',[[0,0,0,.13,.11,.10],[.02,.21,.01,.14,.18,.12],[-.12,.30,.01,.085,.08,.09]],0x454B50,Math.round(u*100));
     item.scale.setScalar(size);attach(item,u);context.push(item);
   }
-  const synthase=complex('atpSynthase',[[0,0,0,.13,.12,.12],[0,.18,0,.037,.14,.037],[-.095,.36,0,.13,.12,.11],[.09,.36,.01,.13,.12,.11],[0,.40,.095,.10,.10,.095]],0xb39faa,94);
+  const synthase=complex('atpSynthase',[[0,0,0,.13,.12,.12],[0,.18,0,.037,.14,.037],[-.095,.36,0,.13,.12,.11],[.09,.36,.01,.13,.12,.11],[0,.40,.095,.10,.10,.095]],0xE5D8BE,94);
   attach(synthase,.72,.965);
   const activeSite=sdhAnchor.clone().addScaledVector(towardMatrix,.34);
   const matrixStart=activeSite.clone().add(v3(-.55,-.06,-.05));
   const qSite=mito.innerSurface(.49,.035);
-  const succinate=particle(root,'succinate',0xa0bfb0,'double',4,.040);
-  const fumarate=particle(root,'fumarate',0xb7c49d,'double',4,.037);
-  const quinone=particle(root,'ubiquinone',0xc7af85,'cluster',3,.035);
-  const electron=particle(root,'electronFlow',0xb0cad0,'single',4,.021);
-  const inhibitor=particle(root,'threeNP',0xcb9fa4,'filament',3,.061);
+  const succinate=particle(root,'succinate',0xE88A38,'double',4,.040);
+  const fumarate=particle(root,'fumarate',0xE5D8BE,'double',4,.037);
+  const quinone=particle(root,'ubiquinone',0xE5D8BE,'cluster',3,.035);
+  const electron=particle(root,'electronFlow',0xFAF8F2,'single',4,.021);
+  const inhibitor=particle(root,'threeNP',0xE88A38,'filament',3,.061);
   const pools={succinate,fumarate,ubiquinone:quinone,electronFlow:electron,threeNP:inhibitor};
-  const labelAnchors=[label('mitochondria','Membranas y crestas',v3(-1.70,-.40,.35)),label('sdh','SDH · complejo II',activeSite,'right'),
-    label('respiratory','Complejos I, III y IV · contexto',mito.innerSurface(.18,.025)),label('atpSynthase','ATP sintasa · contexto',synthase.position.clone(),'right'),
-    label('succinate','Succinato · matriz',matrixStart),label('fumarate','Fumarato · matriz',activeSite.clone().add(v3(.32,-.07,-.05)),'right'),
-    label('ubiquinone','Q · ubiquinona',qSite.clone(),'right'),label('electronFlow','Transferencia electrónica',qSite.clone().lerp(activeSite,.5)),
+  const labelAnchors=[label('mitochondria','Membranes and cristae',v3(-1.70,-.40,.35)),label('sdh','SDH · complex II',activeSite,'right'),
+    label('respiratory','Complexes I, III and IV · context',mito.innerSurface(.18,.025)),label('atpSynthase','ATP synthase · context',synthase.position.clone(),'right'),
+    label('succinate','Succinate · matrix',matrixStart),label('fumarate','Fumarate · matrix',activeSite.clone().add(v3(.32,-.07,-.05)),'right'),
+    label('ubiquinone','Q · ubiquinone',qSite.clone(),'right'),label('electronFlow','Electron transfer',qSite.clone().lerp(activeSite,.5)),
     label('threeNP','3-NP',matrixStart.clone().add(v3(.12,-.15,.08)))];
   const common=['mitochondria','sdh','respiratory','atpSynthase'];
   const keys=[common,[...common,'succinate','fumarate','ubiquinone','electronFlow'],[...common,'succinate','fumarate','ubiquinone','electronFlow','threeNP'],[...common,'ubiquinone','threeNP']];
-  const basal=sdh.material.color.clone(),inhibited=new THREE.Color(0xb38397);
+  const basal=sdh.material.color.clone(),inhibited=new THREE.Color(0xE88A38);
   let stage=0,inhibition=0,flux=0;
   function update({time=0,state={},stepIndex=0,selected=null}={}) {
     stage=stages(stepIndex,4);time=clock(time);inhibition=stage>=2?bounded(state.inhibition):0;
@@ -160,10 +160,10 @@ export function createThreeNPEnvironment({texture}={}) {
 export function createQuinEnvironment({texture}={}) {
   const base=createGlutamateEnvironment({texture}),root=base.root;
   root.name='QUIN potential mechanism, independent of homogenate observations';
-  const quin=particle(root,'quin',0xc19daf,'quinolinate',7,.068);
+  const quin=particle(root,'quin',0xE88A38,'quinolinate',7,.068);
   const allowed=new Set(['terminal','vesicles','ampa','nmda','spine','dendrite','mitochondria','calcium','ros']);
   const selectable=base.selectable.filter(object=>allowed.has(object.userData.key));selectable.push(quin.mesh);
-  const labelAnchors=base.labelAnchors.filter(anchor=>allowed.has(anchor.key));labelAnchors.push(label('quin','QUIN · extracelular',v3(-.25,.58,.60),'right'));
+  const labelAnchors=base.labelAnchors.filter(anchor=>allowed.has(anchor.key));labelAnchors.push(label('quin','QUIN · extracellular',v3(-.25,.58,.60),'right'));
   const common=['terminal','vesicles','ampa','nmda','spine','dendrite','mitochondria','quin'];
   const keys=[common,common,[...common,'calcium'],[...common,'calcium','ros'],[...common,'calcium','ros']];
   let stage=0,calcium=0,stress=0;

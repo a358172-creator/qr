@@ -23,7 +23,7 @@ export function createAfferentAxon(texture) {
   });
   geometry.translate(-1, -1, 0); geometry.scale(1 / .35, 1 / .35, 1 / .35);
   const p = geometry.attributes.position, colors = [], color = new THREE.Color();
-  const deep = new THREE.Color(0x73639b), pale = new THREE.Color(0xb2a2cf);
+  const deep = new THREE.Color(0x454B50), pale = new THREE.Color(0x6D9FC3);
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
     const n = .45 + .20 * Math.sin(x * 3.8 + y * 5.7) * Math.sin(z * 4.1 - y * 2.7) + .12 * Math.cos(x * 9 - y * 7 + z * 4);
@@ -32,5 +32,5 @@ export function createAfferentAxon(texture) {
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   const mesh = new THREE.Mesh(geometry, tissueMaterial(texture, { side: THREE.FrontSide }));
   mesh.position.set(1, 1, 0); mesh.scale.setScalar(.35);
-  mesh.name = 'Axón aferente'; return mesh;
+  mesh.name = 'Afferent axon'; return mesh;
 }

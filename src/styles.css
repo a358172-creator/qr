@@ -1,10 +1,17 @@
 :root {
-  color-scheme:dark;
-  --bg:#071923;
-  --text:#eee9e4;
-  --muted:#93aab4;
-  --cyan:#b2d6d7;
-  --line:#a5c5d125;
+  --ivory:#F3EFE4;
+  --warm-white:#FAF8F2;
+  --sand:#E5D8BE;
+  --orange:#E88A38;
+  --blue:#6D9FC3;
+  --slate:#454B50;
+  --gray:#A8A9A3;
+  color-scheme:light;
+  --bg:var(--ivory);
+  --text:var(--slate);
+  --muted:var(--slate);
+  --cyan:var(--blue);
+  --line:var(--sand);
   --serif:Georgia,'Times New Roman',serif;
   --sans:'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Consolas,monospace
@@ -51,12 +58,12 @@ a {
 }
 
 button:focus-visible,a:focus-visible,canvas:focus-visible,summary:focus-visible {
-  outline:2px solid var(--cyan);
+  outline:2px solid var(--slate);
   outline-offset:5px
 }
 
 button:hover {
-  color:#fff
+  color:#454B50
 }
 
 [hidden] {
@@ -64,8 +71,8 @@ button:hover {
 }
 
 ::selection {
-  background:#506071;
-  color:#fff
+  background:#E5D8BE;
+  color:#454B50
 }
 
 .skip-link {
@@ -88,7 +95,7 @@ button:hover {
   position:relative;
   isolation:isolate;
   overflow:hidden;
-  background:radial-gradient(ellipse at 53% 48%,#1d3040 0%,#112734 35%,#071923 74%)
+  background:radial-gradient(ellipse at 53% 48%,#FAF8F2 0%,#F3EFE4 35%,#F3EFE4 74%)
 }
 
 canvas {
@@ -107,7 +114,7 @@ canvas:active {
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:linear-gradient(180deg,#071923a3 0%,transparent 21%,transparent 76%,#071923df 100%);
+  background:linear-gradient(180deg,#F3EFE4a3 0%,transparent 21%,transparent 76%,#F3EFE4df 100%);
   z-index:1
 }
 
@@ -132,7 +139,7 @@ canvas:active {
 }
 
 .brand>span {
-  color:#acd3d8
+  color:#E88A38
 }
 
 .brand small {
@@ -155,13 +162,13 @@ canvas:active {
 
 .scale-navigation button {
   padding:10px 0;
-  color:#869fab;
+  color:#454B50;
   position:relative;
   transition:color .25s
 }
 
 .scale-navigation button[aria-current] {
-  color:#e6eeee
+  color:#454B50
 }
 
 .scale-navigation button[aria-current]:after {
@@ -176,7 +183,7 @@ canvas:active {
 }
 
 .scale-navigation>span {
-  color:#55717f;
+  color:#454B50;
   font-size:10px
 }
 
@@ -188,20 +195,20 @@ canvas:active {
 
 .header-actions button {
   font-size:11px;
-  color:#b4c7cb;
+  color:#454B50;
   padding:8px 0
 }
 
 .header-actions button span {
   margin-left:8px;
-  color:#b9d8d9
+  color:#454B50
 }
 
 .header-actions #help-btn {
   width:23px;
   height:23px;
   padding:0;
-  border:1px solid #adc8d246;
+  border:1px solid #454B5046;
   border-radius:50%;
   font:11px var(--serif)
 }
@@ -229,7 +236,7 @@ canvas:active {
   display:inline-block;
   width:4px;
   height:4px;
-  background:#b2d5d6;
+  background:#E88A38;
   border-radius:50%
 }
 
@@ -241,19 +248,19 @@ canvas:active {
 
 .scene-heading h1 em {
   font-weight:400;
-  color:#c2c8dc
+  color:#454B50
 }
 
 .scene-heading>p:last-of-type {
   font-size:11px;
   line-height:1.85;
-  color:#9db2bd
+  color:#454B50
 }
 
 .heading-line {
   width:36px;
   height:1px;
-  background:#b0c5cb50;
+  background:#E5D8BE50;
   margin-top:29px
 }
 
@@ -266,7 +273,7 @@ canvas:active {
   align-items:center;
   gap:21px;
   z-index:2;
-  color:#97aeba
+  color:#454B50
 }
 
 .scale-indicator>span {
@@ -279,7 +286,7 @@ canvas:active {
   display:block;
   width:1px;
   height:71px;
-  background:linear-gradient(#809dad60,#809dad15)
+  background:linear-gradient(#E5D8BE60,#E5D8BE15)
 }
 
 .scale-indicator b {
@@ -297,12 +304,12 @@ canvas:active {
 
 .specimen-note .eyebrow {
   font-size:7px;
-  color:#8ba7b4
+  color:#454B50
 }
 
 .specimen-note p {
   font:14px/1.65 var(--serif);
-  color:#c2cdd1;
+  color:#454B50;
   margin:12px 0 0
 }
 
@@ -331,27 +338,27 @@ canvas:active {
   gap:12px;
   min-height:32px;
   text-align:left;
-  color:#cad4de
+  color:#454B50
 }
 
 .hotspot-dot {
   width:9px;
   height:9px;
-  border:1px solid #c2ccddb3;
+  border:1px solid #454B50b3;
   border-radius:50%;
   display:block;
   flex:none;
   position:relative;
-  background:#0b1b2966;
-  box-shadow:0 0 0 5px #c5c4df0a
+  background:#E88A3866;
+  box-shadow:0 0 0 5px #E88A380a
 }
 
 .hotspot.available .hotspot-dot {
   width:11px;
   height:11px;
-  background:#e0d2e5;
-  border-color:#f2e1f3;
-  box-shadow:0 0 0 6px #d4c4e626,0 0 0 12px #d4c4e60c
+  background:#E88A38;
+  border-color:#E5D8BE;
+  box-shadow:0 0 0 6px #E88A3826,0 0 0 12px #E88A380c
 }
 
 .hotspot.visited .hotspot-dot:after {
@@ -367,8 +374,8 @@ canvas:active {
   line-height:1.7;
   letter-spacing:.01em;
   padding:7px 11px;
-  background:#081b25bd;
-  border-left:1px solid #b9c5d359;
+  background:#FAF8F2bd;
+  border-left:1px solid #454B5059;
   backdrop-filter:blur(8px)
 }
 
@@ -384,22 +391,22 @@ canvas:active {
 .hotspot-index {
   font:8px var(--mono);
   letter-spacing:.1em;
-  color:#a8c4cc;
+  color:#454B50;
   margin-right:9px
 }
 
 .hotspot.available:after {
   content:'↗';
   font-size:14px;
-  color:#c4d7e0;
+  color:#454B50;
   margin-left:-12px;
   padding:6px 10px 6px 0;
-  background:#081b25bd
+  background:#FAF8F2bd
 }
 
 .hotspot.available:hover .hotspot-title {
-  color:white;
-  background:#183442e6
+  color:#454B50;
+  background:#E5D8BEe6
 }
 
 .anatomy-label {
@@ -408,14 +415,14 @@ canvas:active {
   gap:8px;
   min-height:30px;
   font-size:10px;
-  color:#c8d4dc;
+  color:#454B50;
   padding:0
 }
 
 .anatomy-label span {
-  background:#081b25c9;
+  background:#FAF8F2c9;
   padding:4px 7px;
-  border:1px solid #9bb5c925;
+  border:1px solid #454B5025;
   backdrop-filter:blur(4px)
 }
 
@@ -423,7 +430,7 @@ canvas:active {
   width:32px;
   height:1px;
   position:relative;
-  background:#b9c7d960;
+  background:#E5D8BE60;
   display:block
 }
 
@@ -435,7 +442,7 @@ canvas:active {
   right:0;
   top:-1px;
   border-radius:50%;
-  background:#c5d6df
+  background:#E5D8BE
 }
 
 .anatomy-label[data-side=right] {
@@ -448,24 +455,24 @@ canvas:active {
 }
 
 .anatomy-label.selected span,.anatomy-label:hover span {
-  border-color:#b8d5d98f;
-  background:#183040e8
+  border-color:#6D9FC38f;
+  background:#E5D8BEe8
 }
 
 .anatomy-label[data-key=ampa] {
-  color:#afd4bc
+  color:#454B50
 }
 
 .anatomy-label[data-key=nmda] {
-  color:#c4b5e5
+  color:#454B50
 }
 
 .anatomy-label[data-key=calcium] {
-  color:#e0ada1
+  color:#454B50
 }
 
 .anatomy-label[data-key=glutamate] {
-  color:#e5c494
+  color:#454B50
 }
 
 .scene-footer {
@@ -486,7 +493,7 @@ canvas:active {
   display:flex;
   align-items:center;
   gap:13px;
-  color:#91aab7;
+  color:#454B50;
   font-size:10px
 }
 
@@ -494,7 +501,7 @@ canvas:active {
   width:20px;
   height:20px;
   fill:none;
-  stroke:#9dbec9;
+  stroke:#454B50;
   stroke-width:1.05;
   stroke-linecap:round;
   stroke-linejoin:round
@@ -502,19 +509,19 @@ canvas:active {
 
 .scene-hint b {
   font-weight:400;
-  color:#526e7d;
+  color:#454B50;
   margin:0 7px
 }
 
 .figure-note {
   font:7px var(--mono);
   letter-spacing:.14em;
-  color:#819fac
+  color:#454B50
 }
 
 .figure-note i {
   font-style:normal;
-  color:#54717f;
+  color:#454B50;
   margin:0 10px
 }
 
@@ -525,7 +532,7 @@ canvas:active {
 }
 
 .view-tools button {
-  color:#a3bdc6;
+  color:#454B50;
   font-size:10px;
   min-height:32px;
   display:flex;
@@ -540,10 +547,10 @@ canvas:active {
 .toggle {
   width:22px;
   height:11px;
-  border:1px solid #759ca9;
+  border:1px solid #6D9FC3;
   border-radius:9px;
   position:relative;
-  background:#648e963d
+  background:#6D9FC33d
 }
 
 .toggle:after {
@@ -552,14 +559,14 @@ canvas:active {
   width:5px;
   height:5px;
   border-radius:50%;
-  background:#bad5d8;
+  background:#6D9FC3;
   top:2px;
   right:2px
 }
 
 .view-tools button[aria-pressed=false] .toggle:after {
   right:12px;
-  background:#667e86
+  background:#6D9FC3
 }
 
 .narrative {
@@ -577,7 +584,7 @@ canvas:active {
   inset:-26px -34px -12px;
   z-index:-1;
   pointer-events:none;
-  background:linear-gradient(180deg,#07192300,#071923d9 24%,#071923f0);
+  background:linear-gradient(180deg,#F3EFE400,#F3EFE4d9 24%,#F3EFE4f0);
   mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)
 }
 
@@ -590,7 +597,7 @@ canvas:active {
 
 .narrative-caption>span {
   font:9px var(--mono);
-  color:#9fc4cd;
+  color:#454B50;
   white-space:nowrap;
   padding-top:7px
 }
@@ -605,7 +612,7 @@ canvas:active {
   font-size:11px;
   line-height:1.7;
   margin:0;
-  color:#adc0c9;
+  color:#454B50;
   max-width:585px
 }
 
@@ -629,15 +636,15 @@ canvas:active {
   right:0;
   top:6px;
   height:2px;
-  background:#7699ae36
+  background:#E5D8BE36
 }
 
 .timeline-track button[aria-current]:before {
-  background:#b4d2d9
+  background:#6D9FC3
 }
 
 .timeline-track button.done:before {
-  background:#8fabb4
+  background:#6D9FC3
 }
 
 .transport {
@@ -650,7 +657,7 @@ canvas:active {
 .transport button {
   min-width:29px;
   min-height:36px;
-  color:#c0d2d8;
+  color:#454B50;
   font-size:11px
 }
 
@@ -666,7 +673,7 @@ canvas:active {
 
 .transport #restart-btn {
   font-size:19px;
-  color:#8faab6
+  color:#454B50
 }
 
 .transport #back-btn {
@@ -678,7 +685,7 @@ canvas:active {
 }
 
 .transport #explore-btn[aria-pressed=true] {
-  color:#e9e0ee
+  color:#454B50
 }
 
 .transport-divider {
@@ -690,7 +697,7 @@ canvas:active {
 
 .structure-picker {
   position:relative;
-  color:#b7cbd3;
+  color:#454B50;
   font-size:10px;
   cursor:pointer;
   padding:10px 16px 10px 0
@@ -703,10 +710,10 @@ canvas:active {
   width:100%;
   opacity:0;
   cursor:pointer;
-  color:#dfebee;
-  background:#102734
+  color:#454B50;
+  background:#FAF8F2
 }
-.structure-picker:focus-within { outline:1px solid #b7cbd3; outline-offset:4px }
+.structure-picker:focus-within { outline:1px solid #6D9FC3; outline-offset:4px }
 @media(min-width:641px) and (max-width:1100px) {
   .atlas[data-view=synapse][data-section=true] .scene-heading h1,
   .atlas[data-view=synapse][data-section=true] .scene-heading .heading-line,
@@ -730,7 +737,7 @@ canvas:active {
 }
 
 .atlas[data-view=synapse] .figure-note {
-  color:#718f9b
+  color:#454B50
 }
 
 .atlas.transitioning .hotspots-layer,.atlas.transitioning .labels-layer {
@@ -752,9 +759,9 @@ canvas:active {
   overscroll-behavior:contain;
   z-index:8;
   padding:25px 27px;
-  background:#0b202bfa;
-  border:1px solid #a9beca32;
-  box-shadow:0 12px 45px #020c1333;
+  background:#FAF8F2fa;
+  border:1px solid #454B5032;
+  box-shadow:0 12px 45px #454B5033;
   backdrop-filter:blur(18px);
   animation:appear .25s ease-out
 }
@@ -765,7 +772,7 @@ canvas:active {
   z-index:1;
   margin:-25px -27px 12px;
   padding:25px 42px 1px 27px;
-  background:#0b202b;
+  background:#FAF8F2;
   border-bottom:1px solid var(--line)
 }
 
@@ -776,7 +783,7 @@ canvas:active {
 }
 
 .callout p:not(.eyebrow) {
-  color:#afc0c9;
+  color:#454B50;
   font-size:12px;
   line-height:1.75
 }
@@ -784,12 +791,12 @@ canvas:active {
 .observation {
   margin:16px 0;
   padding:0 0 0 12px;
-  border-left:2px solid #b8a7c27a
+  border-left:2px solid #E88A387a
 }
 .observation>span {
   font:8px var(--mono);
   letter-spacing:.1em;
-  color:#c5b7cf
+  color:#454B50
 }
 .observation p { margin:6px 0 0 }
 .inspect-button {
@@ -801,27 +808,27 @@ canvas:active {
   margin:14px 0;
   padding:9px 12px;
   font-size:11px;
-  color:#d9e3e7;
-  background:#acc6d20d;
-  border:1px solid #adc5d144
+  color:#454B50;
+  background:#E5D8BE0d;
+  border:1px solid #454B5044
 }
-.inspect-button:hover { background:#acc6d21c; border-color:#adc5d177 }
+.inspect-button:hover { background:#E5D8BE1c; border-color:#6D9FC377 }
 .detail-expansion { border-top:1px solid var(--line); padding-top:12px }
 .detail-expansion summary {
   cursor:pointer;
   font-size:11px;
-  color:#c7d6dd;
+  color:#454B50;
   line-height:1.7
 }
-.detail-expansion summary::marker { color:#bba7c5 }
-.detail-expansion[open] summary { color:#e1d4e6 }
+.detail-expansion summary::marker { color:#454B50 }
+.detail-expansion[open] summary { color:#454B50 }
 .detail-expansion p { margin-bottom:5px }
 
 .callout .detail-note {
   border-top:1px solid var(--line);
   padding-top:12px;
   font-size:9px!important;
-  color:#91a7b2!important
+  color:#454B50!important
 }
 
 .close {
@@ -831,7 +838,7 @@ canvas:active {
   width:32px;
   height:32px;
   font:25px var(--sans);
-  color:#9bb0bb
+  color:#454B50
 }
 
 .region-toast {
@@ -840,14 +847,14 @@ canvas:active {
   left:50%;
   transform:translateX(-50%);
   z-index:8;
-  background:#0c2331f2;
-  border:1px solid #adc7d235;
+  background:#FAF8F2f2;
+  border:1px solid #454B5035;
   padding:12px 23px;
   font-size:11px;
   text-align:center;
   max-width:calc(100% - 40px);
   width:max-content;
-  color:#bdd0d9
+  color:#454B50
 }
 
 .scene-loading,.scene-error {
@@ -868,16 +875,16 @@ canvas:active {
 
 .scene-loading small {
   font:9px var(--mono);
-  color:#829da8;
+  color:#454B50;
   letter-spacing:.09em
 }
 
 .loading-orbit {
   width:40px;
   height:40px;
-  border:1px solid #b6cadd28;
-  border-top-color:#c3b9d2;
-  border-right-color:#c3b9d27a;
+  border:1px solid #454B5028;
+  border-top-color:#E5D8BE;
+  border-right-color:#454B507a;
   border-radius:50%;
   animation:orbit 2s linear infinite
 }
@@ -897,25 +904,25 @@ canvas:active {
 }
 
 .scene-error button {
-  color:var(--cyan);
+  color:var(--slate);
   padding:16px;
   border-bottom:1px solid var(--line)
 }
 
 dialog {
   position:fixed;
-  background:#0c212d;
+  background:#FAF8F2;
   color:var(--text);
-  border:1px solid #9fb7c338;
+  border:1px solid #454B5038;
   padding:45px 48px;
   width:min(690px,calc(100% - 36px));
   max-height:85svh;
   overflow:auto;
-  box-shadow:0 35px 130px #02090d99
+  box-shadow:0 35px 130px #454B5099
 }
 
 dialog::backdrop {
-  background:#031019b5;
+  background:#454B50b5;
   backdrop-filter:blur(8px)
 }
 
@@ -928,7 +935,7 @@ dialog h2 {
 dialog>p:not(.eyebrow) {
   font-size:12px;
   line-height:1.8;
-  color:#b1c2cb
+  color:#454B50
 }
 
 .reference-list {
@@ -946,14 +953,14 @@ dialog>p:not(.eyebrow) {
 
 .reference-list li>span {
   font:9px var(--mono);
-  color:var(--cyan);
+  color:var(--slate);
   padding-top:4px
 }
 
 .reference-list a {
   font:16px/1.5 var(--serif);
   text-decoration:none;
-  color:#d7dfe3
+  color:#454B50
 }
 
 .reference-list a:hover {
@@ -963,7 +970,7 @@ dialog>p:not(.eyebrow) {
 
 .reference-list a span {
   font:12px var(--sans);
-  color:var(--cyan)
+  color:var(--slate)
 }
 
 .reference-list p {
@@ -983,12 +990,12 @@ dl {
 dt {
   font-size:12px;
   margin-top:20px;
-  color:#d2dce1
+  color:#454B50
 }
 
 dd {
   font-size:11px;
-  color:#9eb4c0;
+  color:#454B50;
   margin:5px 0 0;
   line-height:1.8
 }
@@ -1365,7 +1372,7 @@ dd {
 
 /* Quiet margins let the specimen occupy the field without covering its reading aids. */
 .atmosphere {
-  background:linear-gradient(90deg,#071923c9 0%,#07192355 12%,transparent 29%),linear-gradient(180deg,#071923d1 0%,transparent 18%,transparent 64%,#071923f2 94%)
+  background:linear-gradient(90deg,#F3EFE4c9 0%,#F3EFE455 12%,transparent 29%),linear-gradient(180deg,#F3EFE4d1 0%,transparent 18%,transparent 64%,#F3EFE4f2 94%)
 }
 
 .hotspot.flipped {
@@ -1403,7 +1410,7 @@ dd {
     top:141px
   }
   .atmosphere {
-    background:linear-gradient(180deg,#071923e8 0%,#07192355 14%,transparent 32%,transparent 61%,#071923ee 84%),linear-gradient(90deg,#07192366,transparent 35%)
+    background:linear-gradient(180deg,#F3EFE4e8 0%,#F3EFE455 14%,transparent 32%,transparent 61%,#F3EFE4ee 84%),linear-gradient(90deg,#F3EFE466,transparent 35%)
   }
   .hotspot-title {
     max-width:230px;

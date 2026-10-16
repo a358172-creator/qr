@@ -5,30 +5,30 @@ import { figureSource } from './figure-source.js';
 const base = import.meta.env?.BASE_URL ?? './';
 export const AGES = [3, 5, 9, 12, 30].map(day => ({ id: `PN${day}`, day }));
 export const EXPOSURES = [
-  { id: 'control', label: 'Control', concentration: '', mechanismKey: 'e-control', atlasTarget: 'mitochondrial', mechanism: 'La bicapa y la mitocondria ofrecen una referencia anatómica para explorar los mecanismos celulares.' },
-  { id: 'feso4', label: 'FeSO₄', concentration: '1 mM', mechanismKey: 'e-feso4', atlasTarget: 'mitochondrial', mechanism: 'El hierro redox-activo puede participar en la reacción de Fenton y favorecer oxidación lipídica localizada.' },
-  { id: 'quin', label: 'QUIN', concentration: '100 µM', mechanismKey: 'e-quin', atlasTarget: 'glutamate', mechanism: 'QUIN puede activar NMDAR y favorecer desregulación de Ca²⁺. Coagonistas, voltaje y duración de la estimulación condicionan la respuesta.' },
-  { id: '3np', label: '3-NP', concentration: '3 mM', mechanismKey: 'e-3np', atlasTarget: 'mitochondrial', mechanism: '3-NP puede inactivar SDH/complejo II y reducir la transferencia de electrones hacia ubiquinona, un mecanismo descrito en la literatura.' },
+  { id: 'control', label: 'Control', concentration: '', mechanismKey: 'e-control', atlasTarget: 'mitochondrial', mechanism: 'The bilayer and mitochondrion provide an anatomical reference for exploring cellular mechanisms.' },
+  { id: 'feso4', label: 'FeSO₄', concentration: '1 mM', mechanismKey: 'e-feso4', atlasTarget: 'mitochondrial', mechanism: 'Redox-active iron can participate in the Fenton reaction and promote localized lipid oxidation.' },
+  { id: 'quin', label: 'QUIN', concentration: '100 µM', mechanismKey: 'e-quin', atlasTarget: 'glutamate', mechanism: 'QUIN can activate NMDAR and promote Ca²⁺ dysregulation. Coagonists, voltage and stimulation duration condition the response.' },
+  { id: '3np', label: '3-NP', concentration: '3 mM', mechanismKey: 'e-3np', atlasTarget: 'mitochondrial', mechanism: '3-NP can inactivate SDH/complex II and reduce electron transfer to ubiquinone, a mechanism described in the literature.' },
 ];
 // Internal source interpretation: retain the approved clarification and literal
 // figure legend for traceability. Neither note is part of the public presentation.
 export const MTT_NOTE = 'Nota editorial: el pie original indica «a p<0.05 vs. PN3», pero PN3 no está representado y aparecen asteriscos, no letras a. Según la aclaración del autor, probablemente señalan p<0.05 frente al control de cada edad. Es una interpretación propuesta del pie, no verificada independientemente; se conservan exactamente los símbolos y no se recalculan pruebas ni valores.';
 export const TBARS_NOTE = 'Aclaración del investigador: QUIN no mostró un patrón consistente de incremento de peroxidación lipídica entre las edades evaluadas. La figura conserva diferencias significativas respecto al control en condiciones tempranas, indicadas por asteriscos en PN3 y PN5. No se generaliza el efecto a todas las edades ni se recalculan resultados.';
 const methods = {
-  dcfda: { label: 'DCFDA', title: 'Señal oxidativa · DCFDA', unit: 'oxidacion de DCFA (μM/ug proteina)', displayUnit: 'µM/µg proteína',
-    caption: 'Señal oxidativa durante el desarrollo posnatal tras la exposición a diferentes toxinas.',
-    method: 'Evaluación indirecta de procesos oxidativos mediante una señal fluorescente generada a partir de la sonda.',
-    limitation: 'La señal integra la química de la sonda y las condiciones del ensayo; no identifica una especie reactiva ni una fuente celular específica.',
-    statisticalNotes: 'El pie define a p<0.05 frente a PN5. Esa comparación entre edades no equivale a una comparación de cada exposición frente a su control.' },
-  tbars: { label: 'TBARS', title: 'Peroxidación lipídica · TBARS', unit: 'µM MDA/mg proteina', displayUnit: 'µM MDA/mg proteína',
-    caption: 'Peroxidación lipídica durante el desarrollo posnatal tras la exposición a diferentes toxinas.',
-    method: 'Evaluación de sustancias reactivas al ácido tiobarbitúrico relacionadas con productos de oxidación lipídica, expresadas en términos de MDA.',
-    limitation: 'La reacción integra diversos productos de oxidación lipídica; su señal no corresponde exclusivamente a una molécula.',
-    statisticalNotes: 'El pie define a p<0.05 frente a PN3 y * p<0.05 frente al control de cada edad posnatal. Los símbolos originales se conservan sin desplazamientos.' },
-  mtt: { label: 'MTT', title: 'Capacidad reductora · MTT', unit: 'MTT reduction (%)', displayUnit: 'Reducción de MTT (%)',
-    caption: 'Capacidad reductora durante el desarrollo posnatal tras la exposición a diferentes toxinas.',
-    method: 'Evaluación de capacidad reductora mediante la conversión de MTT a formazán, expresada en porcentaje.',
-    limitation: 'La señal reúne la contribución de distintos sistemas reductores y se interpreta como capacidad reductora, no como una medida directa de viabilidad neuronal, SDH, ATP o respiración.', statisticalNotes: MTT_NOTE },
+  dcfda: { label: 'DCFDA', title: 'Oxidative signal · DCFDA', unit: 'oxidacion de DCFA (μM/ug proteina)', displayUnit: 'µM/µg protein',
+    caption: 'Oxidative signaling during postnatal development following exposure to different toxins.',
+    method: 'Indirect assessment of oxidative processes through a fluorescent signal generated from the probe.',
+    limitation: 'The signal integrates probe chemistry and assay conditions; it does not identify a specific reactive species or cellular source.',
+    statisticalNotes: 'The legend defines a p<0.05 versus PN5. This comparison between ages is not equivalent to comparing each exposure with its control.' },
+  tbars: { label: 'TBARS', title: 'Lipid peroxidation · TBARS', unit: 'µM MDA/mg proteina', displayUnit: 'µM MDA/mg protein',
+    caption: 'Lipid peroxidation during postnatal development following exposure to different toxins.',
+    method: 'Assessment of thiobarbituric acid-reactive substances related to lipid oxidation products, expressed in terms of MDA.',
+    limitation: 'The reaction integrates various lipid oxidation products; its signal does not correspond exclusively to one molecule.',
+    statisticalNotes: 'The legend defines a p<0.05 versus PN3 and * p<0.05 versus the control at each postnatal age. Original symbols retain their positions.' },
+  mtt: { label: 'MTT', title: 'Reducing capacity · MTT', unit: 'MTT reduction (%)', displayUnit: 'MTT reduction (%)',
+    caption: 'Reducing capacity during postnatal development following exposure to different toxins.',
+    method: 'Assessment of reducing capacity through conversion of MTT to formazan, expressed as a percentage.',
+    limitation: 'The signal combines contributions from different reducing systems and is interpreted as reducing capacity, rather than a direct measure of neuronal viability, SDH, ATP or respiration.', statisticalNotes: MTT_NOTE },
 };
 export const ASSAYS = figureSource.figures.map(source => ({
   id: source.assay, ...methods[source.assay], ages: [...source.ages],
@@ -41,22 +41,22 @@ export function getEvidence(age, exposure, assayId) {
   const assay = ASSAYS.find(item => item.id === assayId);
   const status = assay.ages.includes(age) ? 'available' : 'not-evaluated';
   const provenance = `Figura ${figureSource.figures.find(item => item.assay === assayId).figure} de graficas.docx. Vector EMF original conservado; SVG para visualización. No se aportó Excel ni tabla de medias y SEM. El resaltado usa coordenadas gráficas, sin convertirlas a valores experimentales.`;
-  if (status === 'not-evaluated') return { status, mean: null, sem: null, summary: 'No evaluado: MTT se presenta para PN5, PN9, PN12 y PN30.', comparison: '', statisticalCaution: MTT_NOTE, provenance };
+  if (status === 'not-evaluated') return { status, mean: null, sem: null, summary: 'Not evaluated: MTT is presented for PN5, PN9, PN12 and PN30.', comparison: '', statisticalCaution: MTT_NOTE, provenance };
   let summary;
-  if (exposure === 'control') summary = `Control de ${age}: referencia experimental para las exposiciones de la misma edad posnatal.`;
+  if (exposure === 'control') summary = `Control at ${age}: experimental reference for exposures at the same postnatal age.`;
   else if (exposure === 'quin') summary = assayId === 'tbars'
-    ? (['PN3', 'PN5'].includes(age) ? `QUIN en ${age}: diferencia significativa respecto al control de la misma edad (* p<0.05). En conjunto, QUIN no mostró un patrón consistente de incremento de TBARS entre las edades evaluadas.` : 'QUIN no mostró un patrón consistente de incremento de TBARS entre las edades evaluadas; las diferencias significativas se observaron en condiciones tempranas.')
-    : 'No se detectaron diferencias estadísticamente significativas tras la exposición aguda a QUIN en este ensayo.';
+    ? (['PN3', 'PN5'].includes(age) ? `QUIN at ${age}: significant difference versus the control at the same age (* p<0.05). Overall, QUIN did not show a consistent pattern of increased TBARS across the ages evaluated.` : 'QUIN did not show a consistent pattern of increased TBARS across the ages evaluated; significant differences were observed in early conditions.')
+    : 'No statistically significant differences were detected following acute QUIN exposure in this assay.';
   else if (assayId === 'dcfda') summary = exposure === 'feso4'
-    ? 'No se detectó un incremento significativo de DCFDA con FeSO₄. TBARS y MTT describen otras dimensiones de la respuesta.'
-    : 'La señal DCFDA describe procesos oxidativos y complementa los resultados de TBARS y MTT.';
-  else if (assayId === 'tbars' && exposure === 'feso4') summary = 'El estudio documenta aumento de TBARS con FeSO₄. La figura presenta la respuesta correspondiente a cada edad posnatal.';
-  else if (assayId === 'mtt' && exposure === '3np') summary = 'El estudio documenta disminución de la señal MTT con 3-NP, indicativa de cambios en la capacidad reductora.';
-  else if (assayId === 'mtt') summary = 'El estudio documenta cambios de la señal MTT con FeSO₄. La figura presenta la respuesta de cada edad posnatal.';
-  else summary = 'La figura presenta la señal TBARS tras la exposición a 3-NP junto al control correspondiente a la misma edad posnatal.';
+    ? 'No significant increase in DCFDA was detected with FeSO₄. TBARS and MTT describe other dimensions of the response.'
+    : 'The DCFDA signal describes oxidative processes and complements the TBARS and MTT results.';
+  else if (assayId === 'tbars' && exposure === 'feso4') summary = 'The study documents increased TBARS with FeSO₄. The figure presents the response at each postnatal age.';
+  else if (assayId === 'mtt' && exposure === '3np') summary = 'The study documents a decreased MTT signal with 3-NP, indicating changes in reducing capacity.';
+  else if (assayId === 'mtt') summary = 'The study documents changes in the MTT signal with FeSO₄. The figure presents the response at each postnatal age.';
+  else summary = 'The figure presents the TBARS signal following 3-NP exposure alongside the control at the same postnatal age.';
   return {
     status, mean: null, sem: null, summary,
-    comparison: 'Referencia: control correspondiente a la misma edad posnatal.',
+    comparison: 'Reference: control at the same postnatal age.',
     statisticalCaution: assayId === 'mtt' ? MTT_NOTE : assayId === 'tbars' && exposure === 'quin' ? TBARS_NOTE : assay.statisticalNotes,
     provenance,
   };
@@ -70,11 +70,11 @@ export function getEvidencePresentation(age, exposure, assayId) {
   const assay = ASSAYS.find(item => item.id === assayId);
   return {
     status: result.status, summary: result.summary, comparison: result.comparison,
-    unit: `Unidad: ${assay.displayUnit}.`,
-    sample: result.status === 'available' ? 'Media ± SEM, n = 5–6.' : '',
-    statistics: result.status === 'available' ? 'Comparaciones estadísticas según la figura original.' : '',
+    unit: `Unit: ${assay.displayUnit}.`,
+    sample: result.status === 'available' ? 'Mean ± SEM, n = 5–6.' : '',
+    statistics: result.status === 'available' ? 'Statistical comparisons follow the original figure.' : '',
     caption: assay.caption,
-    source: 'Figura original del análisis experimental.',
+    source: 'Original figure from the experimental analysis.',
   };
 }
 
@@ -89,14 +89,14 @@ export function visualSelection(assayId, age, exposure) {
 }
 
 export const REFERENCES = [
-  { title: 'Lloyd, Hanna y Mason (1997) · Reacción de Fenton', url: 'https://pubmed.ncbi.nlm.nih.gov/9119257/', note: 'Química de formación del radical hidroxilo.' },
-  { title: 'Heyes et al. (1993) · Vía de las quinureninas', url: 'https://pubmed.ncbi.nlm.nih.gov/8293279/', note: 'Contexto metabólico de QUIN en otras preparaciones.' },
-  { title: 'Knight et al. (1988) · Especificidad de TBARS', url: 'https://pubmed.ncbi.nlm.nih.gov/3197281/', note: 'La reacción no identifica exclusivamente MDA.' },
-  { title: 'PubChem · Ácido quinolínico, CID 1066', url: 'https://pubchem.ncbi.nlm.nih.gov/compound/1066', note: 'Estructura química del ácido quinolínico.' },
-  { title: 'Huang et al. (2006) · 3-NP y complejo II', url: 'https://pubmed.ncbi.nlm.nih.gov/16371358/', note: 'Estudio estructural del mecanismo de inactivación de SDH.' },
-  { title: 'Perkins y Stone (1983) · QUIN y receptores excitadores', url: 'https://pubmed.ncbi.nlm.nih.gov/6308211/', note: 'Farmacología primaria del potencial excitador de QUIN.' },
-  { title: 'LeBel, Ischiropoulos y Bondy (1992) · Sonda DCFH', url: 'https://doi.org/10.1021/tx00026a012', note: 'Dependencia química y límites de interpretación de la señal fluorescente.' },
-  { title: 'Ohkawa, Ohishi y Yagi (1979) · Reacción de ácido tiobarbitúrico', url: 'https://pubmed.ncbi.nlm.nih.gov/36810/', note: 'Método de referencia para productos de peroxidación lipídica.' },
-  { title: 'Berridge y Tan (1993) · Reducción celular de MTT', url: 'https://pubmed.ncbi.nlm.nih.gov/8390225/', note: 'Contribuciones reductoras que impiden equiparar MTT con actividad específica de complejo II.' },
-  { title: 'Bates et al. (1994) · Desarrollo y metabolismo mitocondrial cerebral', url: 'https://pubmed.ncbi.nlm.nih.gov/7768212/', note: 'Contexto del desarrollo posnatal y metabolismo energético cerebral.' },
+  { title: 'Lloyd, Hanna and Mason (1997) · Fenton reaction', url: 'https://pubmed.ncbi.nlm.nih.gov/9119257/', note: 'Chemistry of hydroxyl radical formation.' },
+  { title: 'Heyes et al. (1993) · Kynurenine pathway', url: 'https://pubmed.ncbi.nlm.nih.gov/8293279/', note: 'Metabolic context of QUIN in other preparations.' },
+  { title: 'Knight et al. (1988) · TBARS specificity', url: 'https://pubmed.ncbi.nlm.nih.gov/3197281/', note: 'The reaction does not exclusively identify MDA.' },
+  { title: 'PubChem · Quinolinic acid, CID 1066', url: 'https://pubchem.ncbi.nlm.nih.gov/compound/1066', note: 'Chemical structure of quinolinic acid.' },
+  { title: 'Huang et al. (2006) · 3-NP and complex II', url: 'https://pubmed.ncbi.nlm.nih.gov/16371358/', note: 'Structural study of the SDH inactivation mechanism.' },
+  { title: 'Perkins and Stone (1983) · QUIN and excitatory receptors', url: 'https://pubmed.ncbi.nlm.nih.gov/6308211/', note: 'Primary pharmacology of the excitatory potential of QUIN.' },
+  { title: 'LeBel, Ischiropoulos and Bondy (1992) · DCFH probe', url: 'https://doi.org/10.1021/tx00026a012', note: 'Chemical dependence and limits of fluorescent signal interpretation.' },
+  { title: 'Ohkawa, Ohishi and Yagi (1979) · Thiobarbituric acid reaction', url: 'https://pubmed.ncbi.nlm.nih.gov/36810/', note: 'Reference method for lipid peroxidation products.' },
+  { title: 'Berridge and Tan (1993) · Cellular MTT reduction', url: 'https://pubmed.ncbi.nlm.nih.gov/8390225/', note: 'Reducing contributions that prevent equating MTT with specific complex II activity.' },
+  { title: 'Bates et al. (1994) · Development and brain mitochondrial metabolism', url: 'https://pubmed.ncbi.nlm.nih.gov/7768212/', note: 'Context of postnatal development and brain energy metabolism.' },
 ];

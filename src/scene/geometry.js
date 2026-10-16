@@ -56,8 +56,8 @@ export function membraneSurface(profile, kind) {
   };
   const geometry = gridGeometry(112, 100, sample);
   const position = geometry.attributes.position, colors = [], color = new THREE.Color();
-  const pale = new THREE.Color(kind === 'pre' ? 0xb2a2cf : 0xc3a1b5);
-  const deep = new THREE.Color(kind === 'pre' ? 0x73639b : 0x967693);
+  const pale = new THREE.Color(kind === 'pre' ? 0x6D9FC3 : 0xE5D8BE);
+  const deep = new THREE.Color(kind === 'pre' ? 0x454B50 : 0xA8A9A3);
   for (let i = 0; i < position.count; i++) {
     const x = position.getX(i), y = position.getY(i), z = position.getZ(i);
     const n = .45 + .20 * Math.sin(x * 3.8 + y * 5.7) * Math.sin(z * 4.1 - y * 2.7)
@@ -143,10 +143,10 @@ export function surfaceTexture() {
 export function tissueMaterial(texture, options = {}) {
   const { fadeBase = false, relief = .008, ...materialOptions } = options;
   const mat = new THREE.MeshPhysicalMaterial({
-    color: 0xf7efff, vertexColors: true, roughness: .64, metalness: 0,
+    color: 0xFAF8F2, vertexColors: true, roughness: .64, metalness: 0,
     transparent: true, opacity: .90, depthWrite: false, side: THREE.DoubleSide,
     forceSinglePass: true, bumpMap: texture, bumpScale: .024,
-    sheen: .28, sheenColor: new THREE.Color(0xd6c8ef), sheenRoughness: .69,
+    sheen: .28, sheenColor: new THREE.Color(0xFAF8F2), sheenRoughness: .69,
     clearcoat: .04, clearcoatRoughness: .48,
     ...materialOptions,
   });

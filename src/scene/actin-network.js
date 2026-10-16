@@ -99,7 +99,7 @@ export function createActinNetwork({ texture } = {}) {
   const root = new THREE.Group();
   root.name = 'Three-dimensional postsynaptic actin network';
   const paths = makeSkeleton(), indices = [], colors = [], uvs = [];
-  const dark = new THREE.Color(0x79435f), light = new THREE.Color(0xc37b9e), color = new THREE.Color();
+  const dark = new THREE.Color(0x454B50), light = new THREE.Color(0xE88A38), color = new THREE.Color();
   let vertexCount = 0;
   for (const path of paths) {
     path.offset = vertexCount;
@@ -141,15 +141,15 @@ export function createActinNetwork({ texture } = {}) {
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   const material = organicMaterial({
-    roughness: .64, clearcoat: .025, sheen: .17, sheenColor: new THREE.Color(0xb58ba8),
-    bumpMap: texture ?? null, bumpScale: .003, emissive: 0x793754, emissiveIntensity: .018,
+    roughness: .64, clearcoat: .025, sheen: .17, sheenColor: new THREE.Color(0xE5D8BE),
+    bumpMap: texture ?? null, bumpScale: .003, emissive: 0xE88A38, emissiveIntensity: .018,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'Curved and branched F-actin filaments';
   mesh.userData.key = 'actin';
   root.add(mesh);
   const labelPosition = point(-.55, -1.39, .41);
-  const labelAnchors = [{ key: 'actin', name: 'Actina', position: labelPosition, side: 'left', priority: 5 }];
+  const labelAnchors = [{ key: 'actin', name: 'Actin', position: labelPosition, side: 'left', priority: 5 }];
   const head = p => smooth(p.y, -2.1, -1.2);
   const rotationAxis = point(.2,.85,.35).normalize();
   const frame = { time: 0, remodeling: 0 };
